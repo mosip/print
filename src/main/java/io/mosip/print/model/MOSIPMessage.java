@@ -1,7 +1,7 @@
 package io.mosip.print.model;
 
 //JSON Serializable
-public class Message {
+public class MOSIPMessage {
     private String publisher;
     private String topic;
     private String publishedOn;
@@ -30,7 +30,7 @@ public class Message {
  }
 
  public String getPayload(){
-
+  return payload;
  }
 
  // Setter Methods 

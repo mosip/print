@@ -20,6 +20,9 @@ implements ApplicationListener<ApplicationReadyEvent> {
   @Value("${mosip.event.hubURL}")
   private String hubURL;
   
+  @Value("${mosip.event.callbackURL}")
+  private String callbackURL;
+
   @Value("${mosip.event.topic}")
   private String topic;
 
@@ -34,6 +37,7 @@ implements ApplicationListener<ApplicationReadyEvent> {
     
     SubscriptionChangeRequest subscriptionChangeRequest = new SubscriptionChangeRequest();
     subscriptionChangeRequest.setHubURL(hubURL);
+    subscriptionChangeRequest.setCallbackURL(callbackURL);
     subscriptionChangeRequest.setTopic(topic);
     subscriptionChangeRequest.setSecret(secret);
     //subscriptionChangeRequest.setLeaseSeconds(leaseSeconds);

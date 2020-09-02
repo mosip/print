@@ -2,6 +2,9 @@ package io.mosip.print.service;
 
 import java.util.Map;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class PrintService {
     
     public String print(Map map){
