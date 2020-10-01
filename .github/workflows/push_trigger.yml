@@ -115,7 +115,7 @@ jobs:
     env:
       NAMESPACE: ${{ secrets.dev_namespace_docker_hub }}
       SERVICE_NAME: print
-      SERVICE_LOCATION: 
+      SERVICE_LOCATION: print
 
     steps:
       - uses: actions/checkout@v2
