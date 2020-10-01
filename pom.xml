@@ -118,20 +118,19 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${spring.boot.version}</version>
+				<configuration>
+					<executable>true</executable>
+					<layout>ZIP</layout>
+				</configuration>
 				<executions>
 					<execution>
-					  
-					  <configuration>
-						<rules>
-						  <bannedDependencies>
-							<excludes>
-							  <exclude>io.mosip.kernel:kernel-parent</exclude>
-							</excludes>
-						  </bannedDependencies>
-						</rules>
-					  </configuration>
+						<goals>
+							<goal>build-info</goal>
+							<goal>repackage</goal>
+						</goals>
 					</execution>
-				  </executions>
+				</executions>
 			</plugin>
 			<plugin>
 				<artifactId>maven-enforcer-plugin</artifactId>
