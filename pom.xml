@@ -9,10 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>io.mosip.print</groupId>
-	<artifactId>mosip_print</artifactId>
+	<artifactId>print</artifactId>
 	<version>1.1.2-SNAPSHOT</version>
-	<name>demo</name>
-	<description>Demo project for Spring Boot</description>
+	<name>print</name>
 
 	<properties>
 		<java.version>11</java.version>
