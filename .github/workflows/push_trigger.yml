@@ -137,7 +137,7 @@ jobs:
           xpath: /*[local-name()="project"]/*[local-name()="version"] 
       
       - name: Unzip and extract the print
-        run: unzip -uj "release.zip" "${{ env.SERVICE_LOCATION }}/target/*" -d "${{ env.SERVICE_LOCATION }}/target"
+        run: unzip -uj "release.zip" "target/*" -d "target"
       
       - name: Build image
         run: |
