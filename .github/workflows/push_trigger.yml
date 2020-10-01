@@ -115,7 +115,7 @@ jobs:
     env:
       NAMESPACE: ${{ secrets.dev_namespace_docker_hub }}
       SERVICE_NAME: print
-      SERVICE_LOCATION: print
+      SERVICE_LOCATION: 
 
     steps:
       - uses: actions/checkout@v2
@@ -133,7 +133,7 @@ jobs:
         id: getPomVersion
         uses: mavrosxristoforos/get-xml-info@1.0
         with:
-          xml-file: ./${{ env.SERVICE_LOCATION }}/pom.xml 
+          xml-file: ${{ env.SERVICE_LOCATION }}/pom.xml 
           xpath: /*[local-name()="project"]/*[local-name()="version"] 
       
       - name: Unzip and extract the print
@@ -141,7 +141,7 @@ jobs:
       
       - name: Build image
         run: |
-          cd "./${{env.SERVICE_LOCATION}}"
+          cd "${{env.SERVICE_LOCATION}}"
           docker build . --file Dockerfile --tag ${{ env.SERVICE_NAME }}
       - name: Log into registry
         run: echo "${{ secrets.release_docker_hub }}" | docker login -u ${{ secrets.actor_docker_hub }} --password-stdin
