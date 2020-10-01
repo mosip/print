@@ -194,10 +194,11 @@
 								</goals>
 							</execution>
 				            </executions>
+
 				</plugin>-->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-javadoc-plugin</artifactId>
+          <artifactId>maven-javadoc-plugin</artifactId>
 					<configuration>
 						<aggregate>true</aggregate>
 						<doclint>none</doclint>
@@ -300,7 +301,6 @@
                         </execution>
                   </executions>
                 </plugin>
-
       
                 <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
