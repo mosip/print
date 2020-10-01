@@ -115,7 +115,7 @@ jobs:
     env:
       NAMESPACE: ${{ secrets.dev_namespace_docker_hub }}
       SERVICE_NAME: print
-      SERVICE_LOCATION: print
+      SERVICE_LOCATION: 
 
     steps:
       - uses: actions/checkout@v2
@@ -137,7 +137,7 @@ jobs:
           xpath: /*[local-name()="project"]/*[local-name()="version"] 
       
       - name: Unzip and extract the print
-        run: unzip -uj "release.zip" "${{ env.SERVICE_LOCATION }}/target/*" -d "./${{ env.SERVICE_LOCATION }}/target"
+        run: unzip -uj "release.zip" "${{ env.SERVICE_LOCATION }}/target/*" -d "${{ env.SERVICE_LOCATION }}/target"
       
       - name: Build image
         run: |
