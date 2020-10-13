@@ -1,7 +1,6 @@
 package io.mosip.print.exception;
 
 import io.mosip.kernel.core.exception.BaseUncheckedException;
-import io.mosip.print.exception.PlatformErrorMessages;
 
 public class AccessDeniedException extends BaseUncheckedException {
 
@@ -15,6 +14,7 @@ public class AccessDeniedException extends BaseUncheckedException {
 		super();
 
 	}
+
 
 	/**
 	 * Instantiates a new access denied exception.

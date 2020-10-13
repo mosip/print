@@ -27,12 +27,15 @@ public class WebSubSubscriptionHelper {
 	@Value("${mosip.event.secret}")
 	private String webSubSecret;
 
-	@Value("${CALLBACKURL}")
+	@Value("${mosip.event.callBackUrl}")
 	private String callBackUrl;
 
 	/** The config server file storage URL. */
-	@Value("${mosip.partnerhuburl}")
-	private String partnerhuburl;
+	// @Value("${mosip.partnerhuburl}")
+	/// private String partnerhuburl;
+
+	@Value("${mosip.event.topic}")
+	private String topic;
 
 	@Autowired
 	private PublisherClient<String, EventModel, HttpHeaders> pb;
@@ -54,9 +57,9 @@ public class WebSubSubscriptionHelper {
 		try {
 			SubscriptionChangeRequest subscriptionRequest = new SubscriptionChangeRequest();
 			subscriptionRequest.setCallbackURL(callBackUrl);
-			subscriptionRequest.setHubURL(webSubHubUrl);
+			subscriptionRequest.setHubURL(webSubHubUrl + "/hub");
 			subscriptionRequest.setSecret(webSubSecret);
-			subscriptionRequest.setTopic("CREDENTIAL_STATUS_UPDATE");
+			subscriptionRequest.setTopic(topic);
 			sb.subscribe(subscriptionRequest);
 		} catch (WebSubClientException e) {
 			LOGGER.info("NotifyPrint", WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION, "websub subscription error");
@@ -65,7 +68,7 @@ public class WebSubSubscriptionHelper {
 
 	private void registerTopic() {
 		try {
-			pb.registerTopic("CREDENTIAL_STATUS_UPDATE", partnerhuburl);
+			pb.registerTopic("792112/CREDENTIAL_ISSUED", webSubHubUrl + "/publish");
 		} catch (WebSubClientException e) {
 			LOGGER.info("NotifyPrint", WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION, "topic already registered");
 		}

@@ -23,6 +23,9 @@ implements ApplicationListener<ApplicationReadyEvent> {
   
   @Value("${mosip.event.topic}")
   private String topic;
+
+	@Value("${mosip.event.callBackUrl}")
+	private String callBackUrl;
  
 
   @Value("${mosip.event.secret}")
@@ -41,8 +44,7 @@ implements ApplicationListener<ApplicationReadyEvent> {
     subscriptionChangeRequest.setHubURL(hubURL+"/hub");
     subscriptionChangeRequest.setTopic(topic);
     subscriptionChangeRequest.setSecret(secret);
-	subscriptionChangeRequest.setCallbackURL("http://localhost:8088/v1/print/print/callback/notifyPrint");
-	System.out.println(">>>" + subscriptionChangeRequest.toString());
+	subscriptionChangeRequest.setCallbackURL(callBackUrl);
 	// subscriptionChangeRequest.setLeaseSeconds(320);
     //subscriptionChangeRequest.setLeaseSeconds(leaseSeconds);
     //HttpHeaders httpHeaders=new HttpHeaders();

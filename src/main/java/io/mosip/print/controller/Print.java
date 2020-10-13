@@ -29,7 +29,6 @@ import io.mosip.print.model.CredentialStatusEvent;
 import io.mosip.print.model.EventModel;
 import io.mosip.print.model.MOSIPMessage;
 import io.mosip.print.service.PrintService;
-import io.mosip.print.util.PrintServiceRequestValidator;
 
 @RestController
 @RequestMapping(value = "/print")
@@ -42,8 +41,6 @@ public class Print {
 	@Autowired
 	private PrintService<Map<String, byte[]>> printService;
 
-	@Autowired
-	private PrintServiceRequestValidator validator;
 
 	@PostMapping(value = "/enqueue", consumes = "application/json")
 	@PreAuthenticateContentAndVerifyIntent(secret = "Kslk30SNF2AChs2", callback = "/print/enqueue", topic = "http://mosip.io/print/pdf")
