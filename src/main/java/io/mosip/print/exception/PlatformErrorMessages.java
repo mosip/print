@@ -10,6 +10,23 @@ package io.mosip.print.exception;
 public enum PlatformErrorMessages {
 
 
+	/** The rpr prt applicant photo not set. */
+	RPR_PRT_APPLICANT_PHOTO_NOT_SET(PlatformConstants.PRT_PRINT_PREFIX + "006", "Error while setting applicant photo"),
+	/** The rpr prt qrcode not set. */
+	RPR_PRT_QRCODE_NOT_SET(PlatformConstants.PRT_PRINT_PREFIX + "007", "Error while setting qrCode for uin card"),
+	/** The rpr prt pdf generation failed. */
+	RPR_PRT_PDF_GENERATION_FAILED(PlatformConstants.PRT_PRINT_PREFIX + "003", "PDF Generation Failed"),
+	/** The rpr prt qrcode not generated. */
+	RPR_PRT_QRCODE_NOT_GENERATED(PlatformConstants.PRT_PRINT_PREFIX + "005", "Error while generating QR Code"),
+	/** The rpr prt qr code generation error. */
+	RPR_PRT_QR_CODE_GENERATION_ERROR(PlatformConstants.PRT_PRINT_PREFIX + "022", "Error while QR Code Generation"),
+
+	/** The rpr prt vid creation error. */
+	RPR_PRT_VID_CREATION_ERROR(PlatformConstants.PRT_PRINT_PREFIX + "023", "Error while creating VID"),
+
+	/** The rpr prt vid exception. */
+	RPR_PRT_VID_EXCEPTION(PlatformConstants.PRT_PRINT_PREFIX + "018",
+			"Could not generate/regenerate VID as per policy,Please use existing VID"),
 	// Printing stage exceptions
 	RPR_PRT_PDF_NOT_GENERATED(PlatformConstants.PRT_PRINT_PREFIX + "001", "Error while generating PDF for UIN Card"),
 	/** The rpr rgs json parsing exception. */

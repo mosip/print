@@ -10,7 +10,7 @@ public final class PlatformConstants {
 	/**
 	 * RPR platform error codes.
 	 */
-	static final String PRT_PRINT_PREFIX = "PRT-";
+	public static final String PRT_PRINT_PREFIX = "PRT-";
 
 	/**
 	 * Instantiates a new RPR platform error codes.

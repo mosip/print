@@ -1,5 +1,7 @@
 package io.mosip.print.constant;
 
+import io.mosip.print.exception.PlatformConstants;
+
 /**
  *
  * @author M1048399 Horteppa
@@ -10,10 +12,10 @@ public enum PlatformSuccessMessages {
 	// RPR_PUM_PACKET_UPLOADER(PlatformConstants.RPR_PACKET_UPLOADER_MODULE + "000",
 	// "Packet uploaded to file system"),
 
-	RPR_PUM_PACKET_ARCHIVED(PlatformConstants.RPR_PACKET_UPLOADER_MODULE + "001", "Packet successfully archived"),
+	RPR_PUM_PACKET_ARCHIVED(PlatformConstants.PRT_PRINT_PREFIX + "001", "Packet successfully archived"),
 
 
-	RPR_PRINT_SERVICE_SUCCESS(PlatformConstants.RPR_PRINTING_MODULE + "002", "Pdf generated and sent to print stage");
+	RPR_PRINT_SERVICE_SUCCESS(PlatformConstants.PRT_PRINT_PREFIX + "002", "Pdf generated and sent to print stage");
 
 	/** The success message. */
 	private final String successMessage;
