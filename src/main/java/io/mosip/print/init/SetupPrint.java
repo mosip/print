@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import io.mosip.kernel.core.websub.spi.SubscriptionClient;
@@ -43,8 +41,9 @@ implements ApplicationListener<ApplicationReadyEvent> {
     subscriptionChangeRequest.setHubURL(hubURL+"/hub");
     subscriptionChangeRequest.setTopic(topic);
     subscriptionChangeRequest.setSecret(secret);
-    subscriptionChangeRequest.setCallbackURL("http://localhost:8098/print/callback/notifyPrint");
-   // subscriptionChangeRequest.setLeaseSeconds(320);
+	subscriptionChangeRequest.setCallbackURL("http://localhost:8088/v1/print/print/callback/notifyPrint");
+	System.out.println(">>>" + subscriptionChangeRequest.toString());
+	// subscriptionChangeRequest.setLeaseSeconds(320);
     //subscriptionChangeRequest.setLeaseSeconds(leaseSeconds);
     //HttpHeaders httpHeaders=new HttpHeaders();
    // sb.publishUpdate(issuer+"/"+"CREDENTIAL_ISSUED", eventModel, MediaType.APPLICATION_JSON_UTF8_VALUE, httpHeaders,  hubURL);
