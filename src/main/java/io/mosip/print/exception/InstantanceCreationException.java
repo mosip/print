@@ -23,7 +23,7 @@ public class InstantanceCreationException extends BaseUncheckedException {
 	 * @param errorMessage the error message
 	 */
 	public InstantanceCreationException(String errorMessage) {
-		super(PlatformErrorMessages.RPR_SYS_INSTANTIATION_EXCEPTION.getCode() + EMPTY_SPACE, errorMessage);
+		super(PlatformErrorMessages.PRT_SYS_INSTANTIATION_EXCEPTION.getCode() + EMPTY_SPACE, errorMessage);
 	}
 
 	/**
@@ -33,7 +33,7 @@ public class InstantanceCreationException extends BaseUncheckedException {
 	 * @param cause the cause
 	 */
 	public InstantanceCreationException(String message, Throwable cause) {
-		super(PlatformErrorMessages.RPR_SYS_INSTANTIATION_EXCEPTION.getCode() + EMPTY_SPACE, message, cause);
+		super(PlatformErrorMessages.PRT_SYS_INSTANTIATION_EXCEPTION.getCode() + EMPTY_SPACE, message, cause);
 	}
 
 }

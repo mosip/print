@@ -216,10 +216,10 @@ public class Utilities {
 				printLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
 						regId,
 						"Utilities::retrieveUIN():: error with error message "
-								+ PlatformErrorMessages.RPR_PVM_INVALID_UIN.getMessage() + " "
+								+ PlatformErrorMessages.PRT_PVM_INVALID_UIN.getMessage() + " "
 								+ idResponseDto.getErrors().toString());
 				throw new IdRepoAppException(
-						PlatformErrorMessages.RPR_PVM_INVALID_UIN.getMessage() + idResponseDto.getErrors().toString());
+						PlatformErrorMessages.PRT_PVM_INVALID_UIN.getMessage() + idResponseDto.getErrors().toString());
 			}
 			String response = objMapper.writeValueAsString(idResponseDto.getResponse().getIdentity());
 			try {

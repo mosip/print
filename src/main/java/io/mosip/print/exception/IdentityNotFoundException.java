@@ -1,7 +1,6 @@
 package io.mosip.print.exception;
 
 import io.mosip.kernel.core.exception.BaseUncheckedException;
-import io.mosip.print.exception.PlatformErrorMessages;
 
 /**
  * The Class IdentityNotFoundException.
@@ -24,7 +23,7 @@ public class IdentityNotFoundException extends BaseUncheckedException {
 	 * @param errorMessage the error message
 	 */
 	public IdentityNotFoundException(String errorMessage) {
-		super(PlatformErrorMessages.RPR_PIS_IDENTITY_NOT_FOUND.getCode()+ EMPTY_SPACE, errorMessage);
+		super(PlatformErrorMessages.PRT_PIS_IDENTITY_NOT_FOUND.getCode() + EMPTY_SPACE, errorMessage);
 	}
 
 	/**
@@ -34,7 +33,7 @@ public class IdentityNotFoundException extends BaseUncheckedException {
 	 * @param cause the cause
 	 */
 	public IdentityNotFoundException(String message, Throwable cause) {
-		super(PlatformErrorMessages.RPR_PIS_IDENTITY_NOT_FOUND.getCode() + EMPTY_SPACE, message, cause);
+		super(PlatformErrorMessages.PRT_PIS_IDENTITY_NOT_FOUND.getCode() + EMPTY_SPACE, message, cause);
 	}
 
 }

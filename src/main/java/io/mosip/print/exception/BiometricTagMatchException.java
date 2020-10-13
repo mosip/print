@@ -22,7 +22,7 @@ public class BiometricTagMatchException  extends BaseUncheckedException {
      * @param errorMessage the error message
      */
     public BiometricTagMatchException(String errorMessage) {
-        super(PlatformErrorMessages.RPR_UTL_BIOMETRIC_TAG_MATCH.getCode() + EMPTY_SPACE, errorMessage);
+		super(PlatformErrorMessages.PRT_UTL_BIOMETRIC_TAG_MATCH.getCode() + EMPTY_SPACE, errorMessage);
     }
 
     /**
@@ -32,6 +32,6 @@ public class BiometricTagMatchException  extends BaseUncheckedException {
      * @param cause   the cause
      */
     public BiometricTagMatchException(String message, Throwable cause) {
-        super(PlatformErrorMessages.RPR_UTL_BIOMETRIC_TAG_MATCH.getCode() + EMPTY_SPACE, message, cause);
+		super(PlatformErrorMessages.PRT_UTL_BIOMETRIC_TAG_MATCH.getCode() + EMPTY_SPACE, message, cause);
     }
 }

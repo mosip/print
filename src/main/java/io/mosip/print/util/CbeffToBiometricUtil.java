@@ -170,7 +170,7 @@ public class CbeffToBiometricUtil {
 			List<BIRType> file2BirTypeList = getBIRTypeList(cbeffFile2);
 
 			if (isBiometricTypeSame(file1BirTypeList, file2BirTypeList)) {
-				throw new BiometricTagMatchException(PlatformErrorMessages.RPR_UTL_BIOMETRIC_TAG_MATCH.getCode());
+				throw new BiometricTagMatchException(PlatformErrorMessages.PRT_UTL_BIOMETRIC_TAG_MATCH.getCode());
 			}
 
 			file1BirTypeList.addAll(file2BirTypeList);

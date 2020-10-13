@@ -24,7 +24,7 @@ public class TemplateProcessingFailureException extends BaseUncheckedException {
 	 *            the message
 	 */
 	public TemplateProcessingFailureException(String message) {
-		super(PlatformErrorMessages.RPR_TEM_PROCESSING_FAILURE.getCode(), message);
+		super(PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.getCode(), message);
 	}
 
 	/**
@@ -36,7 +36,7 @@ public class TemplateProcessingFailureException extends BaseUncheckedException {
 	 *            the cause
 	 */
 	public TemplateProcessingFailureException(String message, Throwable cause) {
-		super(PlatformErrorMessages.RPR_TEM_PROCESSING_FAILURE.getCode() + EMPTY_SPACE, message, cause);
+		super(PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.getCode() + EMPTY_SPACE, message, cause);
 	}
 
 }

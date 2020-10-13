@@ -1,7 +1,6 @@
 package io.mosip.print.exception;
 
 import io.mosip.kernel.core.exception.BaseUncheckedException;
-import io.mosip.print.exception.PlatformErrorMessages;
 
 public class InvalidTokenException extends BaseUncheckedException {
 
@@ -32,7 +31,7 @@ public class InvalidTokenException extends BaseUncheckedException {
 	 * @param message the message
 	 */
 	public InvalidTokenException(String message) {
-		super(PlatformErrorMessages.RPR_AUT_INVALID_TOKEN.getCode(), message);
+		super(PlatformErrorMessages.PRT_AUT_INVALID_TOKEN.getCode(), message);
 	}
 	
 	/**
@@ -42,6 +41,6 @@ public class InvalidTokenException extends BaseUncheckedException {
 	 * @param cause the cause
 	 */
 	public InvalidTokenException(String message,Throwable cause) {
-		super(PlatformErrorMessages.RPR_AUT_INVALID_TOKEN.getCode() + EMPTY_SPACE, message,cause);
+		super(PlatformErrorMessages.PRT_AUT_INVALID_TOKEN.getCode() + EMPTY_SPACE, message, cause);
 	}
 }

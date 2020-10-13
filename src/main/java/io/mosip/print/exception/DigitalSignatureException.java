@@ -22,7 +22,7 @@ public class DigitalSignatureException extends BaseUncheckedException {
      * @param errorMessage the error message
      */
     public DigitalSignatureException(String errorMessage) {
-        super(PlatformErrorMessages.RPR_UTL_DIGITAL_SIGN_EXCEPTION.getCode() + EMPTY_SPACE, errorMessage);
+		super(PlatformErrorMessages.PRT_UTL_DIGITAL_SIGN_EXCEPTION.getCode() + EMPTY_SPACE, errorMessage);
     }
 
     /**
@@ -32,6 +32,6 @@ public class DigitalSignatureException extends BaseUncheckedException {
      * @param cause   the cause
      */
     public DigitalSignatureException(String message, Throwable cause) {
-        super(PlatformErrorMessages.RPR_UTL_DIGITAL_SIGN_EXCEPTION.getCode() + EMPTY_SPACE, message, cause);
+		super(PlatformErrorMessages.PRT_UTL_DIGITAL_SIGN_EXCEPTION.getCode() + EMPTY_SPACE, message, cause);
     }
 }

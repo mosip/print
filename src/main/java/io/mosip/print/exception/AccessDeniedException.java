@@ -22,7 +22,7 @@ public class AccessDeniedException extends BaseUncheckedException {
 	 * @param message the message
 	 */
 	public AccessDeniedException(String message) {
-		super(PlatformErrorMessages.RPR_AUT_ACCESS_DENIED.getCode(), message);
+		super(PlatformErrorMessages.PRT_AUT_ACCESS_DENIED.getCode(), message);
 	}
 	
 	/**
@@ -32,6 +32,6 @@ public class AccessDeniedException extends BaseUncheckedException {
 	 * @param cause the cause
 	 */
 	public AccessDeniedException(String message,Throwable cause) {
-		super(PlatformErrorMessages.RPR_AUT_ACCESS_DENIED.getCode(), message,cause);
+		super(PlatformErrorMessages.PRT_AUT_ACCESS_DENIED.getCode(), message, cause);
 	}
 }

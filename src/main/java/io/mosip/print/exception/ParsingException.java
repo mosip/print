@@ -23,7 +23,7 @@ public class ParsingException extends BaseUncheckedException{
 	 * @param errorMessage the error message
 	 */
 	public ParsingException(String errorMessage) {
-		super(PlatformErrorMessages.RPR_SYS_JSON_PARSING_EXCEPTION.getCode()+ EMPTY_SPACE, errorMessage);
+		super(PlatformErrorMessages.PRT_RGS_JSON_PARSING_EXCEPTION.getCode() + EMPTY_SPACE, errorMessage);
 	}
 
 	/**
@@ -33,7 +33,7 @@ public class ParsingException extends BaseUncheckedException{
 	 * @param cause the cause
 	 */
 	public ParsingException(String message, Throwable cause) {
-		super(PlatformErrorMessages.RPR_SYS_JSON_PARSING_EXCEPTION.getCode() + EMPTY_SPACE, message, cause);
+		super(PlatformErrorMessages.PRT_RGS_JSON_PARSING_EXCEPTION.getCode() + EMPTY_SPACE, message, cause);
 	}
 
 }

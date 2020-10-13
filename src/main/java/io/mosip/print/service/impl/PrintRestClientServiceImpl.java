@@ -94,7 +94,7 @@ public class PrintRestClientServiceImpl implements PrintRestClientService<Object
 						e.getMessage() + ExceptionUtils.getStackTrace(e));
 
 				throw new ApisResourceAccessException(
-						PlatformErrorMessages.RPR_RCT_UNKNOWN_RESOURCE_EXCEPTION.getCode(), e);
+						PlatformErrorMessages.PRT_RCT_UNKNOWN_RESOURCE_EXCEPTION.getCode(), e);
 
 			}
 		}
@@ -145,7 +145,7 @@ public class PrintRestClientServiceImpl implements PrintRestClientService<Object
 						e.getMessage() + ExceptionUtils.getStackTrace(e));
 
 				throw new ApisResourceAccessException(
-						PlatformErrorMessages.RPR_RCT_UNKNOWN_RESOURCE_EXCEPTION.getCode(), e);
+						PlatformErrorMessages.PRT_RCT_UNKNOWN_RESOURCE_EXCEPTION.getCode(), e);
 
 			}
 		}
@@ -184,7 +184,7 @@ public class PrintRestClientServiceImpl implements PrintRestClientService<Object
 						e.getMessage() + ExceptionUtils.getStackTrace(e));
 
 				throw new ApisResourceAccessException(
-						PlatformErrorMessages.RPR_RCT_UNKNOWN_RESOURCE_EXCEPTION.getMessage(), e);
+						PlatformErrorMessages.PRT_RCT_UNKNOWN_RESOURCE_EXCEPTION.getMessage(), e);
 
 			}
 		}
@@ -255,7 +255,7 @@ public class PrintRestClientServiceImpl implements PrintRestClientService<Object
 						e.getMessage() + ExceptionUtils.getStackTrace(e));
 
 				throw new ApisResourceAccessException(
-						PlatformErrorMessages.RPR_RCT_UNKNOWN_RESOURCE_EXCEPTION.getMessage(), e);
+						PlatformErrorMessages.PRT_RCT_UNKNOWN_RESOURCE_EXCEPTION.getMessage(), e);
 
 			}
 		}
@@ -301,7 +301,7 @@ public class PrintRestClientServiceImpl implements PrintRestClientService<Object
 						e.getMessage() + ExceptionUtils.getStackTrace(e));
 
 				throw new ApisResourceAccessException(
-						PlatformErrorMessages.RPR_RCT_UNKNOWN_RESOURCE_EXCEPTION.getMessage(), e);
+						PlatformErrorMessages.PRT_RCT_UNKNOWN_RESOURCE_EXCEPTION.getMessage(), e);
 
 			}
 		}
@@ -356,7 +356,7 @@ public class PrintRestClientServiceImpl implements PrintRestClientService<Object
 						e.getMessage() + ExceptionUtils.getStackTrace(e));
 
 				throw new ApisResourceAccessException(
-						PlatformErrorMessages.RPR_RCT_UNKNOWN_RESOURCE_EXCEPTION.getMessage(), e);
+						PlatformErrorMessages.PRT_RCT_UNKNOWN_RESOURCE_EXCEPTION.getMessage(), e);
 
 			}
 		}
@@ -411,7 +411,7 @@ public class PrintRestClientServiceImpl implements PrintRestClientService<Object
 						e.getMessage() + ExceptionUtils.getStackTrace(e));
 
 				throw new ApisResourceAccessException(
-						PlatformErrorMessages.RPR_RCT_UNKNOWN_RESOURCE_EXCEPTION.getMessage(), e);
+						PlatformErrorMessages.PRT_RCT_UNKNOWN_RESOURCE_EXCEPTION.getMessage(), e);
 			}
 		}
 		regProcLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.USERID.toString(), "",

@@ -246,7 +246,7 @@ public class PrintServiceImpl implements PrintService{
 			if (!isPhotoSet) {
 				regProcLogger.debug(LoggerFileConstant.SESSIONID.toString(),
 						LoggerFileConstant.REGISTRATIONID.toString(), uin,
-						PlatformErrorMessages.RPR_PRT_APPLICANT_PHOTO_NOT_SET.name());
+						PlatformErrorMessages.PRT_PRT_APPLICANT_PHOTO_NOT_SET.name());
 			}
 			setTemplateAttributes(credentialSubject, attributes);
 			attributes.put(IdType.UIN.toString(), uin);
@@ -258,7 +258,7 @@ public class PrintServiceImpl implements PrintService{
 			if (!isQRcodeSet) {
 				regProcLogger.debug(LoggerFileConstant.SESSIONID.toString(),
 						LoggerFileConstant.REGISTRATIONID.toString(), uin,
-						PlatformErrorMessages.RPR_PRT_QRCODE_NOT_SET.name());
+						PlatformErrorMessages.PRT_PRT_QRCODE_NOT_SET.name());
 			}
 
 			template = setTemplateForMaskedUIN(cardType, uin, vid, attributes, template);
@@ -268,9 +268,9 @@ public class PrintServiceImpl implements PrintService{
 			if (uinArtifact == null) {
 				regProcLogger.error(LoggerFileConstant.SESSIONID.toString(),
 						LoggerFileConstant.REGISTRATIONID.toString(), "UIN",
-						PlatformErrorMessages.RPR_TEM_PROCESSING_FAILURE.name());
+						PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.name());
 				throw new TemplateProcessingFailureException(
-						PlatformErrorMessages.RPR_TEM_PROCESSING_FAILURE.getCode());
+						PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.getCode());
 			}
 
 			String password = null;
@@ -280,7 +280,6 @@ public class PrintServiceImpl implements PrintService{
 
 			// generating pdf
 			byte[] pdfbytes = uinCardGenerator.generateUinCard(uinArtifact, UinCardType.PDF, password);
-			System.out.println(">>>>>>>>>>>" + pdfbytes);
 			byteMap.put(UIN_CARD_PDF, pdfbytes);
 
 			byte[] uinbyte = attributes.get("UIN").toString().getBytes();
@@ -290,10 +289,10 @@ public class PrintServiceImpl implements PrintService{
 
 		} catch (VidCreationException e) {
 			e.printStackTrace();
-			description.setMessage(PlatformErrorMessages.RPR_PRT_VID_CREATION_ERROR.getMessage());
-			description.setCode(PlatformErrorMessages.RPR_PRT_VID_CREATION_ERROR.getCode());
+			description.setMessage(PlatformErrorMessages.PRT_PRT_VID_CREATION_ERROR.getMessage());
+			description.setCode(PlatformErrorMessages.PRT_PRT_VID_CREATION_ERROR.getCode());
 			regProcLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
-					"UIN", PlatformErrorMessages.RPR_PRT_QRCODE_NOT_GENERATED.name() + e.getMessage()
+					"UIN", PlatformErrorMessages.PRT_PRT_QRCODE_NOT_GENERATED.name() + e.getMessage()
 							+ ExceptionUtils.getStackTrace(e));
 			throw new PDFGeneratorException(e.getErrorCode(), e.getErrorText());
 
@@ -301,60 +300,60 @@ public class PrintServiceImpl implements PrintService{
 
 		catch (QrcodeGenerationException e) {
 			e.printStackTrace();
-			description.setMessage(PlatformErrorMessages.RPR_PRT_QR_CODE_GENERATION_ERROR.getMessage());
-			description.setCode(PlatformErrorMessages.RPR_PRT_QR_CODE_GENERATION_ERROR.getCode());
+			description.setMessage(PlatformErrorMessages.PRT_PRT_QR_CODE_GENERATION_ERROR.getMessage());
+			description.setCode(PlatformErrorMessages.PRT_PRT_QR_CODE_GENERATION_ERROR.getCode());
 			regProcLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
 					"UIN",
-					PlatformErrorMessages.RPR_PRT_QRCODE_NOT_GENERATED.name() + ExceptionUtils.getStackTrace(e));
+					PlatformErrorMessages.PRT_PRT_QRCODE_NOT_GENERATED.name() + ExceptionUtils.getStackTrace(e));
 			throw new PDFGeneratorException(PDFGeneratorExceptionCodeConstant.PDF_EXCEPTION.getErrorCode(),
 					e.getErrorText());
 
 		} catch (UINNotFoundInDatabase e) {
 			e.printStackTrace();
-			description.setMessage(PlatformErrorMessages.RPR_PRT_UIN_NOT_FOUND_IN_DATABASE.getMessage());
-			description.setCode(PlatformErrorMessages.RPR_PRT_UIN_NOT_FOUND_IN_DATABASE.getCode());
+			description.setMessage(PlatformErrorMessages.PRT_PRT_UIN_NOT_FOUND_IN_DATABASE.getMessage());
+			description.setCode(PlatformErrorMessages.PRT_PRT_UIN_NOT_FOUND_IN_DATABASE.getCode());
 
 			regProcLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
 					"UIN".toString(),
-					PlatformErrorMessages.RPR_PRT_UIN_NOT_FOUND_IN_DATABASE.name() + ExceptionUtils.getStackTrace(e));
+					PlatformErrorMessages.PRT_PRT_UIN_NOT_FOUND_IN_DATABASE.name() + ExceptionUtils.getStackTrace(e));
 			throw new PDFGeneratorException(PDFGeneratorExceptionCodeConstant.PDF_EXCEPTION.getErrorCode(),
 					e.getErrorText());
 
 		} catch (TemplateProcessingFailureException e) {
 			e.printStackTrace();
-			description.setMessage(PlatformErrorMessages.RPR_TEM_PROCESSING_FAILURE.getMessage());
-			description.setCode(PlatformErrorMessages.RPR_TEM_PROCESSING_FAILURE.getCode());
+			description.setMessage(PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.getMessage());
+			description.setCode(PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.getCode());
 
 			regProcLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
 					"UIN",
-					PlatformErrorMessages.RPR_TEM_PROCESSING_FAILURE.name() + ExceptionUtils.getStackTrace(e));
-			throw new TemplateProcessingFailureException(PlatformErrorMessages.RPR_TEM_PROCESSING_FAILURE.getMessage());
+					PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.name() + ExceptionUtils.getStackTrace(e));
+			throw new TemplateProcessingFailureException(PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.getMessage());
 
 		} catch (PDFGeneratorException e) {
 			e.printStackTrace();
-			description.setMessage(PlatformErrorMessages.RPR_PRT_PDF_NOT_GENERATED.getMessage());
-			description.setCode(PlatformErrorMessages.RPR_PRT_PDF_NOT_GENERATED.getCode());
+			description.setMessage(PlatformErrorMessages.PRT_PRT_PDF_NOT_GENERATED.getMessage());
+			description.setCode(PlatformErrorMessages.PRT_PRT_PDF_NOT_GENERATED.getCode());
 
 			regProcLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
 					"UIN",
-					PlatformErrorMessages.RPR_PRT_PDF_NOT_GENERATED.name() + ExceptionUtils.getStackTrace(e));
+					PlatformErrorMessages.PRT_PRT_PDF_NOT_GENERATED.name() + ExceptionUtils.getStackTrace(e));
 			throw new PDFGeneratorException(PDFGeneratorExceptionCodeConstant.PDF_EXCEPTION.getErrorCode(),
 					e.getErrorText());
 
 		} catch (PDFSignatureException e) {
 			e.printStackTrace();
-			description.setMessage(PlatformErrorMessages.RPR_PRT_PDF_SIGNATURE_EXCEPTION.getMessage());
-			description.setCode(PlatformErrorMessages.RPR_PRT_PDF_SIGNATURE_EXCEPTION.getCode());
+			description.setMessage(PlatformErrorMessages.PRT_PRT_PDF_SIGNATURE_EXCEPTION.getMessage());
+			description.setCode(PlatformErrorMessages.PRT_PRT_PDF_SIGNATURE_EXCEPTION.getCode());
 
 			regProcLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
 					"UIN".toString(),
-					PlatformErrorMessages.RPR_PRT_PDF_SIGNATURE_EXCEPTION.name() + ExceptionUtils.getStackTrace(e));
-			throw new PDFSignatureException(PlatformErrorMessages.RPR_PRT_PDF_SIGNATURE_EXCEPTION.getMessage());
+					PlatformErrorMessages.PRT_PRT_PDF_SIGNATURE_EXCEPTION.name() + ExceptionUtils.getStackTrace(e));
+			throw new PDFSignatureException(PlatformErrorMessages.PRT_PRT_PDF_SIGNATURE_EXCEPTION.getMessage());
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			description.setMessage(PlatformErrorMessages.RPR_PRT_PDF_GENERATION_FAILED.getMessage());
-			description.setCode(PlatformErrorMessages.RPR_PRT_PDF_GENERATION_FAILED.getCode());
+			description.setMessage(PlatformErrorMessages.PRT_PRT_PDF_GENERATION_FAILED.getMessage());
+			description.setCode(PlatformErrorMessages.PRT_PRT_PDF_GENERATION_FAILED.getCode());
 			regProcLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
 					"UIN", description + ex.getMessage() + ExceptionUtils.getStackTrace(ex));
 			throw new PDFGeneratorException(PDFGeneratorExceptionCodeConstant.PDF_EXCEPTION.getErrorCode(),
@@ -372,8 +371,8 @@ public class PrintServiceImpl implements PrintService{
 				eventName = EventName.UPDATE.toString();
 				eventType = EventType.BUSINESS.toString();
 			} else {
-				description.setMessage(PlatformErrorMessages.RPR_PRT_PDF_GENERATION_FAILED.getMessage());
-				description.setCode(PlatformErrorMessages.RPR_PRT_PDF_GENERATION_FAILED.getCode());
+				description.setMessage(PlatformErrorMessages.PRT_PRT_PDF_GENERATION_FAILED.getMessage());
+				description.setCode(PlatformErrorMessages.PRT_PRT_PDF_GENERATION_FAILED.getCode());
 
 				eventId = EventId.RPR_405.toString();
 				eventName = EventName.EXCEPTION.toString();
@@ -452,7 +451,7 @@ public class PrintServiceImpl implements PrintService{
 		LinkedHashMap<String, String> printTextFileMap = new LinkedHashMap<>();
 		JSONObject demographicIdentity = JsonUtil.objectMapperReadValue(jsonString, JSONObject.class);
 		if (demographicIdentity == null)
-			throw new IdentityNotFoundException(PlatformErrorMessages.RPR_PIS_IDENTITY_NOT_FOUND.getMessage());
+			throw new IdentityNotFoundException(PlatformErrorMessages.PRT_PIS_IDENTITY_NOT_FOUND.getMessage());
 		String printTextFileJson = Utilities.getJson(utilities.getConfigServerFileStorageURL(),
 				utilities.getRegistrationProcessorPrintTextFile());
 
@@ -513,7 +512,6 @@ public class PrintServiceImpl implements PrintService{
 		// textFileJson.put("digitalSignature", digitalSignaturedQrData);
 		// Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 		// String printTextFileString = gson.toJson(textFileJson);
-		System.out.println(">>" + qrJsonObj.toString());
 		byte[] qrCodeBytes = qrCodeGenerator.generateQrCode(qrJsonObj.toString(), QrVersion.V30);
 		if (qrCodeBytes != null) {
 			String imageString = CryptoUtil.encodeBase64String(qrCodeBytes);
@@ -579,7 +577,7 @@ public class PrintServiceImpl implements PrintService{
 		try {
 			JSONObject demographicIdentity = JsonUtil.objectMapperReadValue(jsonString, JSONObject.class);
 			if (demographicIdentity == null)
-				throw new IdentityNotFoundException(PlatformErrorMessages.RPR_PIS_IDENTITY_NOT_FOUND.getMessage());
+				throw new IdentityNotFoundException(PlatformErrorMessages.PRT_PIS_IDENTITY_NOT_FOUND.getMessage());
 
 			String mapperJsonString = Utilities.getJson(utilities.getConfigServerFileStorageURL(),
 					utilities.getGetRegProcessorIdentityJson());
@@ -627,7 +625,7 @@ public class PrintServiceImpl implements PrintService{
 		} catch (JsonParseException | JsonMappingException e) {
 			regProcLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
 					null, "Error while parsing Json file" + ExceptionUtils.getStackTrace(e));
-			throw new ParsingException(PlatformErrorMessages.RPR_SYS_JSON_PARSING_EXCEPTION.getMessage(), e);
+			throw new ParsingException(PlatformErrorMessages.PRT_RGS_JSON_PARSING_EXCEPTION.getMessage(), e);
 		}
 	}
 
@@ -694,8 +692,8 @@ public class PrintServiceImpl implements PrintService{
 				"PrintServiceImpl::getVid():: post CREATEVID service call ended successfully");
 
 		if (vidResponse.getErrors() != null && !vidResponse.getErrors().isEmpty()) {
-			throw new VidCreationException(PlatformErrorMessages.RPR_PRT_VID_EXCEPTION.getCode(),
-					PlatformErrorMessages.RPR_PRT_VID_EXCEPTION.getMessage());
+			throw new VidCreationException(PlatformErrorMessages.PRT_PRT_VID_EXCEPTION.getCode(),
+					PlatformErrorMessages.PRT_PRT_VID_EXCEPTION.getMessage());
 
 		} else {
 			vid = vidResponse.getResponse().getVid();

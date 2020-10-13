@@ -111,9 +111,9 @@ public class TemplateGenerator {
 
 		} catch (TemplateResourceNotFoundException | TemplateParsingException | TemplateMethodInvocationException e) {
 			regProcLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
-					null, PlatformErrorMessages.RPR_TEM_PROCESSING_FAILURE.name() + e.getMessage()
+					null, PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.name() + e.getMessage()
 							+ ExceptionUtils.getStackTrace(e));
-			throw new TemplateProcessingFailureException(PlatformErrorMessages.RPR_TEM_PROCESSING_FAILURE.getCode());
+			throw new TemplateProcessingFailureException(PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.getCode());
 		}
 	}
 

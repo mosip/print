@@ -21,7 +21,7 @@ public class TokenGenerationFailedException  extends BaseUncheckedException {
 	 *            the error message
 	 */
 	public TokenGenerationFailedException(String errorMessage) {
-		super(PlatformErrorMessages.RPR_BDD_ABIS_ABORT.getCode() + EMPTY_SPACE, errorMessage);
+		super(PlatformErrorMessages.PRT_BDD_ABIS_ABORT.getCode() + EMPTY_SPACE, errorMessage);
 	}
 
 	/**
@@ -33,7 +33,7 @@ public class TokenGenerationFailedException  extends BaseUncheckedException {
 	 *            the cause
 	 */
 	public TokenGenerationFailedException(String message, Throwable cause) {
-		super(PlatformErrorMessages.RPR_BDD_ABIS_ABORT.getCode() + EMPTY_SPACE, message, cause);
+		super(PlatformErrorMessages.PRT_BDD_ABIS_ABORT.getCode() + EMPTY_SPACE, message, cause);
 	}
 }
 

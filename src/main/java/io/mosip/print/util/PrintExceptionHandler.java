@@ -97,7 +97,7 @@ public class PrintExceptionHandler {
 
 	@ExceptionHandler(JsonMappingException.class)
 	public ResponseEntity<PrintResponse> badRequest(JsonMappingException ex) {
-		RegStatusAppException reg1 = new RegStatusAppException(PlatformErrorMessages.RPR_RGS_JSON_MAPPING_EXCEPTION,
+		RegStatusAppException reg1 = new RegStatusAppException(PlatformErrorMessages.PRT_RGS_JSON_MAPPING_EXCEPTION,
 				ex);
 		return buildPrintApiExceptionResponse(reg1);
 	}
@@ -105,14 +105,14 @@ public class PrintExceptionHandler {
 	@ExceptionHandler(InvalidFormatException.class)
 	public ResponseEntity<PrintResponse> badRequest(InvalidFormatException ex) {
 		RegStatusAppException reg1 = new RegStatusAppException(
-				PlatformErrorMessages.RPR_PGS_INVALID_INPUT_PARAMETER.getCode(),
-				String.format(PlatformErrorMessages.RPR_PGS_INVALID_INPUT_PARAMETER.getMessage(), "idType"));
+				PlatformErrorMessages.PRT_PGS_INVALID_INPUT_PARAMETER.getCode(),
+				String.format(PlatformErrorMessages.PRT_PGS_INVALID_INPUT_PARAMETER.getMessage(), "idType"));
 		return buildPrintApiExceptionResponse(reg1);
 	}
 
 	@ExceptionHandler(JsonParseException.class)
 	public ResponseEntity<PrintResponse> badRequest(JsonParseException ex) {
-		RegStatusAppException reg1 = new RegStatusAppException(PlatformErrorMessages.RPR_RGS_JSON_PARSING_EXCEPTION,
+		RegStatusAppException reg1 = new RegStatusAppException(PlatformErrorMessages.PRT_RGS_JSON_PARSING_EXCEPTION,
 				ex);
 		return buildPrintApiExceptionResponse(reg1);
 	}

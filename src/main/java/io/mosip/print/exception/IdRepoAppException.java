@@ -21,7 +21,8 @@ public class IdRepoAppException extends BaseUncheckedException {
 	 *            the error message
 	 */
 	public IdRepoAppException(String errorMessage) {
-		super(PlatformErrorMessages.RPR_PVM_INVALID_UIN.getCode() + EMPTY_SPACE, PlatformErrorMessages.RPR_PVM_INVALID_UIN.getMessage()+ "-" +errorMessage);
+		super(PlatformErrorMessages.PRT_PVM_INVALID_UIN.getCode() + EMPTY_SPACE,
+				PlatformErrorMessages.PRT_PVM_INVALID_UIN.getMessage() + "-" + errorMessage);
 	}
 
 	/**
@@ -33,7 +34,8 @@ public class IdRepoAppException extends BaseUncheckedException {
 	 *            the cause
 	 */
 	public IdRepoAppException(String message, Throwable cause) {
-		super(PlatformErrorMessages.RPR_PVM_INVALID_UIN.getCode() + EMPTY_SPACE, PlatformErrorMessages.RPR_PVM_INVALID_UIN.getMessage()+"-" +message, cause);
+		super(PlatformErrorMessages.PRT_PVM_INVALID_UIN.getCode() + EMPTY_SPACE,
+				PlatformErrorMessages.PRT_PVM_INVALID_UIN.getMessage() + "-" + message, cause);
 	}
 
 }

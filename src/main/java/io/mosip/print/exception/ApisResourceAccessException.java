@@ -25,7 +25,7 @@ public class ApisResourceAccessException extends BaseCheckedException {
 	 * @param message the message
 	 */
 	public ApisResourceAccessException(String message) {
-		super(PlatformErrorMessages.RPR_RCT_UNKNOWN_RESOURCE_EXCEPTION.getCode(), message);
+		super(PlatformErrorMessages.PRT_RCT_UNKNOWN_RESOURCE_EXCEPTION.getCode(), message);
 	}
 
 	/**
@@ -35,6 +35,6 @@ public class ApisResourceAccessException extends BaseCheckedException {
 	 * @param cause the cause
 	 */
 	public ApisResourceAccessException(String message, Throwable cause) {
-		super(PlatformErrorMessages.RPR_RCT_UNKNOWN_RESOURCE_EXCEPTION.getCode(), message, cause);
+		super(PlatformErrorMessages.PRT_RCT_UNKNOWN_RESOURCE_EXCEPTION.getCode(), message, cause);
 	}
 }

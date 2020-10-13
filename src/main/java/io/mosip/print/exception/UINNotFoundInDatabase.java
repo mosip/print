@@ -22,7 +22,7 @@ public class UINNotFoundInDatabase extends BaseUncheckedException{
 	 * @param errorMessage the error message
 	 */
 	public UINNotFoundInDatabase(String errorMessage) {
-		super(PlatformErrorMessages.RPR_PRT_UIN_NOT_FOUND_IN_DATABASE.getCode(), errorMessage);
+		super(PlatformErrorMessages.PRT_PRT_UIN_NOT_FOUND_IN_DATABASE.getCode(), errorMessage);
 	}
 
 	/**
@@ -32,7 +32,7 @@ public class UINNotFoundInDatabase extends BaseUncheckedException{
 	 * @param cause the cause
 	 */
 	public UINNotFoundInDatabase(String message, Throwable cause) {
-		super(PlatformErrorMessages.RPR_PRT_UIN_NOT_FOUND_IN_DATABASE.getCode() + EMPTY_SPACE, message, cause);
+		super(PlatformErrorMessages.PRT_PRT_UIN_NOT_FOUND_IN_DATABASE.getCode() + EMPTY_SPACE, message, cause);
 
 	}
 }

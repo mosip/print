@@ -70,7 +70,7 @@ public class JsonUtil {
 		try {
 			return gson.fromJson(jsonObject, clazz);
 		} catch (Exception e) {
-			throw new UnsupportedEncodingException(PlatformErrorMessages.RPR_CMB_UNSUPPORTED_ENCODING.getMessage());
+			throw new UnsupportedEncodingException(PlatformErrorMessages.PRT_CMB_UNSUPPORTED_ENCODING.getMessage());
 		}
 	}
 
@@ -237,12 +237,12 @@ public class JsonUtil {
 			}
 		} catch (InstantiationException | IllegalAccessException e) {
 
-			throw new InstantanceCreationException(PlatformErrorMessages.RPR_SYS_INSTANTIATION_EXCEPTION.getMessage(),
+			throw new InstantanceCreationException(PlatformErrorMessages.PRT_SYS_INSTANTIATION_EXCEPTION.getMessage(),
 					e);
 
 		} catch (NoSuchFieldException | SecurityException e) {
 
-			throw new FieldNotFoundException(PlatformErrorMessages.RPR_SYS_NO_SUCH_FIELD_EXCEPTION.getMessage(), e);
+			throw new FieldNotFoundException(PlatformErrorMessages.PRT_SYS_NO_SUCH_FIELD_EXCEPTION.getMessage(), e);
 
 		}
 

@@ -128,7 +128,7 @@ public class UinCardGeneratorImpl implements UinCardGenerator<byte[]> {
 
 		} catch (IOException | PDFGeneratorException e) {
 			regProcLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
-					"", PlatformErrorMessages.RPR_PRT_PDF_NOT_GENERATED.name() + e.getMessage()
+					"", PlatformErrorMessages.PRT_PRT_PDF_NOT_GENERATED.name() + e.getMessage()
 							+ ExceptionUtils.getStackTrace(e));
 			throw new PDFGeneratorException(PDFGeneratorExceptionCodeConstant.PDF_EXCEPTION.getErrorCode(),
 					e.getMessage() + ExceptionUtils.getStackTrace(e));
@@ -137,7 +137,7 @@ public class UinCardGeneratorImpl implements UinCardGenerator<byte[]> {
 					e.printStackTrace();
 			 regProcLogger.error(LoggerFileConstant.SESSIONID.toString(),
 			 LoggerFileConstant.REGISTRATIONID.toString(), "",
-			 PlatformErrorMessages.RPR_PRT_PDF_SIGNATURE_EXCEPTION.name() + e.getMessage()
+						PlatformErrorMessages.PRT_PRT_PDF_SIGNATURE_EXCEPTION.name() + e.getMessage()
 			 + ExceptionUtils.getStackTrace(e)); throw new PDFSignatureException(
 			 e.getMessage() + ExceptionUtils.getStackTrace(e)); }
 			 

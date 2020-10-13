@@ -22,7 +22,7 @@ public class PDFSignatureException extends BaseUncheckedException{
 	 * @param errorMessage the error message
 	 */
 	public PDFSignatureException(String errorMessage) {
-		super(PlatformErrorMessages.RPR_PRT_PDF_SIGNATURE_EXCEPTION.getCode(), errorMessage);
+		super(PlatformErrorMessages.PRT_PRT_PDF_SIGNATURE_EXCEPTION.getCode(), errorMessage);
 	}
 
 	/**
@@ -32,7 +32,7 @@ public class PDFSignatureException extends BaseUncheckedException{
 	 * @param cause the cause
 	 */
 	public PDFSignatureException(String message, Throwable cause) {
-		super(PlatformErrorMessages.RPR_PRT_PDF_SIGNATURE_EXCEPTION.getCode() + EMPTY_SPACE, message, cause);
+		super(PlatformErrorMessages.PRT_PRT_PDF_SIGNATURE_EXCEPTION.getCode() + EMPTY_SPACE, message, cause);
 
 	}
 }
