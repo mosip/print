@@ -1,10 +1,7 @@
 package io.mosip.print.controller;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
@@ -83,12 +80,12 @@ public class Print {
 		byte[] pdfbytes = printService.getDocuments(decodedCrdential, getSignature(sign, credential), "UIN", false)
 				.get("uinPdf");
 		InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(pdfbytes));
-
-		File pdfFile = new File(
-				"/media/lenovo/872da60f-3c16-4cfb-b900-0f63cbe7f3a9/opt/projects/mosip/MajorBug/print/uin.pdf");
-		OutputStream os = new FileOutputStream(pdfFile);
-		os.write(pdfbytes);
-		os.close();
+		/*
+		 * File pdfFile = new File(
+		 * "/media/lenovo/872da60f-3c16-4cfb-b900-0f63cbe7f3a9/opt/projects/mosip/MajorBug/print/uin.pdf"
+		 * ); OutputStream os = new FileOutputStream(pdfFile); os.write(pdfbytes);
+		 * os.close();
+		 */
 		return ResponseEntity.ok().contentType(MediaType.parseMediaType("application/pdf"))
 				.header("Content-Disposition", "attachment; filename=\"" + "4957694814" + ".pdf\"")
 				.body((Object) resource);
