@@ -37,6 +37,9 @@ public class Print {
 	/** The printservice. */
 	@Autowired
 	private PrintService<Map<String, byte[]>> printService;
+	
+	@Value("${mosip.event.topic}")
+	private String topic;
 
 
 	@PostMapping(value = "/enqueue", consumes = "application/json")
@@ -68,7 +71,7 @@ public class Print {
 	 * @throws RegPrintAppException the reg print app exception
 	 */
 	@PostMapping(path = "/callback/notifyPrint", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@PreAuthenticateContentAndVerifyIntent(secret = "test", callback = "/v1/print/print/callback/notifyPrint", topic = "792112/CREDENTIAL_ISSUED")
+	@PreAuthenticateContentAndVerifyIntent(secret = "test", callback = "/v1/print/print/callback/notifyPrint", topic = "${mosip.event.topic}")
 	public ResponseEntity<Object> handleSubscribeEvent(@RequestBody EventModel eventModel) throws IOException {
 		String credential = eventModel.getEvent().getData().get("credential").toString();
 		byte[] str1 = CryptoUtil.decodeBase64(credential);

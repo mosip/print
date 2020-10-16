@@ -45,11 +45,6 @@ implements ApplicationListener<ApplicationReadyEvent> {
     subscriptionChangeRequest.setTopic(topic);
     subscriptionChangeRequest.setSecret(secret);
 	subscriptionChangeRequest.setCallbackURL(callBackUrl);
-	// subscriptionChangeRequest.setLeaseSeconds(320);
-    //subscriptionChangeRequest.setLeaseSeconds(leaseSeconds);
-    //HttpHeaders httpHeaders=new HttpHeaders();
-   // sb.publishUpdate(issuer+"/"+"CREDENTIAL_ISSUED", eventModel, MediaType.APPLICATION_JSON_UTF8_VALUE, httpHeaders,  hubURL);
-
     sb.subscribe(subscriptionChangeRequest);
     return;
   }
