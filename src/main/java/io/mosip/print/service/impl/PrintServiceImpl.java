@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -16,7 +17,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
+import org.joda.time.DateTime;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -25,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -70,6 +72,7 @@ import io.mosip.print.idrepo.dto.IdResponseDTO1;
 import io.mosip.print.logger.LogDescription;
 import io.mosip.print.logger.PrintLogger;
 import io.mosip.print.model.CredentialStatusEvent;
+import io.mosip.print.model.StatusEvent;
 import io.mosip.print.service.PrintRestClientService;
 import io.mosip.print.service.PrintService;
 import io.mosip.print.service.UinCardGenerator;
@@ -79,19 +82,17 @@ import io.mosip.print.util.DigitalSignatureUtility;
 import io.mosip.print.util.JsonUtil;
 import io.mosip.print.util.TemplateGenerator;
 import io.mosip.print.util.Utilities;
+import io.mosip.print.util.WebSubSubscriptionHelper;
 import io.mosip.registration.print.core.http.RequestWrapper;
 
 @Service
 public class PrintServiceImpl implements PrintService{
 
 	private String topic="CREDENTIAL_STATUS_UPDATE";
-
-	@Value("${mosip.event.secret}")
-	private String secret;
-	  
-	@Value("${mosip.event.hubURL}")   
-	private String hubURL;
 	
+	@Autowired
+	private WebSubSubscriptionHelper webSubSubscriptionHelper;
+
 	/** The Constant FILE_SEPARATOR. */
 	public static final String FILE_SEPARATOR = File.separator;
 
@@ -202,26 +203,18 @@ public class PrintServiceImpl implements PrintService{
 	@Autowired
 	private PublisherClient<String, Object, HttpHeaders> pb;
 	
-	@Override
-	public void publishEvent(String topic, CredentialStatusEvent credentialStatusEvent) {
-		// TODO Auto-generated method stub
-		HttpHeaders headers = new HttpHeaders();
-		//headers.add("Cookie", "Authorizatoin=test);
-		pb.publishUpdate(topic, credentialStatusEvent, MediaType.APPLICATION_JSON_UTF8_VALUE, headers,  hubURL+"/publish");
-		
-	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see io.mosip.registration.processor.core.spi.print.service.PrintService#
+	 * @see io.mosip.print.service.PrintService#
 	 * getDocuments(io.mosip.registration.processor.core.constant.IdType,
 	 * java.lang.String, java.lang.String, boolean)
 	 */
 
 	@Override
 	@SuppressWarnings("rawtypes")
-	public Map<String, byte[]> getDocuments(String credential, String sign, String cardType,
+	public Map<String, byte[]> getDocuments(String credential, String requestId, String sign, String cardType,
 			boolean isPasswordProtected) {
 		printLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(), "",
 				"PrintServiceImpl::getDocuments()::entry");
@@ -284,7 +277,7 @@ public class PrintServiceImpl implements PrintService{
 
 			byte[] uinbyte = attributes.get("UIN").toString().getBytes();
 			byteMap.put("UIN", uinbyte);
-
+			printStatusUpdate(requestId);
 			isTransactionSuccessful = true;
 
 		} catch (VidCreationException e) {
@@ -824,6 +817,21 @@ public class PrintServiceImpl implements PrintService{
 		org.json.JSONObject jsonObject = new org.json.JSONObject(crdential);
 		String credentialSubject = jsonObject.get("credentialSubject").toString();
 		return credentialSubject;
+	}
+
+	private void printStatusUpdate(String requestId) {
+		CredentialStatusEvent creEvent = new CredentialStatusEvent();
+		LocalDateTime currentDtime = DateUtils.getUTCCurrentDateTime();
+		StatusEvent sEvent = new StatusEvent();
+		sEvent.setId(UUID.randomUUID().toString());
+		sEvent.setRequestId(requestId);
+		sEvent.setStatus("printing");
+		sEvent.setUrl(null);
+		sEvent.setTimestamp(Timestamp.valueOf(currentDtime).toString());
+		creEvent.setPublishedOn(new DateTime().toString());
+		creEvent.setPublisher("PRINT_SERVICE");
+		creEvent.setTopic(topic);
+		webSubSubscriptionHelper.printStatusUpdateEvent(topic, creEvent);
 	}
 }
 	

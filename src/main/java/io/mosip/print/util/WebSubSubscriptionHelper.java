@@ -3,6 +3,7 @@ package io.mosip.print.util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import io.mosip.kernel.core.logger.spi.Logger;
@@ -12,8 +13,9 @@ import io.mosip.kernel.websub.api.exception.WebSubClientException;
 import io.mosip.kernel.websub.api.model.SubscriptionChangeRequest;
 import io.mosip.kernel.websub.api.model.SubscriptionChangeResponse;
 import io.mosip.kernel.websub.api.model.UnsubscriptionRequest;
+import io.mosip.print.constant.LoggerFileConstant;
 import io.mosip.print.logger.PrintLogger;
-import io.mosip.print.model.EventModel;
+import io.mosip.print.model.CredentialStatusEvent;
 
 @Component
 public class WebSubSubscriptionHelper {
@@ -34,7 +36,7 @@ public class WebSubSubscriptionHelper {
 	private String topic;
 
 	@Autowired
-	private PublisherClient<String, EventModel, HttpHeaders> pb;
+	private PublisherClient<String, CredentialStatusEvent, HttpHeaders> pb;
 
 	/** The Constant BIOMETRICS. */
 	private static final String WEBSUBSUBSCRIPTIONHEPLER = "WebSubSubscriptionHelper";
@@ -45,7 +47,8 @@ public class WebSubSubscriptionHelper {
 	private static final Logger LOGGER = PrintLogger.getLogger(WebSubSubscriptionHelper.class);
 
 	public void initSubsriptions() {
-		LOGGER.info("NotifyPrint", WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION, "Initializing subscribptions..");
+		LOGGER.info(LoggerFileConstant.SESSIONID.toString(), WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION,
+				"Initializing subscribptions..");
 		subscribeForPrintServiceEvents();
 	}
 
@@ -58,15 +61,30 @@ public class WebSubSubscriptionHelper {
 			subscriptionRequest.setTopic(topic);
 			sb.subscribe(subscriptionRequest);
 		} catch (WebSubClientException e) {
-			LOGGER.info("NotifyPrint", WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION, "websub subscription error");
+			LOGGER.info(LoggerFileConstant.SESSIONID.toString(), WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION,
+					"websub subscription error");
 		}
 	}
 
-	private void registerTopic() {
+	public void printStatusUpdateEvent(String topic, CredentialStatusEvent credentialStatusEvent) {
+		try {
+		HttpHeaders headers = new HttpHeaders();
+		registerTopic(topic);
+		pb.publishUpdate(topic, credentialStatusEvent, MediaType.APPLICATION_JSON_UTF8_VALUE, headers,
+				webSubHubUrl + "/publish");
+	} catch (WebSubClientException e) {
+		LOGGER.info(LoggerFileConstant.SESSIONID.toString(), WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION,
+				"websub publish update error");
+	}
+
+	}
+
+	private void registerTopic(String topic) {
 		try {
 			pb.registerTopic(topic, webSubHubUrl + "/publish");
 		} catch (WebSubClientException e) {
-			LOGGER.info("NotifyPrint", WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION, "topic already registered");
+			LOGGER.info(LoggerFileConstant.SESSIONID.toString(), WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION,
+					"topic already registered");
 		}
 
 	}

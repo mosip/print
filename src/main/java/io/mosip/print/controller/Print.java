@@ -10,19 +10,16 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.mosip.kernel.core.util.CryptoUtil;
 import io.mosip.kernel.websub.api.annotation.PreAuthenticateContentAndVerifyIntent;
 import io.mosip.print.exception.RegPrintAppException;
-import io.mosip.print.model.CredentialStatusEvent;
 import io.mosip.print.model.EventModel;
 import io.mosip.print.model.MOSIPMessage;
 import io.mosip.print.service.PrintService;
@@ -48,14 +45,6 @@ public class Print {
 		// printService.print()
 	}
 
-	@PostMapping(path = "/statusPrint", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> handlePublishEvent(@RequestParam String topic,
-			@RequestBody CredentialStatusEvent credentialStatusEvent) {
-
-		printService.publishEvent(topic, credentialStatusEvent);
-		return new ResponseEntity<>("successfully published", HttpStatus.ACCEPTED);
-	}
-
 	/**
 	 * Gets the file.
 	 *
@@ -77,7 +66,8 @@ public class Print {
 		Map proofMap = new HashMap<String, String>();
 		proofMap = (Map) eventModel.getEvent().getData().get("proof");
 		String sign = proofMap.get("signature").toString();
-		byte[] pdfbytes = printService.getDocuments(decodedCrdential, getSignature(sign, credential), "UIN", false)
+		byte[] pdfbytes = printService.getDocuments(decodedCrdential, eventModel.getEvent().getTransactionId(),
+				getSignature(sign, credential), "UIN", false)
 				.get("uinPdf");
 		InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(pdfbytes));
 		/*
@@ -87,7 +77,7 @@ public class Print {
 		 * os.close();
 		 */
 		return ResponseEntity.ok().contentType(MediaType.parseMediaType("application/pdf"))
-				.header("Content-Disposition", "attachment; filename=\"" + "4957694814" + ".pdf\"")
+				.header("Content-Disposition", "attachment; filename=\"" + "uinCard" + ".pdf\"")
 				.body((Object) resource);
 
 	}
