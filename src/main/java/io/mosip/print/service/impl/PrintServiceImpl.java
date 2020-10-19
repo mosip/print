@@ -141,7 +141,7 @@ public class PrintServiceImpl implements PrintService{
 	private static final String UINCARDPASSWORD = "mosip.registration.processor.print.service.uincard.password";
 
 	/** The reg proc logger. */
-	private static Logger regProcLogger = PrintLogger.getLogger(PrintServiceImpl.class);
+	private static Logger printLogger = PrintLogger.getLogger(PrintServiceImpl.class);
 
 	/** The core audit request builder. */
 	@Autowired
@@ -223,7 +223,7 @@ public class PrintServiceImpl implements PrintService{
 	@SuppressWarnings("rawtypes")
 	public Map<String, byte[]> getDocuments(String credential, String sign, String cardType,
 			boolean isPasswordProtected) {
-		regProcLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(), "",
+		printLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(), "",
 				"PrintServiceImpl::getDocuments()::entry");
 
 		String credentialSubject;
@@ -244,7 +244,7 @@ public class PrintServiceImpl implements PrintService{
 			uin = credentialSubjectJson.getString("UIN");
 			boolean isPhotoSet = setApplicantPhoto(individualBiometric, attributes);
 			if (!isPhotoSet) {
-				regProcLogger.debug(LoggerFileConstant.SESSIONID.toString(),
+				printLogger.debug(LoggerFileConstant.SESSIONID.toString(),
 						LoggerFileConstant.REGISTRATIONID.toString(), uin,
 						PlatformErrorMessages.PRT_PRT_APPLICANT_PHOTO_NOT_SET.name());
 			}
@@ -256,7 +256,7 @@ public class PrintServiceImpl implements PrintService{
 
 			boolean isQRcodeSet = setQrCode(credentialSubject, attributes);
 			if (!isQRcodeSet) {
-				regProcLogger.debug(LoggerFileConstant.SESSIONID.toString(),
+				printLogger.debug(LoggerFileConstant.SESSIONID.toString(),
 						LoggerFileConstant.REGISTRATIONID.toString(), uin,
 						PlatformErrorMessages.PRT_PRT_QRCODE_NOT_SET.name());
 			}
@@ -266,7 +266,7 @@ public class PrintServiceImpl implements PrintService{
 			// getting template and placing original valuespng
 			InputStream uinArtifact = templateGenerator.getTemplate(template, attributes, primaryLang);
 			if (uinArtifact == null) {
-				regProcLogger.error(LoggerFileConstant.SESSIONID.toString(),
+				printLogger.error(LoggerFileConstant.SESSIONID.toString(),
 						LoggerFileConstant.REGISTRATIONID.toString(), "UIN",
 						PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.name());
 				throw new TemplateProcessingFailureException(
@@ -291,7 +291,7 @@ public class PrintServiceImpl implements PrintService{
 			e.printStackTrace();
 			description.setMessage(PlatformErrorMessages.PRT_PRT_VID_CREATION_ERROR.getMessage());
 			description.setCode(PlatformErrorMessages.PRT_PRT_VID_CREATION_ERROR.getCode());
-			regProcLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
+			printLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
 					"UIN", PlatformErrorMessages.PRT_PRT_QRCODE_NOT_GENERATED.name() + e.getMessage()
 							+ ExceptionUtils.getStackTrace(e));
 			throw new PDFGeneratorException(e.getErrorCode(), e.getErrorText());
@@ -302,7 +302,7 @@ public class PrintServiceImpl implements PrintService{
 			e.printStackTrace();
 			description.setMessage(PlatformErrorMessages.PRT_PRT_QR_CODE_GENERATION_ERROR.getMessage());
 			description.setCode(PlatformErrorMessages.PRT_PRT_QR_CODE_GENERATION_ERROR.getCode());
-			regProcLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
+			printLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
 					"UIN",
 					PlatformErrorMessages.PRT_PRT_QRCODE_NOT_GENERATED.name() + ExceptionUtils.getStackTrace(e));
 			throw new PDFGeneratorException(PDFGeneratorExceptionCodeConstant.PDF_EXCEPTION.getErrorCode(),
@@ -313,7 +313,7 @@ public class PrintServiceImpl implements PrintService{
 			description.setMessage(PlatformErrorMessages.PRT_PRT_UIN_NOT_FOUND_IN_DATABASE.getMessage());
 			description.setCode(PlatformErrorMessages.PRT_PRT_UIN_NOT_FOUND_IN_DATABASE.getCode());
 
-			regProcLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
+			printLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
 					"UIN".toString(),
 					PlatformErrorMessages.PRT_PRT_UIN_NOT_FOUND_IN_DATABASE.name() + ExceptionUtils.getStackTrace(e));
 			throw new PDFGeneratorException(PDFGeneratorExceptionCodeConstant.PDF_EXCEPTION.getErrorCode(),
@@ -324,7 +324,7 @@ public class PrintServiceImpl implements PrintService{
 			description.setMessage(PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.getMessage());
 			description.setCode(PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.getCode());
 
-			regProcLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
+			printLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
 					"UIN",
 					PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.name() + ExceptionUtils.getStackTrace(e));
 			throw new TemplateProcessingFailureException(PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.getMessage());
@@ -334,7 +334,7 @@ public class PrintServiceImpl implements PrintService{
 			description.setMessage(PlatformErrorMessages.PRT_PRT_PDF_NOT_GENERATED.getMessage());
 			description.setCode(PlatformErrorMessages.PRT_PRT_PDF_NOT_GENERATED.getCode());
 
-			regProcLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
+			printLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
 					"UIN",
 					PlatformErrorMessages.PRT_PRT_PDF_NOT_GENERATED.name() + ExceptionUtils.getStackTrace(e));
 			throw new PDFGeneratorException(PDFGeneratorExceptionCodeConstant.PDF_EXCEPTION.getErrorCode(),
@@ -345,7 +345,7 @@ public class PrintServiceImpl implements PrintService{
 			description.setMessage(PlatformErrorMessages.PRT_PRT_PDF_SIGNATURE_EXCEPTION.getMessage());
 			description.setCode(PlatformErrorMessages.PRT_PRT_PDF_SIGNATURE_EXCEPTION.getCode());
 
-			regProcLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
+			printLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
 					"UIN".toString(),
 					PlatformErrorMessages.PRT_PRT_PDF_SIGNATURE_EXCEPTION.name() + ExceptionUtils.getStackTrace(e));
 			throw new PDFSignatureException(PlatformErrorMessages.PRT_PRT_PDF_SIGNATURE_EXCEPTION.getMessage());
@@ -354,7 +354,7 @@ public class PrintServiceImpl implements PrintService{
 			ex.printStackTrace();
 			description.setMessage(PlatformErrorMessages.PRT_PRT_PDF_GENERATION_FAILED.getMessage());
 			description.setCode(PlatformErrorMessages.PRT_PRT_PDF_GENERATION_FAILED.getCode());
-			regProcLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
+			printLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
 					"UIN", description + ex.getMessage() + ExceptionUtils.getStackTrace(ex));
 			throw new PDFGeneratorException(PDFGeneratorExceptionCodeConstant.PDF_EXCEPTION.getErrorCode(),
 					ex.getMessage() + ExceptionUtils.getStackTrace(ex));
@@ -385,7 +385,7 @@ public class PrintServiceImpl implements PrintService{
 			auditLogRequestBuilder.createAuditRequestBuilder(description.getMessage(), eventId, eventName, eventType,
 					moduleId, moduleName, uin);
 		}
-		regProcLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(), "",
+		printLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(), "",
 				"PrintServiceImpl::getDocuments()::exit");
 
 		return byteMap;
@@ -429,7 +429,7 @@ public class PrintServiceImpl implements PrintService{
 	 * null, IdResponseDTO1.class); }
 	 * 
 	 * if (response == null || response.getResponse() == null) {
-	 * regProcLogger.error(LoggerFileConstant.SESSIONID.toString(),
+	 * printLogger.error(LoggerFileConstant.SESSIONID.toString(),
 	 * LoggerFileConstant.REGISTRATIONID.toString(), idValue,
 	 * PlatformErrorMessages.RPR_PRT_IDREPO_RESPONSE_NULL.name()); throw new
 	 * IDRepoResponseNull(PlatformErrorMessages.RPR_PRT_IDREPO_RESPONSE_NULL.getCode
@@ -548,7 +548,7 @@ public class PrintServiceImpl implements PrintService{
 				 * dis.skipBytes(headerLength);
 				 * 
 				 * if (skippedBytes != 0) {
-				 * regProcLogger.debug(LoggerFileConstant.SESSIONID.toString(),
+				 * printLogger.debug(LoggerFileConstant.SESSIONID.toString(),
 				 * LoggerFileConstant.REGISTRATIONID.toString(), "",
 				 * "bytes skipped for image "); } String data =
 				 * DatatypeConverter.printBase64Binary(IOUtils.toByteArray(dis));
@@ -623,7 +623,7 @@ public class PrintServiceImpl implements PrintService{
 			}
 
 		} catch (JsonParseException | JsonMappingException e) {
-			regProcLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
+			printLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
 					null, "Error while parsing Json file" + ExceptionUtils.getStackTrace(e));
 			throw new ParsingException(PlatformErrorMessages.PRT_RGS_JSON_PARSING_EXCEPTION.getMessage(), e);
 		}
@@ -681,14 +681,14 @@ public class PrintServiceImpl implements PrintService{
 		request.setRequesttime(localdatetime);
 		request.setVersion(env.getProperty(REG_PROC_APPLICATION_VERSION));
 
-		regProcLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(), "",
+		printLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(), "",
 				"PrintServiceImpl::getVid():: post CREATEVID service call started with request data : "
 						+ JsonUtil.objectMapperObjectToJson(vidRequestDto));
 
 		vidResponse = (VidResponseDTO) restClientService.postApi(ApiName.CREATEVID, "", "", request,
 				VidResponseDTO.class);
 
-		regProcLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(), "",
+		printLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(), "",
 				"PrintServiceImpl::getVid():: post CREATEVID service call ended successfully");
 
 		if (vidResponse.getErrors() != null && !vidResponse.getErrors().isEmpty()) {

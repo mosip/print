@@ -1,51 +1,45 @@
 package io.mosip.print.init;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 
-import io.mosip.kernel.core.websub.spi.SubscriptionClient;
-import io.mosip.kernel.websub.api.model.SubscriptionChangeRequest;
-import io.mosip.kernel.websub.api.model.SubscriptionChangeResponse;
-import io.mosip.kernel.websub.api.model.UnsubscriptionRequest;
+import io.mosip.kernel.core.logger.spi.Logger;
+import io.mosip.print.constant.LoggerFileConstant;
+import io.mosip.print.logger.PrintLogger;
+import io.mosip.print.util.WebSubSubscriptionHelper;
 
 @Component
 public class SetupPrint 
 implements ApplicationListener<ApplicationReadyEvent> {
 
-    @Autowired
-  SubscriptionClient<SubscriptionChangeRequest,UnsubscriptionRequest, SubscriptionChangeResponse> sb; 
-  
-  @Value("${mosip.event.hubURL}")   
-  private String hubURL;
-  
-  @Value("${mosip.event.topic}")
-  private String topic;
+	private static Logger logger = PrintLogger.getLogger(SetupPrint.class);
 
-	@Value("${mosip.event.callBackUrl}")
-	private String callBackUrl;
- 
+	@Autowired
+	private ThreadPoolTaskScheduler taskScheduler;
+  
+	@Value("${mosip.event.delay :60000}")
+	private int taskSubsctiptionDelay;
 
-  @Value("${mosip.event.secret}")
-  private String secret;
+	@Autowired
+	private WebSubSubscriptionHelper webSubSubscriptionHelper;
   
-  //private String topicName="792112/CREDENTIAL_ISSUED";
-  /**
-   * This event is executed as late as conceivably possible to indicate that 
-   * the application is ready to service requests.
-   */
-  
-  @Override
-  public void onApplicationEvent(final ApplicationReadyEvent event) {
-    
-    SubscriptionChangeRequest subscriptionChangeRequest = new SubscriptionChangeRequest();
-    subscriptionChangeRequest.setHubURL(hubURL+"/hub");
-    subscriptionChangeRequest.setTopic(topic);
-    subscriptionChangeRequest.setSecret(secret);
-	subscriptionChangeRequest.setCallbackURL(callBackUrl);
-    sb.subscribe(subscriptionChangeRequest);
-    return;
-  }
+	@Override
+	public void onApplicationEvent(final ApplicationReadyEvent event) {
+		logger.info(LoggerFileConstant.SESSIONID.toString(), "onApplicationEvent", this.getClass().getSimpleName(),
+				"Scheduling event subscriptions after (milliseconds): " + taskSubsctiptionDelay);
+		taskScheduler.schedule(this::initSubsriptions, new Date(System.currentTimeMillis() + taskSubsctiptionDelay));
+	}
+
+	private void initSubsriptions() {
+		logger.info(LoggerFileConstant.SESSIONID.toString(), "initSubsriptions", this.getClass().getSimpleName(),
+				"Initializing subscribptions..");
+		webSubSubscriptionHelper.initSubsriptions();
+	}
+
 }

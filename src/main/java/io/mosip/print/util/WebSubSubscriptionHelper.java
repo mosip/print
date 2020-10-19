@@ -30,10 +30,6 @@ public class WebSubSubscriptionHelper {
 	@Value("${mosip.event.callBackUrl}")
 	private String callBackUrl;
 
-	/** The config server file storage URL. */
-	// @Value("${mosip.partnerhuburl}")
-	/// private String partnerhuburl;
-
 	@Value("${mosip.event.topic}")
 	private String topic;
 
@@ -68,7 +64,7 @@ public class WebSubSubscriptionHelper {
 
 	private void registerTopic() {
 		try {
-			pb.registerTopic("792112/CREDENTIAL_ISSUED", webSubHubUrl + "/publish");
+			pb.registerTopic(topic, webSubHubUrl + "/publish");
 		} catch (WebSubClientException e) {
 			LOGGER.info("NotifyPrint", WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION, "topic already registered");
 		}
