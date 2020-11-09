@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,6 +57,8 @@ import io.mosip.print.constant.LoggerFileConstant;
 import io.mosip.print.constant.ModuleName;
 import io.mosip.print.constant.PlatformSuccessMessages;
 import io.mosip.print.constant.UinCardType;
+import io.mosip.print.dto.DecryptRequestDto;
+import io.mosip.print.dto.DecryptResponseDto;
 import io.mosip.print.dto.JsonValue;
 import io.mosip.print.dto.VidRequestDto;
 import io.mosip.print.dto.VidResponseDTO;
@@ -84,6 +87,7 @@ import io.mosip.print.util.TemplateGenerator;
 import io.mosip.print.util.Utilities;
 import io.mosip.print.util.WebSubSubscriptionHelper;
 import io.mosip.registration.print.core.http.RequestWrapper;
+import io.mosip.registration.print.core.http.ResponseWrapper;
 
 @Service
 public class PrintServiceImpl implements PrintService{
@@ -214,7 +218,8 @@ public class PrintServiceImpl implements PrintService{
 
 	@Override
 	@SuppressWarnings("rawtypes")
-	public Map<String, byte[]> getDocuments(String credential, String requestId, String sign, String cardType,
+	public Map<String, byte[]> getDocuments(String credential, String encryptionPin, String requestId, String sign,
+			String cardType,
 			boolean isPasswordProtected) {
 		printLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(), "",
 				"PrintServiceImpl::getDocuments()::entry");
@@ -232,22 +237,23 @@ public class PrintServiceImpl implements PrintService{
 		try {
 			credentialSubject = getCrdentialSubject(credential);
 			org.json.JSONObject credentialSubjectJson = new org.json.JSONObject(credentialSubject);
-			individualBio = credentialSubjectJson.getString("individualBiometrics");
+			org.json.JSONObject decryptedJson = decryptAttribute(credentialSubjectJson, encryptionPin, credential);
+			individualBio = decryptedJson.getString("biometrics");
 			String individualBiometric = new String(individualBio);
-			uin = credentialSubjectJson.getString("UIN");
+			uin = decryptedJson.getString("UIN");
 			boolean isPhotoSet = setApplicantPhoto(individualBiometric, attributes);
 			if (!isPhotoSet) {
 				printLogger.debug(LoggerFileConstant.SESSIONID.toString(),
 						LoggerFileConstant.REGISTRATIONID.toString(), uin,
 						PlatformErrorMessages.PRT_PRT_APPLICANT_PHOTO_NOT_SET.name());
 			}
-			setTemplateAttributes(credentialSubject, attributes);
+			setTemplateAttributes(decryptedJson.toString(), attributes);
 			attributes.put(IdType.UIN.toString(), uin);
 
-			byte[] textFileByte = createTextFile(credentialSubject);
+			byte[] textFileByte = createTextFile(decryptedJson.toString());
 			byteMap.put(UIN_TEXT_FILE, textFileByte);
 
-			boolean isQRcodeSet = setQrCode(credentialSubject, attributes);
+			boolean isQRcodeSet = setQrCode(decryptedJson.toString(), attributes);
 			if (!isQRcodeSet) {
 				printLogger.debug(LoggerFileConstant.SESSIONID.toString(),
 						LoggerFileConstant.REGISTRATIONID.toString(), uin,
@@ -498,7 +504,7 @@ public class PrintServiceImpl implements PrintService{
 			throws QrcodeGenerationException, IOException {
 		boolean isQRCodeSet = false;
 		JSONObject qrJsonObj = JsonUtil.objectMapperReadValue(qrString, JSONObject.class);
-		qrJsonObj.remove("individualBiometrics");
+		qrJsonObj.remove("biometrics");
 		// String digitalSignaturedQrData =
 		// digitalSignatureUtility.getDigitalSignature(qrString);
 		// JSONObject textFileJson = new JSONObject();
@@ -833,6 +839,45 @@ public class PrintServiceImpl implements PrintService{
 		creEvent.setTopic(topic);
 		creEvent.setEvent(sEvent);
 		webSubSubscriptionHelper.printStatusUpdateEvent(topic, creEvent);
+	}
+
+	public org.json.JSONObject decryptAttribute(org.json.JSONObject data, String encryptionPin, String credential) {
+
+		org.json.JSONObject jsonObj = new org.json.JSONObject(credential);
+
+		RequestWrapper<DecryptRequestDto> request = new RequestWrapper<>();
+		ResponseWrapper<DecryptResponseDto> response = new ResponseWrapper<DecryptResponseDto>();
+		LocalDateTime now = LocalDateTime.now(ZoneId.of("UTC"));
+		request.setRequesttime(now);
+		String strq = null;
+		org.json.JSONArray jsonArray = (org.json.JSONArray) jsonObj.get("protectedAtributes");
+		for (Object str : jsonArray) {
+			try {
+				DecryptRequestDto decryptRequestDto = new DecryptRequestDto();
+				DecryptResponseDto decryptResponseDto = new DecryptResponseDto();
+				decryptRequestDto.setUserPin(encryptionPin);
+				decryptRequestDto.setData(data.getString(str.toString()));
+				request.setRequest(decryptRequestDto);
+				// response=(DecryptResponseDto)restApiClient.postApi(env.getProperty(ApiName.DECRYPTPINBASSED.name()),
+				// "", de, DecryptResponseDto.class)
+				response = (ResponseWrapper) restClientService.postApi(ApiName.DECRYPTPINBASSED, "", "", request,
+						ResponseWrapper.class);
+
+				decryptResponseDto = JsonUtil.readValue(JsonUtil.writeValueAsString(response.getResponse()),
+						DecryptResponseDto.class);
+				data.put((String) str, decryptResponseDto.getData());
+			} catch (ApisResourceAccessException e) {
+				printLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
+						null, "Error while parsing Json file" + ExceptionUtils.getStackTrace(e));
+				throw new ParsingException(PlatformErrorMessages.PRT_RGS_JSON_PARSING_EXCEPTION.getMessage(), e);
+			} catch (IOException e) {
+				printLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
+						null, "Error while parsing Json file" + ExceptionUtils.getStackTrace(e));
+				throw new ParsingException(PlatformErrorMessages.PRT_RGS_JSON_PARSING_EXCEPTION.getMessage(), e);
+			}
+		}
+		return data;
+
 	}
 }
 	
