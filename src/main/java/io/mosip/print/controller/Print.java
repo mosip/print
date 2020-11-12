@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import io.mosip.kernel.websub.api.annotation.PreAuthenticateContentAndVerifyIntent;
 import io.mosip.print.exception.RegPrintAppException;
 import io.mosip.print.model.EventModel;
-import io.mosip.print.model.MOSIPMessage;
 import io.mosip.print.service.PrintService;
 import io.mosip.print.util.CryptoCoreUtil;
 
@@ -36,14 +36,6 @@ public class Print {
 	CryptoCoreUtil cryptoCoreUtil;
 
 
-	@PostMapping(value = "/enqueue", consumes = "application/json")
-	@PreAuthenticateContentAndVerifyIntent(secret = "Kslk30SNF2AChs2", callback = "/print/enqueue", topic = "http://mosip.io/print/pdf")
-	public void printPost(@RequestBody MOSIPMessage message) {
-		System.out.println(message.getTopic());
-		// TODO: Validate the MOSIPmessage
-		// TODO:Call the print service with the map that we received from MOSIPMessage
-		// printService.print()
-	}
 
 	/**
 	 * Gets the file.
@@ -57,15 +49,16 @@ public class Print {
 	 * @throws RegPrintAppException the reg print app exception
 	 */
 	@PostMapping(path = "/callback/notifyPrint", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@PreAuthenticateContentAndVerifyIntent(secret = "Kslk30SNF2AChs2", callback = "/v1/print/print/callback/notifyPrint", topic = "${mosip.event.topic}")
-	public ResponseEntity<Object> handleSubscribeEvent(@RequestBody EventModel eventModel) throws Exception {
+	@PreAuthenticateContentAndVerifyIntent(secret = "${mosip.event.secret}", callback = "/v1/print/print/callback/notifyPrint", topic = "${mosip.event.topic}")
+	public ResponseEntity<String> handleSubscribeEvent(@RequestBody EventModel eventModel) throws Exception {
 		String credential = eventModel.getEvent().getData().get("credential").toString();
 		String ecryptionPin = eventModel.getEvent().getData().get("protectionKey").toString();
 		String decodedCrdential = cryptoCoreUtil.decrypt(credential);
 		Map proofMap = new HashMap<String, String>();
 		proofMap = (Map) eventModel.getEvent().getData().get("proof");
 		String sign = proofMap.get("signature").toString();
-		byte[] pdfbytes = printService.getDocuments(decodedCrdential, ecryptionPin,
+		byte[] pdfbytes = printService.getDocuments(decodedCrdential,
+				eventModel.getEvent().getData().get("credentialType").toString(), ecryptionPin,
 				eventModel.getEvent().getTransactionId(),
 				getSignature(sign, credential), "UIN", false)
 				.get("uinPdf");
@@ -76,9 +69,7 @@ public class Print {
 		 * ); OutputStream os = new FileOutputStream(pdfFile); os.write(pdfbytes);
 		 * os.close();
 		 */
-		return ResponseEntity.ok().contentType(MediaType.parseMediaType("application/pdf"))
-				.header("Content-Disposition", "attachment; filename=\"" + "uinCard" + ".pdf\"")
-				.body((Object) resource);
+		return new ResponseEntity<>("successfully printed", HttpStatus.OK);
 
 	}
 

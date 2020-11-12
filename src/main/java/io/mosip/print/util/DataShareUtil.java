@@ -11,13 +11,17 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.mosip.kernel.core.logger.spi.Logger;
+import io.mosip.print.constant.ApiName;
 import io.mosip.print.dto.DataShare;
 import io.mosip.print.dto.DataShareResponseDto;
 import io.mosip.print.dto.ErrorDTO;
+import io.mosip.print.exception.ApiNotAccessibleException;
 import io.mosip.print.exception.DataShareException;
 import io.mosip.print.logger.PrintLogger;
 import io.mosip.print.service.PrintRestClientService;
@@ -41,7 +45,7 @@ public class DataShareUtil {
 	private static final String CREDENTIALFILE = "credentialfile";
 
 	public DataShare getDataShare(byte[] data, String policyId, String partnerId)
-			throws IOException, DataShareException {
+			throws IOException, DataShareException, ApiNotAccessibleException {
 		try {
 
 			LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
@@ -62,12 +66,10 @@ public class DataShareUtil {
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 		HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<LinkedMultiValueMap<String, Object>>(
 				map, headers);
-		// String responseString = restUtil.postApi(ApiName.CREATEDATASHARE,
-		// pathsegments, "", "",
-		// MediaType.MULTIPART_FORM_DATA, requestEntity, String.class);
-		String responseString = null;
+		String responseString = (String) restUtil.postApi(ApiName.CREATEDATASHARE, pathsegments, "", "", requestEntity,
+				String.class);
 		DataShareResponseDto responseObject = mapper.readValue(responseString, DataShareResponseDto.class);
-
+		System.out.println("data share responses" + responseObject);
 		if (responseObject == null) {
 			throw new DataShareException();
 		}
@@ -81,20 +83,19 @@ public class DataShareUtil {
 		}
 		} catch (Exception e) {
 
-			/*
-			 * if (e.getCause() instanceof HttpClientErrorException) {
-			 * HttpClientErrorException httpClientException = (HttpClientErrorException)
-			 * e.getCause(); throw new io.mosip.print.exception.ApiNotAccessibleException(
-			 * httpClientException.getResponseBodyAsString()); } else if (e.getCause()
-			 * instanceof HttpServerErrorException) { HttpServerErrorException
-			 * httpServerException = (HttpServerErrorException) e.getCause(); throw new
-			 * ApiNotAccessibleException(httpServerException.getResponseBodyAsString()); }
-			 * else { throw new DataShareException(e); }
-			 */
+			if (e.getCause() instanceof HttpClientErrorException) {
+
+				HttpClientErrorException httpClientException = (HttpClientErrorException) e.getCause();
+				throw new io.mosip.print.exception.ApiNotAccessibleException(
+						httpClientException.getResponseBodyAsString());
+			} else if (e.getCause() instanceof HttpServerErrorException) {
+				HttpServerErrorException httpServerException = (HttpServerErrorException) e.getCause();
+				throw new ApiNotAccessibleException(httpServerException.getResponseBodyAsString());
+			} else {
+				throw new DataShareException(e);
+			}
 
 		}
-		return null;
-
 
 	}
 }

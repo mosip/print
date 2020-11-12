@@ -52,10 +52,10 @@ public class CryptoCoreUtil {
     public static PrivateKey loadP12() throws KeyStoreException, NoSuchAlgorithmException, CertificateException,
             IOException, UnrecoverableEntryException {
         KeyStore mosipKeyStore = KeyStore.getInstance("PKCS12");
-		java.io.FileInputStream fis = new java.io.FileInputStream("src/main/resources/pr001-new-key.p12");
-        mosipKeyStore.load(fis, "pas$w0rd@123".toCharArray());
-        ProtectionParameter password = new PasswordProtection("pas$w0rd@123".toCharArray());
-        PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) mosipKeyStore.getEntry("pr001-enc-key", password);
+		java.io.FileInputStream fis = new java.io.FileInputStream("src/main/resources/partner.p12");
+		mosipKeyStore.load(fis, "password@123".toCharArray());
+		ProtectionParameter password = new PasswordProtection("password@123".toCharArray());
+		PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) mosipKeyStore.getEntry("partner", password);
         PrivateKey privateKey = privateKeyEntry.getPrivateKey();
         return privateKey;
     }
@@ -69,7 +69,6 @@ public class CryptoCoreUtil {
         final int cipherKeyandDataLength = key.length;
         final int keySplitterLength = keySplitter.length();
         keyDemiliterIndex = getSplitterIndex(key, keyDemiliterIndex, keySplitter);
-        System.out.println("split" + keyDemiliterIndex);
         byte[] encryptedKey = copyOfRange(key, 0, keyDemiliterIndex);
 		try {
 			encryptedData = copyOfRange(key, keyDemiliterIndex + keySplitterLength, cipherKeyandDataLength);
