@@ -65,7 +65,9 @@ public enum PlatformErrorMessages {
 	PRT_PIS_IDENTITY_NOT_FOUND(PlatformConstants.PRT_PRINT_PREFIX + "002",
 			"Unable to Find Identity Field in ID JSON"),
 	/** Access denied for the token present. */
-	PRT_AUT_ACCESS_DENIED(PlatformConstants.PRT_PRINT_PREFIX + "02", "Access Denied For Role - %s");
+	PRT_AUT_ACCESS_DENIED(PlatformConstants.PRT_PRINT_PREFIX + "02", "Access Denied For Role - %s"),
+	DATASHARE_EXCEPTION(PlatformConstants.PRT_PRINT_PREFIX + "025", "Data share api failure"),
+	API_NOT_ACCESSIBLE_EXCEPTION(PlatformConstants.PRT_PRINT_PREFIX + "026", "Api not accessible failure");
 	
 
 	/** The error message. */
