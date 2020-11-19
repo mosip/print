@@ -49,10 +49,11 @@ public class CryptoCoreUtil {
 		return strData;
     }
 
-    public static PrivateKey loadP12() throws KeyStoreException, NoSuchAlgorithmException, CertificateException,
+	public PrivateKey loadP12() throws KeyStoreException, NoSuchAlgorithmException, CertificateException,
             IOException, UnrecoverableEntryException {
         KeyStore mosipKeyStore = KeyStore.getInstance("PKCS12");
-		java.io.FileInputStream fis = new java.io.FileInputStream("src/main/resources/partner.p12");
+		java.io.FileInputStream fis = new java.io.FileInputStream(
+				getClass().getClassLoader().getResource("partner.p12").getFile());
 		mosipKeyStore.load(fis, "password@123".toCharArray());
 		ProtectionParameter password = new PasswordProtection("password@123".toCharArray());
 		PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) mosipKeyStore.getEntry("partner", password);
