@@ -15,8 +15,9 @@ public interface PrintService<T> {
 	 *            the is password protected
 	 * @return the documents
 	 */
-	public T getDocuments(String credentialSubject, String requestId, String sign, String cardType,
-			boolean isPasswordProtected);
+	public T getDocuments(String credentialSubject, String credentialType, String encryptionPin, String requestId,
+			String sign,
+			String cardType, boolean isPasswordProtected);
 
 	// Map<String, byte[]> getDocuments(String credentialSubject, String sign,
 	// String cardType,
