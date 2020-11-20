@@ -3,6 +3,7 @@ package io.mosip.print.util;
 import static java.util.Arrays.copyOfRange;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -49,11 +50,11 @@ public class CryptoCoreUtil {
 		return strData;
     }
 
-    public static PrivateKey loadP12() throws KeyStoreException, NoSuchAlgorithmException, CertificateException,
+	public PrivateKey loadP12() throws KeyStoreException, NoSuchAlgorithmException, CertificateException,
             IOException, UnrecoverableEntryException {
         KeyStore mosipKeyStore = KeyStore.getInstance("PKCS12");
-		java.io.FileInputStream fis = new java.io.FileInputStream("src/main/resources/partner.p12");
-		mosipKeyStore.load(fis, "password@123".toCharArray());
+		InputStream in = getClass().getClassLoader().getResourceAsStream("partner.p12");
+		mosipKeyStore.load(in, "password@123".toCharArray());
 		ProtectionParameter password = new PasswordProtection("password@123".toCharArray());
 		PrivateKeyEntry privateKeyEntry = (PrivateKeyEntry) mosipKeyStore.getEntry("partner", password);
         PrivateKey privateKey = privateKeyEntry.getPrivateKey();

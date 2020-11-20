@@ -214,8 +214,11 @@ public class PrintServiceImpl implements PrintService{
 	@Autowired
 	private PublisherClient<String, Object, HttpHeaders> pb;
 	
-	@Value("${mosip.partner.id}")
+	@Value("${mosip.datashare.partner.id}")
 	private String partnerId;
+
+	@Value("${mosip.datashare.policy.id}")
+	private String policyId;
 
 	/*
 	 * (non-Javadoc)
@@ -843,8 +846,7 @@ public class PrintServiceImpl implements PrintService{
 	private void printStatusUpdate(String requestId, byte[] data, String credentialType)
 			throws DataShareException, ApiNotAccessibleException, IOException, Exception {
 		DataShare dataShare = null;
-		System.out.println("credenti  :: " + credentialType);
-		dataShare = dataShareUtil.getDataShare(data, getPolicy(credentialType), partnerId);
+		dataShare = dataShareUtil.getDataShare(data, policyId, partnerId);
 		CredentialStatusEvent creEvent = new CredentialStatusEvent();
 		LocalDateTime currentDtime = DateUtils.getUTCCurrentDateTime();
 		StatusEvent sEvent = new StatusEvent();
@@ -857,7 +859,6 @@ public class PrintServiceImpl implements PrintService{
 		creEvent.setPublisher("PRINT_SERVICE");
 		creEvent.setTopic(topic);
 		creEvent.setEvent(sEvent);
-		System.out.println("event" + creEvent);
 		webSubSubscriptionHelper.printStatusUpdateEvent(topic, creEvent);
 	}
 
@@ -902,19 +903,16 @@ public class PrintServiceImpl implements PrintService{
 		return data;
 
 	}
-
-	public String getPolicy(String credentialTYpe) throws Exception {
-
-		if (credentialTYpe.equalsIgnoreCase("qrcode")) {
-			return "mpolicy-default-qrcode";
-		} else if (credentialTYpe.equalsIgnoreCase("euin")) {
-			return "mpolicy-default-euin";
-		} else if (credentialTYpe.equalsIgnoreCase("reprint")) {
-			return "mpolicy-default-reprint";
-		} else {
-			throw new Exception("Credential Type is invalid");
-		}
-	}
+	/*
+	 * public String getPolicy(String credentialTYpe) throws Exception {
+	 * 
+	 * if (credentialTYpe.equalsIgnoreCase("qrcode")) { return
+	 * "mpolicy-default-qrcode"; } else if (credentialTYpe.equalsIgnoreCase("euin"))
+	 * { return "mpolicy-default-euin"; } else if
+	 * (credentialTYpe.equalsIgnoreCase("reprint")) { return
+	 * "mpolicy-default-reprint"; } else { throw new
+	 * Exception("Credential Type is invalid"); } }
+	 */
 }
 	
 	
