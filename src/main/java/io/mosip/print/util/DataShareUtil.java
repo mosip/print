@@ -69,7 +69,6 @@ public class DataShareUtil {
 		String responseString = (String) restUtil.postApi(ApiName.CREATEDATASHARE, pathsegments, "", "", requestEntity,
 				String.class);
 		DataShareResponseDto responseObject = mapper.readValue(responseString, DataShareResponseDto.class);
-		System.out.println("data share responses" + responseObject);
 		if (responseObject == null) {
 			throw new DataShareException();
 		}
