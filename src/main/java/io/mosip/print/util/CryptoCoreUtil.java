@@ -49,13 +49,6 @@ public class CryptoCoreUtil {
 
 	private final static int THUMBPRINT_LENGTH = 32;
 
-	public static void main(String[] args) throws Exception {
-		CryptoCoreUtil cr = new CryptoCoreUtil();
-		String data = "eOnjygslhZntNeBTrPGYXFFRtOBtANNXXwlvoKxCcTpDUveUrwbcmX5wTxYUwmenL77R7_lhCfxCxVL1fd2UEez5W0CuLqahTWL2kO5ZvebETCqE5JFRroFFyCggE4d4932aU8PWnL6Q2IwQomYu7JGzGiAgHZxi3HwrfKseJqy4qtRBueVyf8id2y1vxo_oa-dCV7vYPujYGfJiOioaIFmQKwUIbpVZ1g2QIjZ-_z0qYGc8vhFupaETNVGUNpOeTSJqhHYQnn2jXFvT-JTx_oYtCFuyGQz9ngxyRTK3ocZAO6kvzfk48msjoSP2x70dxDQCEaYPPuFH2q4-K8BzO8weofH00bKO6MFj5LBqLkZ-_n3DMxaiuf4ywymXkzjzI0tFWV9TUExJVFRFUiOTbnQltadgatj9HdQ5mlWLBHlGKAyouPj6F_Iv6ZgyOVWOw2I-Y5EtjOQM9uKW1byDapVX";
-		String data1 = cr.decrypt(data);
-		System.out.println(">>>>>>>>>>>>>>" + data1);
-	}
-
 	public String decrypt(String data) throws Exception {
 		PrivateKeyEntry privateKeyEntry = loadP12();
 		byte[] dataBytes = org.apache.commons.codec.binary.Base64.decodeBase64(data);
