@@ -13,7 +13,8 @@ import io.mosip.kernel.cbeffutil.impl.CbeffImpl;
 import io.mosip.kernel.core.cbeffutil.spi.CbeffUtil;
 
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class, 
-        HibernateJpaAutoConfiguration.class, CacheAutoConfiguration.class})
+		HibernateJpaAutoConfiguration.class,
+		CacheAutoConfiguration.class, }, scanBasePackages = { "${mosip.auth.adapter.impl.basepackage}" })
 public class PrintPDFApplication {
 
 	@Bean
