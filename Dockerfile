@@ -31,6 +31,7 @@ ENV is_glowroot_env=${is_glowroot}
 ENV artifactory_url_env=${artifactory_url}
 
 
+
 # change volume to whichever storage directory you want to use for this container.
 VOLUME /home/logs /home/Glowroot
 
@@ -47,6 +48,7 @@ CMD if [ "$is_glowroot_env" = "present" ]; then \
     sed -i 's/<service_name>/print/g' glowroot/glowroot.properties ; \
     java -jar -javaagent:glowroot/glowroot.jar -Dspring.cloud.config.label="${spring_config_label_env}" -Dspring.profiles.active="${active_profile_env}" -Dspring.cloud.config.uri="${spring_config_url_env}" print.jar ; \
     else \
+ 
     java -jar -Dspring.cloud.config.label="${spring_config_label_env}" -Dspring.profiles.active="${active_profile_env}" -Dspring.cloud.config.uri="${spring_config_url_env}" print.jar ; \
     fi
 

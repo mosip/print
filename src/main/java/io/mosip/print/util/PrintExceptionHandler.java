@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -122,10 +121,6 @@ public class PrintExceptionHandler {
 		return buildPrintApiExceptionResponse((Exception) ex);
 	}
 
-	@ExceptionHandler(DataIntegrityViolationException.class)
-	public ResponseEntity<PrintResponse> dataExceptionHandler(final DataIntegrityViolationException e) {
-		return buildPrintApiExceptionResponse((Exception) e);
-	}
 
 	@ExceptionHandler(AccessDeniedException.class)
 	public ResponseEntity<PrintResponse> accessDenied(AccessDeniedException e) {

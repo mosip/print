@@ -2,6 +2,10 @@ package io.mosip.print;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -9,7 +13,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import io.mosip.kernel.cbeffutil.impl.CbeffImpl;
 import io.mosip.kernel.core.cbeffutil.spi.CbeffUtil;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = { SecurityAutoConfiguration.class, DataSourceAutoConfiguration.class,
+		HibernateJpaAutoConfiguration.class,
+		CacheAutoConfiguration.class })
 public class PrintPDFApplication {
 
 	@Bean
