@@ -3,10 +3,8 @@ package io.mosip.print.service.impl;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -298,8 +296,6 @@ public class PrintServiceImpl implements PrintService{
 			}
 			if (credentialType.equalsIgnoreCase("qrcode")) {
 				boolean isQRcodeSet = setQrCode(decryptedJson.toString(), attributes);
-				// String qrcodeString = (String) attributes.get("QrCode");
-				// InputStream qrcodeInputstream = new ByteArrayInputStream(qrcode);
 				InputStream uinArtifact = templateGenerator.getTemplate(template, attributes, primaryLang);
 				pdfbytes = uinCardGenerator.generateUinCard(uinArtifact, UinCardType.PDF,
 						password);
@@ -336,10 +332,6 @@ public class PrintServiceImpl implements PrintService{
 			pdfbytes = uinCardGenerator.generateUinCard(uinArtifact, UinCardType.PDF, password);
 		}
 			printStatusUpdate(requestId, pdfbytes, credentialType);
-			File pdfFile = new File("src/main/resources/uin.pdf");
-			OutputStream os = new FileOutputStream(pdfFile);
-			os.write(pdfbytes);
-			os.close();
 			isTransactionSuccessful = true;
 
 		} catch (VidCreationException e) {
