@@ -134,7 +134,6 @@ public class CryptoUtil {
 	private String hash(byte[] data, byte[] salt) {
 		SecretKeyFactory secretKeyFactory;
 		char[] convertedData = new String(data).toCharArray();
-		System.out.println("iteration : " + iterations);
 		PBEKeySpec pbeKeySpec = new PBEKeySpec(convertedData, salt, iterations, symmetricKeyLength);
 		SecretKey key = null;
 		try {
