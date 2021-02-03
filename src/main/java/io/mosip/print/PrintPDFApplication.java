@@ -10,8 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
-import io.mosip.kernel.cbeffutil.impl.CbeffImpl;
-import io.mosip.kernel.core.cbeffutil.spi.CbeffUtil;
+import io.mosip.print.service.impl.CbeffImpl;
+import io.mosip.print.spi.CbeffUtil;
 
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class, DataSourceAutoConfiguration.class,
 		HibernateJpaAutoConfiguration.class,
