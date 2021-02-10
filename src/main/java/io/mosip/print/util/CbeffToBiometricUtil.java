@@ -5,21 +5,22 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.mosip.kernel.bioapi.impl.BioApiImpl;
-import io.mosip.kernel.cbeffutil.impl.CbeffImpl;
-import io.mosip.kernel.core.bioapi.exception.BiometricException;
-import io.mosip.kernel.core.bioapi.model.KeyValuePair;
-import io.mosip.kernel.core.bioapi.spi.IBioApi;
-import io.mosip.kernel.core.cbeffutil.entity.BIR;
-import io.mosip.kernel.core.cbeffutil.jaxbclasses.BIRType;
-import io.mosip.kernel.core.cbeffutil.jaxbclasses.SingleType;
-import io.mosip.kernel.core.cbeffutil.spi.CbeffUtil;
-import io.mosip.kernel.core.logger.spi.Logger;
-import io.mosip.kernel.core.util.CryptoUtil;
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+
+import io.mosip.print.cbeffutil.BIRType;
+import io.mosip.print.cbeffutil.SingleType;
 import io.mosip.print.constant.LoggerFileConstant;
+import io.mosip.print.entity.BIR;
+import io.mosip.print.exception.BiometricException;
 import io.mosip.print.exception.BiometricTagMatchException;
 import io.mosip.print.exception.PlatformErrorMessages;
 import io.mosip.print.logger.PrintLogger;
+import io.mosip.print.model.KeyValuePair;
+import io.mosip.print.service.IBioApi;
+import io.mosip.print.service.impl.BioApiImpl;
+import io.mosip.print.service.impl.CbeffImpl;
+import io.mosip.print.spi.CbeffUtil;
 
 /**
  * The Class CbeffToBiometricUtil.
@@ -29,8 +30,8 @@ import io.mosip.print.logger.PrintLogger;
  */
 public class CbeffToBiometricUtil {
 	
-	/** The reg proc logger. */
-	private static Logger regProcLogger = PrintLogger.getLogger(CbeffToBiometricUtil.class);
+	/** The print logger. */
+	Logger printLogger = PrintLogger.getLogger(CbeffToBiometricUtil.class);
 
 	/** The cbeffutil. */
 	private CbeffUtil cbeffutil=new CbeffImpl();
@@ -40,8 +41,7 @@ public class CbeffToBiometricUtil {
 	/**
 	 * Instantiates a new cbeff to biometric util.
 	 *
-	 * @param cbeffutil
-	 *            the cbeffutil
+	 * @param cbeffutil the cbeffutil
 	 */
 	public CbeffToBiometricUtil(CbeffUtil cbeffutil) {
 		this.cbeffutil = cbeffutil;
@@ -69,7 +69,7 @@ public class CbeffToBiometricUtil {
 	 *             the exception
 	 */
 	public byte[] getImageBytes(String cbeffFileString, String type, List<String> subType) throws Exception {
-		regProcLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.USERID.toString(), "",
+		printLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.USERID.toString(), "",
 				"CbeffToBiometricUtil::getImageBytes()::entry");
 
 		byte[] photoBytes = null;
@@ -77,7 +77,7 @@ public class CbeffToBiometricUtil {
 			List<BIRType> bIRTypeList = getBIRTypeList(cbeffFileString);
 			photoBytes = getPhotoByTypeAndSubType(bIRTypeList, type, subType);
 		}
-		regProcLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.USERID.toString(), "",
+		printLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.USERID.toString(), "",
 				"CbeffToBiometricUtil::getImageBytes()::exit");
 
 		return photoBytes;
@@ -158,7 +158,7 @@ public class CbeffToBiometricUtil {
 	 */
 	public InputStream mergeCbeff(String cbeffFile1, String cbeffFile2) throws Exception {
 		byte[] mergedCbeffByte = null;
-		regProcLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.USERID.toString(), "",
+		printLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.USERID.toString(), "",
 				"CbeffToBiometricUtil::mergeCbeff()::entry");
 
 		/*
@@ -176,7 +176,7 @@ public class CbeffToBiometricUtil {
 			file1BirTypeList.addAll(file2BirTypeList);
 			mergedCbeffByte = cbeffutil.createXML(convertBIRTYPEtoBIR(file1BirTypeList));
 			// }
-		regProcLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.USERID.toString(), "",
+			printLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.USERID.toString(), "",
 				"CbeffToBiometricUtil::mergeCbeff()::exit");
 
 		return new ByteArrayInputStream(mergedCbeffByte);
@@ -261,7 +261,7 @@ public class CbeffToBiometricUtil {
 	 */
 	public InputStream extractCbeffWithTypes(String cbeffFile, List<String> types) throws Exception {
 		List<BIRType> extractedType = new ArrayList<>();
-		regProcLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.USERID.toString(), "",
+		printLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.USERID.toString(), "",
 				"CbeffToBiometricUtil::extractCbeffWithTypes()::entry");
 
 		byte[] newCbeffByte = null;
@@ -279,7 +279,7 @@ public class CbeffToBiometricUtil {
 		} else {
 			return null;
 		}
-		regProcLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.USERID.toString(), "",
+		printLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.USERID.toString(), "",
 				"CbeffToBiometricUtil::extractCbeffWithTypes()::exit");
 
 		return new ByteArrayInputStream(newCbeffByte);
@@ -308,7 +308,7 @@ public class CbeffToBiometricUtil {
 	 */
 
 	public List<BIRType> getBIRTypeList(String cbeffFileString) throws Exception {
-		return cbeffutil.getBIRDataFromXML(CryptoUtil.decodeBase64(cbeffFileString));
+		return cbeffutil.getBIRDataFromXML(Base64.decodeBase64(cbeffFileString));
 	}
 	/**
 	 * Gets the BIR type list.

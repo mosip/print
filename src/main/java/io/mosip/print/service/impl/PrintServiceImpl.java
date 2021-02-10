@@ -5,13 +5,16 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -20,11 +23,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+
+import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -36,41 +44,36 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import io.mosip.kernel.core.cbeffutil.spi.CbeffUtil;
-import io.mosip.kernel.core.exception.ExceptionUtils;
-import io.mosip.kernel.core.logger.spi.Logger;
-import io.mosip.kernel.core.pdfgenerator.exception.PDFGeneratorException;
-import io.mosip.kernel.core.qrcodegenerator.exception.QrcodeGenerationException;
-import io.mosip.kernel.core.qrcodegenerator.spi.QrCodeGenerator;
-import io.mosip.kernel.core.util.CryptoUtil;
-import io.mosip.kernel.core.util.DateUtils;
-import io.mosip.kernel.core.websub.spi.PublisherClient;
-import io.mosip.kernel.pdfgenerator.itext.constant.PDFGeneratorExceptionCodeConstant;
-import io.mosip.kernel.qrcode.generator.zxing.constant.QrVersion;
 import io.mosip.print.constant.ApiName;
-import io.mosip.print.constant.CardType;
 import io.mosip.print.constant.EventId;
 import io.mosip.print.constant.EventName;
 import io.mosip.print.constant.EventType;
 import io.mosip.print.constant.IdType;
 import io.mosip.print.constant.LoggerFileConstant;
 import io.mosip.print.constant.ModuleName;
+import io.mosip.print.constant.PDFGeneratorExceptionCodeConstant;
 import io.mosip.print.constant.PlatformSuccessMessages;
+import io.mosip.print.constant.QrVersion;
 import io.mosip.print.constant.UinCardType;
+import io.mosip.print.core.http.RequestWrapper;
+import io.mosip.print.dto.CryptoWithPinRequestDto;
+import io.mosip.print.dto.CryptoWithPinResponseDto;
 import io.mosip.print.dto.DataShare;
-import io.mosip.print.dto.DecryptRequestDto;
-import io.mosip.print.dto.DecryptResponseDto;
 import io.mosip.print.dto.JsonValue;
 import io.mosip.print.dto.VidRequestDto;
 import io.mosip.print.dto.VidResponseDTO;
 import io.mosip.print.exception.ApiNotAccessibleException;
 import io.mosip.print.exception.ApisResourceAccessException;
+import io.mosip.print.exception.CryptoManagerException;
 import io.mosip.print.exception.DataShareException;
+import io.mosip.print.exception.ExceptionUtils;
 import io.mosip.print.exception.IdRepoAppException;
 import io.mosip.print.exception.IdentityNotFoundException;
+import io.mosip.print.exception.PDFGeneratorException;
 import io.mosip.print.exception.PDFSignatureException;
 import io.mosip.print.exception.ParsingException;
 import io.mosip.print.exception.PlatformErrorMessages;
+import io.mosip.print.exception.QrcodeGenerationException;
 import io.mosip.print.exception.TemplateProcessingFailureException;
 import io.mosip.print.exception.UINNotFoundInDatabase;
 import io.mosip.print.exception.VidCreationException;
@@ -78,20 +81,26 @@ import io.mosip.print.idrepo.dto.IdResponseDTO1;
 import io.mosip.print.logger.LogDescription;
 import io.mosip.print.logger.PrintLogger;
 import io.mosip.print.model.CredentialStatusEvent;
+import io.mosip.print.model.EventModel;
 import io.mosip.print.model.StatusEvent;
 import io.mosip.print.service.PrintRestClientService;
 import io.mosip.print.service.PrintService;
 import io.mosip.print.service.UinCardGenerator;
+import io.mosip.print.spi.CbeffUtil;
+import io.mosip.print.spi.PublisherClient;
+import io.mosip.print.spi.QrCodeGenerator;
 import io.mosip.print.util.AuditLogRequestBuilder;
 import io.mosip.print.util.CbeffToBiometricUtil;
+import io.mosip.print.util.CryptoCoreUtil;
+import io.mosip.print.util.CryptoUtil;
 import io.mosip.print.util.DataShareUtil;
+import io.mosip.print.util.DateUtils;
 import io.mosip.print.util.DigitalSignatureUtility;
 import io.mosip.print.util.JsonUtil;
+import io.mosip.print.util.RestApiClient;
 import io.mosip.print.util.TemplateGenerator;
 import io.mosip.print.util.Utilities;
 import io.mosip.print.util.WebSubSubscriptionHelper;
-import io.mosip.registration.print.core.http.RequestWrapper;
-import io.mosip.registration.print.core.http.ResponseWrapper;
 
 @Service
 public class PrintServiceImpl implements PrintService{
@@ -103,6 +112,15 @@ public class PrintServiceImpl implements PrintService{
 
 	@Autowired
 	private DataShareUtil dataShareUtil;
+
+	@Autowired
+	CryptoUtil cryptoUtil;
+
+	@Autowired
+	private RestApiClient restApiClient;
+
+	@Autowired
+	private CryptoCoreUtil cryptoCoreUtil;
 
 	/** The Constant FILE_SEPARATOR. */
 	public static final String FILE_SEPARATOR = File.separator;
@@ -118,16 +136,6 @@ public class PrintServiceImpl implements PrintService{
 	@Value("${mosip.secondary-language}")
 	private String secondaryLang;
 
-	/** The un masked length. */
-	@Value("${registration.processor.unMaskedUin.length}")
-	private int unMaskedLength;
-
-	/** The uin length. */
-	@Value("${mosip.kernel.uin.length}")
-	private int uinLength;
-
-	@Value("${mosip.print.uin.header.length}")
-	private int headerLength;
 	/** The Constant UIN_CARD_TEMPLATE. */
 	private static final String UIN_CARD_TEMPLATE = "RPR_UIN_CARD_TEMPLATE";
 
@@ -152,8 +160,8 @@ public class PrintServiceImpl implements PrintService{
 	/** The Constant UINCARDPASSWORD. */
 	private static final String UINCARDPASSWORD = "mosip.registration.processor.print.service.uincard.password";
 
-	/** The reg proc logger. */
-	private static Logger printLogger = PrintLogger.getLogger(PrintServiceImpl.class);
+	/** The print logger. */
+	Logger printLogger = PrintLogger.getLogger(PrintServiceImpl.class);
 
 	/** The core audit request builder. */
 	@Autowired
@@ -175,10 +183,6 @@ public class PrintServiceImpl implements PrintService{
 	@Autowired
 	private PrintRestClientService<Object> restClientService;
 
-	/** The registration status service. */
-	// @Autowired
-	// RegistrationStatusService<String, InternalRegistrationStatusDto,
-	// RegistrationStatusDto> registrationStatusService;
 
 	/** The qr code generator. */
 	@Autowired
@@ -220,6 +224,36 @@ public class PrintServiceImpl implements PrintService{
 	@Value("${mosip.datashare.policy.id}")
 	private String policyId;
 
+	public byte[] generateCard(EventModel eventModel) throws Exception {
+		Map<String, byte[]> byteMap = new HashMap<>();
+		String decodedCrdential = null;
+		String credential = null;
+		if (eventModel.getEvent().getDataShareUri() == null || eventModel.getEvent().getDataShareUri().isEmpty()) {
+			credential = eventModel.getEvent().getData().get("credential").toString();
+		} else {
+			String dataShareUrl = eventModel.getEvent().getDataShareUri();
+			URI dataShareUri = URI.create(dataShareUrl);
+			credential = restApiClient.getApi(dataShareUri, String.class);
+		}
+		String ecryptionPin = eventModel.getEvent().getData().get("protectionKey").toString();
+		decodedCrdential = cryptoCoreUtil.decrypt(credential);
+		Map proofMap = new HashMap<String, String>();
+		proofMap = (Map) eventModel.getEvent().getData().get("proof");
+		String sign = proofMap.get("signature").toString();
+		byte[] pdfbytes = getDocuments(decodedCrdential,
+				eventModel.getEvent().getData().get("credentialType").toString(), ecryptionPin,
+				eventModel.getEvent().getTransactionId(), getSignature(sign, credential), "UIN", false).get("uinPdf");
+		return pdfbytes;
+	}
+
+	private String getSignature(String sign, String crdential) {
+		String signHeader = sign.split("\\.")[0];
+		String signData = sign.split("\\.")[2];
+		String signature = signHeader + "." + crdential + "." + signData;
+		return signature;
+	}
+
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -228,13 +262,12 @@ public class PrintServiceImpl implements PrintService{
 	 * java.lang.String, java.lang.String, boolean)
 	 */
 
-	@Override
 	@SuppressWarnings("rawtypes")
-	public Map<String, byte[]> getDocuments(String credential, String credentialType, String encryptionPin,
+	private Map<String, byte[]> getDocuments(String credential, String credentialType, String encryptionPin,
 			String requestId, String sign,
 			String cardType,
 			boolean isPasswordProtected) {
-		printLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(), "",
+		printLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
 				"PrintServiceImpl::getDocuments()::entry");
 
 
@@ -243,26 +276,36 @@ public class PrintServiceImpl implements PrintService{
 		String uin = null;
 		LogDescription description = new LogDescription();
 		String vid = null;
+		String password = null;
 		String individualBio = null;
 		Map<String, Object> attributes = new LinkedHashMap<>();
 		boolean isTransactionSuccessful = false;
 		IdResponseDTO1 response = null;
 		String template = UIN_CARD_TEMPLATE;
+		byte[] pdfbytes = null;
 		try {
-			/*
-			 * if(credentialType.equalsIgnoreCase("qrcode")) { setQrCode(sign, attributes);
-			 * }
-			 */
+
 			credentialSubject = getCrdentialSubject(credential);
 			org.json.JSONObject credentialSubjectJson = new org.json.JSONObject(credentialSubject);
 			org.json.JSONObject decryptedJson = decryptAttribute(credentialSubjectJson, encryptionPin, credential);
 			individualBio = decryptedJson.getString("biometrics");
 			String individualBiometric = new String(individualBio);
 			uin = decryptedJson.getString("UIN");
+			if (isPasswordProtected) {
+				password = getPassword(uin);
+			}
+			if (credentialType.equalsIgnoreCase("qrcode")) {
+				boolean isQRcodeSet = setQrCode(decryptedJson.toString(), attributes);
+				InputStream uinArtifact = templateGenerator.getTemplate(template, attributes, primaryLang);
+				pdfbytes = uinCardGenerator.generateUinCard(uinArtifact, UinCardType.PDF,
+						password);
+
+			} else {
+
 			boolean isPhotoSet = setApplicantPhoto(individualBiometric, attributes);
 			if (!isPhotoSet) {
 				printLogger.debug(LoggerFileConstant.SESSIONID.toString(),
-						LoggerFileConstant.REGISTRATIONID.toString(), uin,
+						LoggerFileConstant.REGISTRATIONID.toString(), uin +
 						PlatformErrorMessages.PRT_PRT_APPLICANT_PHOTO_NOT_SET.name());
 			}
 			setTemplateAttributes(decryptedJson.toString(), attributes);
@@ -274,33 +317,20 @@ public class PrintServiceImpl implements PrintService{
 			boolean isQRcodeSet = setQrCode(decryptedJson.toString(), attributes);
 			if (!isQRcodeSet) {
 				printLogger.debug(LoggerFileConstant.SESSIONID.toString(),
-						LoggerFileConstant.REGISTRATIONID.toString(), uin,
+						LoggerFileConstant.REGISTRATIONID.toString(), uin +
 						PlatformErrorMessages.PRT_PRT_QRCODE_NOT_SET.name());
 			}
-
-			template = setTemplateForMaskedUIN(cardType, uin, vid, attributes, template);
-
 			// getting template and placing original valuespng
 			InputStream uinArtifact = templateGenerator.getTemplate(template, attributes, primaryLang);
 			if (uinArtifact == null) {
 				printLogger.error(LoggerFileConstant.SESSIONID.toString(),
-						LoggerFileConstant.REGISTRATIONID.toString(), "UIN",
+						LoggerFileConstant.REGISTRATIONID.toString(), "UIN" +
 						PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.name());
 				throw new TemplateProcessingFailureException(
 						PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.getCode());
 			}
-
-			String password = null;
-			if (isPasswordProtected) {
-				password = getPassword(uin);
-			}
-
-			// generating pdf
-			byte[] pdfbytes = uinCardGenerator.generateUinCard(uinArtifact, UinCardType.PDF, password);
-			byteMap.put(UIN_CARD_PDF, pdfbytes);
-
-			byte[] uinbyte = attributes.get("UIN").toString().getBytes();
-			byteMap.put("UIN", uinbyte);
+			pdfbytes = uinCardGenerator.generateUinCard(uinArtifact, UinCardType.PDF, password);
+		}
 			printStatusUpdate(requestId, pdfbytes, credentialType);
 			isTransactionSuccessful = true;
 
@@ -408,20 +438,6 @@ public class PrintServiceImpl implements PrintService{
 		return byteMap;
 	}
 
-	private String setTemplateForMaskedUIN(String cardType, String uin, String vid, Map<String, Object> attributes,
-			String template) throws ApisResourceAccessException, VidCreationException, IOException {
-		if (cardType.equalsIgnoreCase(CardType.MASKED_UIN.toString())) {
-			template = MASKED_UIN_CARD_TEMPLATE;
-			if (vid == null) {
-				vid = getVid(uin);
-			}
-			attributes.put(IdType.VID.toString(), vid);
-			String maskedUin = maskString(uin, uinLength - unMaskedLength, '*');
-			attributes.put(IdType.UIN.toString(), maskedUin);
-		}
-		return template;
-	}
-
 	/**
 	 * Gets the id repo response.
 	 *
@@ -508,18 +524,19 @@ public class PrintServiceImpl implements PrintService{
 	/**
 	 * Sets the qr code.
 	 *
-	 * @param textFileByte
-	 *            the text file byte
-	 * @param attributes
-	 *            the attributes
+	 * @param textFileByte the text file byte
+	 * @param attributes   the attributes
 	 * @return true, if successful
-	 * @throws QrcodeGenerationException
-	 *             the qrcode generation exception
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
+	 * @throws QrcodeGenerationException                          the qrcode
+	 *                                                            generation
+	 *                                                            exception
+	 * @throws IOException                                        Signals that an
+	 *                                                            I/O exception has
+	 *                                                            occurred.
+	 * @throws io.mosip.print.exception.QrcodeGenerationException
 	 */
 	private boolean setQrCode(String qrString, Map<String, Object> attributes)
-			throws QrcodeGenerationException, IOException {
+			throws QrcodeGenerationException, IOException, io.mosip.print.exception.QrcodeGenerationException {
 		boolean isQRCodeSet = false;
 		JSONObject qrJsonObj = JsonUtil.objectMapperReadValue(qrString, JSONObject.class);
 		qrJsonObj.remove("biometrics");
@@ -531,12 +548,21 @@ public class PrintServiceImpl implements PrintService{
 		// String printTextFileString = gson.toJson(textFileJson);
 		byte[] qrCodeBytes = qrCodeGenerator.generateQrCode(qrJsonObj.toString(), QrVersion.V30);
 		if (qrCodeBytes != null) {
-			String imageString = CryptoUtil.encodeBase64String(qrCodeBytes);
+			String imageString = Base64.encodeBase64String(qrCodeBytes);
 			attributes.put(QRCODE, "data:image/png;base64," + imageString);
 			isQRCodeSet = true;
 		}
 
 		return isQRCodeSet;
+	}
+
+	private byte[] generateQrCode(String qrString)
+			throws QrcodeGenerationException, IOException, io.mosip.print.exception.QrcodeGenerationException {
+		JSONObject qrJsonObj = JsonUtil.objectMapperReadValue(qrString, JSONObject.class);
+		qrJsonObj.remove("biometrics");
+		byte[] qrCodeBytes = qrCodeGenerator.generateQrCode(qrJsonObj.toString(), QrVersion.V30);
+
+		return qrCodeBytes;
 	}
 
 	/**
@@ -571,7 +597,7 @@ public class PrintServiceImpl implements PrintService{
 				 * DatatypeConverter.printBase64Binary(IOUtils.toByteArray(dis));
 				 */
 
-				String data = Base64.getEncoder().encodeToString(extractFaceImageData(photoByte));
+				String data = java.util.Base64.getEncoder().encodeToString(extractFaceImageData(photoByte));
 				attributes.put(APPLICANT_PHOTO, "data:image/png;base64," + data);
 				isPhotoSet = true;
 			}
@@ -866,42 +892,40 @@ public class PrintServiceImpl implements PrintService{
 
 		org.json.JSONObject jsonObj = new org.json.JSONObject(credential);
 
-		RequestWrapper<DecryptRequestDto> request = new RequestWrapper<>();
-		ResponseWrapper<DecryptResponseDto> response = new ResponseWrapper<DecryptResponseDto>();
-		LocalDateTime now = LocalDateTime.now(ZoneId.of("UTC"));
-		request.setRequesttime(now);
 		String strq = null;
 		org.json.JSONArray jsonArray = (org.json.JSONArray) jsonObj.get("protectedAttributes");
 		if (!jsonArray.isEmpty()) {
 		for (Object str : jsonArray) {
-			try {
-				DecryptRequestDto decryptRequestDto = new DecryptRequestDto();
-				DecryptResponseDto decryptResponseDto = new DecryptResponseDto();
-				decryptRequestDto.setUserPin(encryptionPin);
-				decryptRequestDto.setData(data.getString(str.toString()));
-				request.setRequest(decryptRequestDto);
-				// response=(DecryptResponseDto)restApiClient.postApi(env.getProperty(ApiName.DECRYPTPINBASSED.name()),
-				// "", de, DecryptResponseDto.class)
-				response = (ResponseWrapper) restClientService.postApi(ApiName.DECRYPTPINBASSED, "", "", request,
-						ResponseWrapper.class);
 
-				decryptResponseDto = JsonUtil.readValue(JsonUtil.writeValueAsString(response.getResponse()),
-						DecryptResponseDto.class);
-				data.put((String) str, decryptResponseDto.getData());
-			} catch (ApisResourceAccessException e) {
-				printLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
-						null, "Error while parsing Json file" + ExceptionUtils.getStackTrace(e));
-				throw new ParsingException(PlatformErrorMessages.PRT_RGS_JSON_PARSING_EXCEPTION.getMessage(), e);
-			} catch (IOException e) {
-				printLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
-						null, "Error while parsing Json file" + ExceptionUtils.getStackTrace(e));
-				throw new ParsingException(PlatformErrorMessages.PRT_RGS_JSON_PARSING_EXCEPTION.getMessage(), e);
+				CryptoWithPinRequestDto cryptoWithPinRequestDto = new CryptoWithPinRequestDto();
+				CryptoWithPinResponseDto cryptoWithPinResponseDto = new CryptoWithPinResponseDto();
+
+				cryptoWithPinRequestDto.setUserPin(encryptionPin);
+				cryptoWithPinRequestDto.setData(data.getString(str.toString()));
+				/*
+				 * response = (ResponseWrapper)
+				 * restClientService.postApi(ApiName.DECRYPTPINBASSED, "", "", request,
+				 * ResponseWrapper.class);
+				 * 
+				 * decryptResponseDto =
+				 * JsonUtil.readValue(JsonUtil.writeValueAsString(response.getResponse()),
+				 * DecryptResponseDto.class);
+				 */
+				try {
+					cryptoWithPinResponseDto = cryptoUtil.decryptWithPin(cryptoWithPinRequestDto);
+				} catch (InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException
+						| InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException e) {
+					printLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
+							null, "Error while decrypting the data" + ExceptionUtils.getStackTrace(e));
+					throw new CryptoManagerException(PlatformErrorMessages.PRT_INVALID_KEY_EXCEPTION.getCode(),
+							PlatformErrorMessages.PRT_INVALID_KEY_EXCEPTION.getMessage(), e);
+				}
+				data.put((String) str, cryptoWithPinResponseDto.getData());
+			
 			}
+
 		}
-	}
-
 		return data;
-
 	}
 	/*
 	 * public String getPolicy(String credentialTYpe) throws Exception {

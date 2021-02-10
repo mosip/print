@@ -1,4 +1,4 @@
-package io.mosip.registration.print.core.http;
+package io.mosip.print.core.http;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;

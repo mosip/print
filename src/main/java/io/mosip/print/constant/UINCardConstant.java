@@ -1,4 +1,4 @@
-package io.mosip.print.service.impl;
+package io.mosip.print.constant;
 
 /**
  * The Class UINCardConstant.

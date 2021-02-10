@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
@@ -16,7 +17,6 @@ import org.springframework.web.client.HttpServerErrorException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.mosip.kernel.core.logger.spi.Logger;
 import io.mosip.print.constant.ApiName;
 import io.mosip.print.dto.DataShare;
 import io.mosip.print.dto.DataShareResponseDto;
@@ -36,7 +36,7 @@ public class DataShareUtil {
 	private ObjectMapper mapper;
 	
 	
-	private static final Logger LOGGER = PrintLogger.getLogger(DataShareUtil.class);
+	Logger printLogger = PrintLogger.getLogger(DataShareUtil.class);
 
 	private static final String GET_DATA = "getDataShare";
 	
