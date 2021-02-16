@@ -13,6 +13,7 @@ import io.mosip.print.exception.QrcodeGenerationException;
  * 
  * @param <T> the type of QR-Version
  */
+
 public interface QrCodeGenerator<T> {
 
 	/**

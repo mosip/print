@@ -7,15 +7,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
+import io.mosip.kernel.core.websub.spi.PublisherClient;
+import io.mosip.kernel.core.websub.spi.SubscriptionClient;
+import io.mosip.kernel.websub.api.model.SubscriptionChangeRequest;
+import io.mosip.kernel.websub.api.model.SubscriptionChangeResponse;
+import io.mosip.kernel.websub.api.model.UnsubscriptionRequest;
 import io.mosip.print.constant.LoggerFileConstant;
 import io.mosip.print.exception.WebSubClientException;
 import io.mosip.print.logger.PrintLogger;
 import io.mosip.print.model.CredentialStatusEvent;
-import io.mosip.print.model.SubscriptionChangeRequest;
-import io.mosip.print.model.SubscriptionChangeResponse;
-import io.mosip.print.model.UnsubscriptionRequest;
-import io.mosip.print.spi.PublisherClient;
-import io.mosip.print.spi.SubscriptionClient;
+
 
 @Component
 public class WebSubSubscriptionHelper {
