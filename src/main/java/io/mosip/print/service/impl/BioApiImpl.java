@@ -1,19 +1,23 @@
 package io.mosip.print.service.impl;
 
+import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import io.mosip.print.entity.BDBInfo;
-import io.mosip.print.entity.BIR;
-import io.mosip.print.model.KeyValuePair;
-import io.mosip.print.model.MatchDecision;
-import io.mosip.print.model.QualityScore;
-import io.mosip.print.model.Response;
-import io.mosip.print.service.IBioApi;
-import io.mosip.print.util.QualityType;
+import io.mosip.kernel.core.bioapi.model.CompositeScore;
+import io.mosip.kernel.core.bioapi.model.KeyValuePair;
+import io.mosip.kernel.core.bioapi.model.QualityScore;
+import io.mosip.kernel.core.bioapi.model.Score;
+import io.mosip.kernel.core.cbeffutil.entity.BDBInfo;
+import io.mosip.kernel.core.cbeffutil.entity.BIR;
+import io.mosip.kernel.core.cbeffutil.jaxbclasses.QualityType;
+import io.mosip.print.spi.IBioApi;
+
+
 
 /**
  * The Class BioApiImpl.
@@ -33,15 +37,12 @@ public class BioApiImpl implements IBioApi {
 	 * bioapi.model.BIR, io.mosip.kernel.core.bioapi.model.KeyValuePair[])
 	 */
 	@Override
-	public Response<QualityScore> checkQuality(BIR sample, KeyValuePair[] flags) {
+	public QualityScore checkQuality(BIR sample, KeyValuePair[] flags) {
 		QualityScore qualityScore = new QualityScore();
 		int major = Optional.ofNullable(sample.getBdbInfo()).map(BDBInfo::getQuality).map(QualityType::getScore)
 				.orElse(0L).intValue();
-		qualityScore.setScore(major);
-		Response<QualityScore> response = new Response<>();
-		response.setStatusCode(200);
-		response.setResponse(qualityScore);
-		return response;
+		qualityScore.setInternalScore(major);
+		return qualityScore;
 	}
 
 	/*
@@ -53,23 +54,53 @@ public class BioApiImpl implements IBioApi {
 	 * io.mosip.kernel.core.bioapi.model.KeyValuePair[])
 	 */
 	@Override
-	public Response<MatchDecision[]> match(BIR sample, BIR[] gallery, KeyValuePair[] flags) {
-		MatchDecision matchingScore[] = new MatchDecision[gallery.length];
+	public Score[] match(BIR sample, BIR[] gallery, KeyValuePair[] flags) {
+		Score matchingScore[] = new Score[gallery.length];
 		int count = 0;
 		for (BIR recordedValue : gallery) {
-			matchingScore[count] = new MatchDecision();
+			matchingScore[count] = new Score();
 			if (Objects.nonNull(recordedValue) && Objects.nonNull(recordedValue.getBdb())
 					&& recordedValue.getBdb().length != 0 && Arrays.equals(recordedValue.getBdb(), sample.getBdb())) {
-				matchingScore[count].setMatch(true);
+				matchingScore[count].setInternalScore(90);
+				matchingScore[count].setScaleScore(90);
 			} else {
-				matchingScore[count].setMatch(false);
+				int randomNumebr = new SecureRandom().nextInt(50);
+				matchingScore[count].setInternalScore(randomNumebr);
+				matchingScore[count].setScaleScore(randomNumebr);
 			}
 			count++;
 		}
-		Response<MatchDecision[]> response = new Response<>();
-		response.setStatusCode(200);
-		response.setResponse(matchingScore);
-		return response;
+		return matchingScore;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * io.mosip.kernel.core.bioapi.spi.IBioApi#compositeMatch(io.mosip.kernel.core.
+	 * bioapi.model.BIR[], io.mosip.kernel.core.bioapi.model.BIR[],
+	 * io.mosip.kernel.core.bioapi.model.KeyValuePair[])
+	 */
+
+	@Override
+	public CompositeScore compositeMatch(BIR[] sampleList, BIR[] recordList, KeyValuePair[] flags) {
+		Score matchingScore[] = new Score[sampleList.length];
+		int count = 0;
+		for (BIR sampleValue : sampleList) {
+			Score[] match = match(sampleValue, recordList, flags);
+			Optional<Score> max = Arrays.stream(match).max(Comparator.comparing(Score::getInternalScore));
+			if (max.isPresent()) {
+				matchingScore[count] = max.get();
+				count++;
+			}
+		}
+		double sum = Arrays.stream(matchingScore).mapToDouble(Score::getInternalScore).sum();
+		CompositeScore compositeScore = new CompositeScore();
+		compositeScore.setIndividualScores(matchingScore);
+		long compositeMatchScore = (long) (sum / matchingScore.length);
+		compositeScore.setInternalScore(compositeMatchScore);
+		compositeScore.setScaledScore(compositeMatchScore);
+		return compositeScore;
 	}
 
 	/*
@@ -80,11 +111,8 @@ public class BioApiImpl implements IBioApi {
 	 * bioapi.model.BIR, io.mosip.kernel.core.bioapi.model.KeyValuePair[])
 	 */
 	@Override
-	public Response<BIR> extractTemplate(BIR sample, KeyValuePair[] flags) {
-		Response<BIR> response = new Response<>();
-		response.setStatusCode(200);
-		response.setResponse(sample);
-		return response;
+	public BIR extractTemplate(BIR sample, KeyValuePair[] flags) {
+		return sample;
 	}
 
 	/*
@@ -95,13 +123,9 @@ public class BioApiImpl implements IBioApi {
 	 * model.BIR, io.mosip.kernel.core.bioapi.model.KeyValuePair[])
 	 */
 	@Override
-	public Response<BIR[]> segment(BIR sample, KeyValuePair[] flags) {
+	public BIR[] segment(BIR sample, KeyValuePair[] flags) {
 		BIR[] bir = new BIR[1];
 		bir[0] = sample;
-		Response<BIR[]> response = new Response<>();
-		response.setStatusCode(200);
-		response.setResponse(bir);
-		return response;
+		return bir;
 	}
-
 }

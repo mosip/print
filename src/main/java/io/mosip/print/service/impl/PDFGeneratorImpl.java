@@ -74,7 +74,6 @@ import io.mosip.print.util.EmptyCheckUtils;
  */
 @Component
 public class PDFGeneratorImpl implements PDFGenerator {
-
 	private static final Logger LOGGER = PrintLogger.getLogger(PDFGeneratorImpl.class);
 	
 	private static final String SHA256 = "SHA256";
@@ -252,8 +251,7 @@ public class PDFGeneratorImpl implements PDFGenerator {
 		try {
 			pdfReader = new PdfReader(pdf);
 			pdfStamper = PdfStamper.createSignature(pdfReader, outputStream, '\0');
-            LOGGER.debug("certificate entry {}",certificateEntry);
-            LOGGER.info("provider {}",provider);
+
 			if (password != null && !password.trim().isEmpty()) {
 				pdfStamper.setEncryption(password.getBytes(), pdfOwnerPassword.getBytes(),
 						com.itextpdf.text.pdf.PdfWriter.ALLOW_PRINTING,
@@ -266,6 +264,7 @@ public class PDFGeneratorImpl implements PDFGenerator {
 			signAppearance.setVisibleSignature(
 					new Rectangle(rectangle.getLlx(), rectangle.getLly(), rectangle.getUrx(), rectangle.getUry()),
 					pageNumber, null);
+
 			OcspClient ocspClient = new OcspClientBouncyCastle(null);
 			TSAClient tsaClient = null;
 			for (X509Certificate certificate : certificateEntry.getChain()) {
@@ -280,7 +279,7 @@ public class PDFGeneratorImpl implements PDFGenerator {
 			List<CrlClient> crlList = new ArrayList<>();
 			crlList.add(new CrlClientOnline(certificateEntry.getChain()));
 
-			ExternalSignature pks = new PrivateKeySignature(certificateEntry.getPrivateKey(), SHA256,
+			ExternalSignature pks = new PrivateKeySignature(certificateEntry.getPrivateKey(), "SHA256",
 					provider.getName());
 			ExternalDigest digest = new BouncyCastleDigest();
 
@@ -288,8 +287,9 @@ public class PDFGeneratorImpl implements PDFGenerator {
 			MakeSignature.signDetached(signAppearance, digest, pks, certificateEntry.getChain(), crlList, ocspClient,
 					tsaClient, 0, CryptoStandard.CMS);
 
+			pdfStamper.close();
+
 		} catch (DocumentException e) {
-			LOGGER.error("Document Exception occur {}",e.getCause());
 			throw new PDFGeneratorException(PDFGeneratorExceptionCodeConstant.PDF_EXCEPTION.getErrorCode(),
 					e.getMessage(), e);
 		} finally {
@@ -325,5 +325,4 @@ public class PDFGeneratorImpl implements PDFGenerator {
 					PDFGeneratorExceptionCodeConstant.INPUTSTREAM_NULL_EMPTY_EXCEPTION.getErrorMessage());
 		}
 	}
-
 }

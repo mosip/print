@@ -1,10 +1,10 @@
-package io.mosip.print.service;
+package io.mosip.print.spi;
 
-import io.mosip.print.entity.BIR;
-import io.mosip.print.model.KeyValuePair;
-import io.mosip.print.model.MatchDecision;
-import io.mosip.print.model.QualityScore;
-import io.mosip.print.model.Response;
+import io.mosip.kernel.core.bioapi.model.CompositeScore;
+import io.mosip.kernel.core.bioapi.model.KeyValuePair;
+import io.mosip.kernel.core.bioapi.model.QualityScore;
+import io.mosip.kernel.core.bioapi.model.Score;
+import io.mosip.kernel.core.cbeffutil.entity.BIR;
 
 /**
  * The Interface IBioApi.
@@ -23,7 +23,7 @@ public interface IBioApi {
 	 * @param flags  the flags
 	 * @return the response
 	 */
-	Response<QualityScore> checkQuality(BIR sample, KeyValuePair[] flags);
+	QualityScore checkQuality(BIR sample, KeyValuePair[] flags);
 
 	/**
 	 * It compares the biometrics and provide the respective matching scores.
@@ -33,7 +33,7 @@ public interface IBioApi {
 	 * @param flags   the flags
 	 * @return the response
 	 */
-	Response<MatchDecision[]> match(BIR sample, BIR[] gallery, KeyValuePair[] flags);
+	Score[] match(BIR sample, BIR[] gallery, KeyValuePair[] flags);
 
 	/**
 	 * Extract template.
@@ -42,7 +42,7 @@ public interface IBioApi {
 	 * @param flags  the flags
 	 * @return the response
 	 */
-	Response<BIR> extractTemplate(BIR sample, KeyValuePair[] flags);
+	BIR extractTemplate(BIR sample, KeyValuePair[] flags);
 
 	/**
 	 * It segment the single biometric image into multiple biometric images. Eg:
@@ -52,5 +52,7 @@ public interface IBioApi {
 	 * @param flags  the flags
 	 * @return the response
 	 */
-	Response<BIR[]> segment(BIR sample, KeyValuePair[] flags);
+	BIR[] segment(BIR sample, KeyValuePair[] flags);
+
+	CompositeScore compositeMatch(BIR[] sampleList, BIR[] recordList, KeyValuePair[] flags);
 }

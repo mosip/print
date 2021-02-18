@@ -18,7 +18,6 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.codec.binary.Base64;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +25,6 @@ import io.mosip.print.dto.CryptoWithPinRequestDto;
 import io.mosip.print.dto.CryptoWithPinResponseDto;
 import io.mosip.print.exception.CryptoManagerException;
 import io.mosip.print.exception.PlatformErrorMessages;
-import io.mosip.print.spi.PDFGenerator;
 
 @Component
 public class CryptoUtil {
@@ -47,8 +45,6 @@ public class CryptoUtil {
 	@Value("${mosip.kernel.crypto.hash-algorithm-name:PBKDF2WithHmacSHA512}")
 	private String passwordAlgorithm;
 
-	@Autowired
-	private PDFGenerator pdfGenerator;
 
 	/*
 	 * public static void main(String[] args) throws NoSuchAlgorithmException,
