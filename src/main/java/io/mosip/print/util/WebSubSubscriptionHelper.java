@@ -9,14 +9,13 @@ import org.springframework.stereotype.Component;
 
 import io.mosip.kernel.core.websub.spi.PublisherClient;
 import io.mosip.kernel.core.websub.spi.SubscriptionClient;
+import io.mosip.kernel.websub.api.exception.WebSubClientException;
 import io.mosip.kernel.websub.api.model.SubscriptionChangeRequest;
 import io.mosip.kernel.websub.api.model.SubscriptionChangeResponse;
 import io.mosip.kernel.websub.api.model.UnsubscriptionRequest;
 import io.mosip.print.constant.LoggerFileConstant;
-import io.mosip.print.exception.WebSubClientException;
 import io.mosip.print.logger.PrintLogger;
 import io.mosip.print.model.CredentialStatusEvent;
-
 
 @Component
 public class WebSubSubscriptionHelper {
@@ -45,10 +44,10 @@ public class WebSubSubscriptionHelper {
 	/** The Constant ID_REPO_SERVICE_IMPL. */
 	private static final String INITSUBSCRIPTION = "initSubsriptions";
 
-	private Logger logger = PrintLogger.getLogger(WebSubSubscriptionHelper.class);
+	private Logger LOGGER = PrintLogger.getLogger(WebSubSubscriptionHelper.class);
 
 	public void initSubsriptions() {
-		logger.info(LoggerFileConstant.SESSIONID.toString(), WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION,
+		LOGGER.info(LoggerFileConstant.SESSIONID.toString(), WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION,
 				"Initializing subscribptions..");
 		registerTopic(topic);
 		subscribeForPrintServiceEvents();
@@ -63,7 +62,7 @@ public class WebSubSubscriptionHelper {
 			subscriptionRequest.setTopic(topic);
 			sb.subscribe(subscriptionRequest);
 		} catch (WebSubClientException e) {
-			logger.info(LoggerFileConstant.SESSIONID.toString(), WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION,
+			LOGGER.info(LoggerFileConstant.SESSIONID.toString(), WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION,
 					"websub subscription error");
 		}
 	}
@@ -75,7 +74,7 @@ public class WebSubSubscriptionHelper {
 		pb.publishUpdate(topic, credentialStatusEvent, MediaType.APPLICATION_JSON_UTF8_VALUE, headers,
 				webSubHubUrl + "/publish");
 	} catch (WebSubClientException e) {
-		logger.info(LoggerFileConstant.SESSIONID.toString(), WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION,
+		LOGGER.info(LoggerFileConstant.SESSIONID.toString(), WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION,
 				"websub publish update error");
 	}
 
@@ -85,7 +84,7 @@ public class WebSubSubscriptionHelper {
 		try {
 			pb.registerTopic(topic, webSubHubUrl + "/publish");
 		} catch (WebSubClientException e) {
-			logger.info(LoggerFileConstant.SESSIONID.toString(), WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION,
+			LOGGER.info(LoggerFileConstant.SESSIONID.toString(), WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION,
 					"topic already registered");
 		}
 

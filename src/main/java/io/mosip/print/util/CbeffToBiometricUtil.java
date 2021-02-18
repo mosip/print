@@ -8,19 +8,18 @@ import java.util.List;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 
-import io.mosip.print.cbeffutil.BIRType;
-import io.mosip.print.cbeffutil.SingleType;
+import io.mosip.kernel.core.cbeffutil.entity.BIR;
+import io.mosip.kernel.core.cbeffutil.jaxbclasses.BIRType;
+import io.mosip.kernel.core.cbeffutil.jaxbclasses.SingleType;
 import io.mosip.print.constant.LoggerFileConstant;
-import io.mosip.print.entity.BIR;
 import io.mosip.print.exception.BiometricException;
 import io.mosip.print.exception.BiometricTagMatchException;
 import io.mosip.print.exception.PlatformErrorMessages;
 import io.mosip.print.logger.PrintLogger;
-import io.mosip.print.model.KeyValuePair;
-import io.mosip.print.service.IBioApi;
 import io.mosip.print.service.impl.BioApiImpl;
 import io.mosip.print.service.impl.CbeffImpl;
 import io.mosip.print.spi.CbeffUtil;
+import io.mosip.print.spi.IBioApi;
 
 /**
  * The Class CbeffToBiometricUtil.
@@ -328,8 +327,9 @@ public class CbeffToBiometricUtil {
 	 * @return the biometric record
 	 * @throws BiometricException 
 	 */
-	public BIR extractTemplate(BIR sample, KeyValuePair[] flags) throws BiometricException {
-		return bioAPi.extractTemplate(sample, flags).getResponse();
+	public BIR extractTemplate(BIR sample, io.mosip.kernel.core.bioapi.model.KeyValuePair[] flags)
+			throws BiometricException {
+		return bioAPi.extractTemplate(sample, flags);
 	}
 
 }

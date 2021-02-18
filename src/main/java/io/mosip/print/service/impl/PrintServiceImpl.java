@@ -330,6 +330,7 @@ public class PrintServiceImpl implements PrintService{
 						PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.getCode());
 			}
 			pdfbytes = uinCardGenerator.generateUinCard(uinArtifact, UinCardType.PDF, password);
+
 		}
 			printStatusUpdate(requestId, pdfbytes, credentialType);
 			isTransactionSuccessful = true;

@@ -6,11 +6,11 @@ package io.mosip.print.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.mosip.print.cbeffutil.BIRInfoType;
-import io.mosip.print.cbeffutil.BIRType;
-import io.mosip.print.cbeffutil.CbeffValidator;
-import io.mosip.print.cbeffutil.CbeffXSDValidator;
-import io.mosip.print.entity.BIR;
+import io.mosip.kernel.core.cbeffutil.common.CbeffValidator;
+import io.mosip.kernel.core.cbeffutil.common.CbeffXSDValidator;
+import io.mosip.kernel.core.cbeffutil.entity.BIR;
+import io.mosip.kernel.core.cbeffutil.jaxbclasses.BIRInfoType;
+import io.mosip.kernel.core.cbeffutil.jaxbclasses.BIRType;
 import io.mosip.print.service.CbeffContainerI;
 
 /**
@@ -92,5 +92,4 @@ public class CbeffContainerImpl extends CbeffContainerI<BIR, BIRType> {
 	public boolean validateXML(byte[] xmlBytes, byte[] xsdBytes) throws Exception {
 		return CbeffXSDValidator.validateXML(xsdBytes, xmlBytes);
 	}
-
 }

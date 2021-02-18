@@ -6,8 +6,9 @@ package io.mosip.print.spi;
 import java.util.List;
 import java.util.Map;
 
-import io.mosip.print.cbeffutil.BIRType;
-import io.mosip.print.entity.BIR;
+import io.mosip.kernel.core.cbeffutil.entity.BIR;
+import io.mosip.kernel.core.cbeffutil.jaxbclasses.BIRType;
+
 
 /**
  * @author Ramadurai Pandian

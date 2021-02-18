@@ -127,5 +127,4 @@ public class TemplateManagerImpl implements TemplateManager {
 		}
 		return isMerged;
 	}
-
 }

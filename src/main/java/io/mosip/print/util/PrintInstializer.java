@@ -19,7 +19,7 @@ public class PrintInstializer implements ApplicationListener<ApplicationReadyEve
 	@Value("${retry-count:3}")
 	private int retryCount;
 
-	@Value("${resubscription-delay-secs:0}")
+	@Value("${print-websub-resubscription-delay-secs:0}")
 	private int reSubscriptionDelaySecs;
 
 	@Autowired
@@ -32,20 +32,20 @@ public class PrintInstializer implements ApplicationListener<ApplicationReadyEve
 	private static final String ONAPPLICATIONEVENT = "onApplicationEvent";
 
 	/** The Constant ID_REPO_SERVICE_IMPL. */
-	private static final String CREDENTIALINSTIALIZER = "CredentialInstializer";
+	private static final String PRINTINSTIALIZER = "PrintInstializer";
 
 	private Logger logger = PrintLogger.getLogger(PrintInstializer.class);
 
 	@Override
 	public void onApplicationEvent(ApplicationReadyEvent event) {
 		if (reSubscriptionDelaySecs > 0) {
-			logger.info(LoggerFileConstant.SESSIONID.toString(), CREDENTIALINSTIALIZER, ONAPPLICATIONEVENT,
+			logger.info(LoggerFileConstant.SESSIONID.toString(), PRINTINSTIALIZER, ONAPPLICATIONEVENT,
 				"Work around for web-sub notification issue after some time.");
 
 		scheduleRetrySubscriptions();
 		}
 		else {
-			logger.info(LoggerFileConstant.SESSIONID.toString(), CREDENTIALINSTIALIZER, ONAPPLICATIONEVENT,
+			logger.info(LoggerFileConstant.SESSIONID.toString(), PRINTINSTIALIZER, ONAPPLICATIONEVENT,
 
 					"Scheduling for re-subscription is Disabled as the re-subsctription delay value is: "
 							+ reSubscriptionDelaySecs);
@@ -54,7 +54,7 @@ public class PrintInstializer implements ApplicationListener<ApplicationReadyEve
 	}
 
 	private void scheduleRetrySubscriptions() {
-		logger.info(LoggerFileConstant.SESSIONID.toString(), CREDENTIALINSTIALIZER, ONAPPLICATIONEVENT,
+		logger.info(LoggerFileConstant.SESSIONID.toString(), PRINTINSTIALIZER, ONAPPLICATIONEVENT,
 				"Scheduling re-subscription every " + reSubscriptionDelaySecs + " seconds");
 
 
@@ -73,14 +73,14 @@ public class PrintInstializer implements ApplicationListener<ApplicationReadyEve
 
 	private boolean initSubsriptions() {
 		try {
-			logger.info(LoggerFileConstant.SESSIONID.toString(), CREDENTIALINSTIALIZER, ONAPPLICATIONEVENT,
+			logger.info(LoggerFileConstant.SESSIONID.toString(), PRINTINSTIALIZER, ONAPPLICATIONEVENT,
 					"Initializing subscribptions..");
 			webSubSubscriptionHelper.initSubsriptions();
 
 			return true;
 		} catch (Exception e) {
-			logger.error(LoggerFileConstant.SESSIONID.toString(), CREDENTIALINSTIALIZER, ONAPPLICATIONEVENT,
-					"Initializing subscribptions failed: " + e.getMessage());
+			logger.error(LoggerFileConstant.SESSIONID.toString(), PRINTINSTIALIZER, ONAPPLICATIONEVENT,
+					"Initializing subscribptions failed: ");
 
 			return false;
 		}
