@@ -903,8 +903,16 @@ public class PrintServiceImpl implements PrintService{
 		return data;
 
 	}
-
-	
+	/*
+	 * public String getPolicy(String credentialTYpe) throws Exception {
+	 *
+	 * if (credentialTYpe.equalsIgnoreCase("qrcode")) { return
+	 * "mpolicy-default-qrcode"; } else if (credentialTYpe.equalsIgnoreCase("euin"))
+	 * { return "mpolicy-default-euin"; } else if
+	 * (credentialTYpe.equalsIgnoreCase("reprint")) { return
+	 * "mpolicy-default-reprint"; } else { throw new
+	 * Exception("Credential Type is invalid"); } }
+	 */
 }
 
 
