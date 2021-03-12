@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,10 +57,15 @@ import io.mosip.print.constant.LoggerFileConstant;
 import io.mosip.print.constant.ModuleName;
 import io.mosip.print.constant.PlatformSuccessMessages;
 import io.mosip.print.constant.UinCardType;
+import io.mosip.print.dto.DataShare;
+import io.mosip.print.dto.DecryptRequestDto;
+import io.mosip.print.dto.DecryptResponseDto;
 import io.mosip.print.dto.JsonValue;
 import io.mosip.print.dto.VidRequestDto;
 import io.mosip.print.dto.VidResponseDTO;
+import io.mosip.print.exception.ApiNotAccessibleException;
 import io.mosip.print.exception.ApisResourceAccessException;
+import io.mosip.print.exception.DataShareException;
 import io.mosip.print.exception.IdRepoAppException;
 import io.mosip.print.exception.IdentityNotFoundException;
 import io.mosip.print.exception.PDFSignatureException;
@@ -78,20 +84,25 @@ import io.mosip.print.service.PrintService;
 import io.mosip.print.service.UinCardGenerator;
 import io.mosip.print.util.AuditLogRequestBuilder;
 import io.mosip.print.util.CbeffToBiometricUtil;
+import io.mosip.print.util.DataShareUtil;
 import io.mosip.print.util.DigitalSignatureUtility;
 import io.mosip.print.util.JsonUtil;
 import io.mosip.print.util.TemplateGenerator;
 import io.mosip.print.util.Utilities;
 import io.mosip.print.util.WebSubSubscriptionHelper;
 import io.mosip.registration.print.core.http.RequestWrapper;
+import io.mosip.registration.print.core.http.ResponseWrapper;
 
 @Service
 public class PrintServiceImpl implements PrintService{
 
 	private String topic="CREDENTIAL_STATUS_UPDATE";
-	
+
 	@Autowired
 	private WebSubSubscriptionHelper webSubSubscriptionHelper;
+
+	@Autowired
+	private DataShareUtil dataShareUtil;
 
 	/** The Constant FILE_SEPARATOR. */
 	public static final String FILE_SEPARATOR = File.separator;
@@ -203,10 +214,15 @@ public class PrintServiceImpl implements PrintService{
 	@Autowired
 	private PublisherClient<String, Object, HttpHeaders> pb;
 	
+	@Value("${mosip.datashare.partner.id}")
+	private String partnerId;
+
+	@Value("${mosip.datashare.policy.id}")
+	private String policyId;
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see io.mosip.print.service.PrintService#
 	 * getDocuments(io.mosip.registration.processor.core.constant.IdType,
 	 * java.lang.String, java.lang.String, boolean)
@@ -214,10 +230,13 @@ public class PrintServiceImpl implements PrintService{
 
 	@Override
 	@SuppressWarnings("rawtypes")
-	public Map<String, byte[]> getDocuments(String credential, String requestId, String sign, String cardType,
+	public Map<String, byte[]> getDocuments(String credential, String credentialType, String encryptionPin,
+			String requestId, String sign,
+			String cardType,
 			boolean isPasswordProtected) {
 		printLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(), "",
 				"PrintServiceImpl::getDocuments()::entry");
+
 
 		String credentialSubject;
 		Map<String, byte[]> byteMap = new HashMap<>();
@@ -230,24 +249,29 @@ public class PrintServiceImpl implements PrintService{
 		IdResponseDTO1 response = null;
 		String template = UIN_CARD_TEMPLATE;
 		try {
+			/*
+			 * if(credentialType.equalsIgnoreCase("qrcode")) { setQrCode(sign, attributes);
+			 * }
+			 */
 			credentialSubject = getCrdentialSubject(credential);
 			org.json.JSONObject credentialSubjectJson = new org.json.JSONObject(credentialSubject);
-			individualBio = credentialSubjectJson.getString("individualBiometrics");
+			org.json.JSONObject decryptedJson = decryptAttribute(credentialSubjectJson, encryptionPin, credential);
+			individualBio = decryptedJson.getString("biometrics");
 			String individualBiometric = new String(individualBio);
-			uin = credentialSubjectJson.getString("UIN");
+			uin = decryptedJson.getString("UIN");
 			boolean isPhotoSet = setApplicantPhoto(individualBiometric, attributes);
 			if (!isPhotoSet) {
 				printLogger.debug(LoggerFileConstant.SESSIONID.toString(),
 						LoggerFileConstant.REGISTRATIONID.toString(), uin,
 						PlatformErrorMessages.PRT_PRT_APPLICANT_PHOTO_NOT_SET.name());
 			}
-			setTemplateAttributes(credentialSubject, attributes);
+			setTemplateAttributes(decryptedJson.toString(), attributes);
 			attributes.put(IdType.UIN.toString(), uin);
 
-			byte[] textFileByte = createTextFile(credentialSubject);
+			byte[] textFileByte = createTextFile(decryptedJson.toString());
 			byteMap.put(UIN_TEXT_FILE, textFileByte);
 
-			boolean isQRcodeSet = setQrCode(credentialSubject, attributes);
+			boolean isQRcodeSet = setQrCode(decryptedJson.toString(), attributes);
 			if (!isQRcodeSet) {
 				printLogger.debug(LoggerFileConstant.SESSIONID.toString(),
 						LoggerFileConstant.REGISTRATIONID.toString(), uin,
@@ -277,7 +301,7 @@ public class PrintServiceImpl implements PrintService{
 
 			byte[] uinbyte = attributes.get("UIN").toString().getBytes();
 			byteMap.put("UIN", uinbyte);
-			printStatusUpdate(requestId);
+			printStatusUpdate(requestId, pdfbytes, credentialType);
 			isTransactionSuccessful = true;
 
 		} catch (VidCreationException e) {
@@ -413,21 +437,21 @@ public class PrintServiceImpl implements PrintService{
 	 * private IdResponseDTO1 getIdRepoResponse(String idType, String idValue)
 	 * throws ApisResourceAccessException { List<String> pathsegments = new
 	 * ArrayList<>(); pathsegments.add(idValue);
-	 * 
+	 *
 	 * IdResponseDTO1 response; if (idType.equalsIgnoreCase(IdType.UIN.toString()))
 	 * { response = (IdResponseDTO1)
 	 * restClientService.getApi(ApiName.IDREPOGETIDBYUIN, pathsegments, "", null,
 	 * IdResponseDTO1.class); } else { response = (IdResponseDTO1)
 	 * restClientService.getApi(ApiName.RETRIEVEIDENTITYFROMRID, pathsegments, "",
 	 * null, IdResponseDTO1.class); }
-	 * 
+	 *
 	 * if (response == null || response.getResponse() == null) {
 	 * printLogger.error(LoggerFileConstant.SESSIONID.toString(),
 	 * LoggerFileConstant.REGISTRATIONID.toString(), idValue,
 	 * PlatformErrorMessages.RPR_PRT_IDREPO_RESPONSE_NULL.name()); throw new
 	 * IDRepoResponseNull(PlatformErrorMessages.RPR_PRT_IDREPO_RESPONSE_NULL.getCode
 	 * ()); }
-	 * 
+	 *
 	 * return response; }
 	 */
 	/**
@@ -498,7 +522,7 @@ public class PrintServiceImpl implements PrintService{
 			throws QrcodeGenerationException, IOException {
 		boolean isQRCodeSet = false;
 		JSONObject qrJsonObj = JsonUtil.objectMapperReadValue(qrString, JSONObject.class);
-		qrJsonObj.remove("individualBiometrics");
+		qrJsonObj.remove("biometrics");
 		// String digitalSignaturedQrData =
 		// digitalSignatureUtility.getDigitalSignature(qrString);
 		// JSONObject textFileJson = new JSONObject();
@@ -539,7 +563,7 @@ public class PrintServiceImpl implements PrintService{
 				 * DataInputStream dis = new DataInputStream(new
 				 * ByteArrayInputStream(photoByte)); int skippedBytes =
 				 * dis.skipBytes(headerLength);
-				 * 
+				 *
 				 * if (skippedBytes != 0) {
 				 * printLogger.debug(LoggerFileConstant.SESSIONID.toString(),
 				 * LoggerFileConstant.REGISTRATIONID.toString(), "",
@@ -592,7 +616,7 @@ public class PrintServiceImpl implements PrintService{
 						} catch (Exception e) {
 							obj = object;
 						}
-					
+
 					if (obj instanceof JSONArray) {
 						// JSONArray node = JsonUtil.getJSONArray(demographicIdentity, value);
 						JsonValue[] jsonValues = JsonUtil.mapJsonNodeToJavaObject(JsonValue.class, (JSONArray) obj);
@@ -611,7 +635,7 @@ public class PrintServiceImpl implements PrintService{
 						attribute.put(value, String.valueOf(object));
 					}
 				}
-					
+
 				}
 			}
 
@@ -819,6 +843,256 @@ public class PrintServiceImpl implements PrintService{
 		return credentialSubject;
 	}
 
+	private void printStatusUpdate(String requestId, byte[] data, String credentialType)
+			throws DataShareException, ApiNotAccessibleException, IOException, Exception {
+		DataShare dataShare = null;
+		dataShare = dataShareUtil.getDataShare(data, policyId, partnerId);
+		CredentialStatusEvent creEvent = new CredentialStatusEvent();
+		LocalDateTime currentDtime = DateUtils.getUTCCurrentDateTime();
+		StatusEvent sEvent = new StatusEvent();
+		sEvent.setId(UUID.randomUUID().toString());
+		sEvent.setRequestId(requestId);
+		sEvent.setStatus("printing");
+		sEvent.setUrl(dataShare.getUrl());
+		sEvent.setTimestamp(Timestamp.valueOf(currentDtime).toString());
+		creEvent.setPublishedOn(new DateTime().toString());
+		creEvent.setPublisher("PRINT_SERVICE");
+		creEvent.setTopic(topic);
+		creEvent.setEvent(sEvent);
+		webSubSubscriptionHelper.printStatusUpdateEvent(topic, creEvent);
+	}
+
+	public org.json.JSONObject decryptAttribute(org.json.JSONObject data, String encryptionPin, String credential) {
+
+		org.json.JSONObject jsonObj = new org.json.JSONObject(credential);
+
+		RequestWrapper<DecryptRequestDto> request = new RequestWrapper<>();
+		ResponseWrapper<DecryptResponseDto> response = new ResponseWrapper<DecryptResponseDto>();
+		LocalDateTime now = LocalDateTime.now(ZoneId.of("UTC"));
+		request.setRequesttime(now);
+		String strq = null;
+		org.json.JSONArray jsonArray = (org.json.JSONArray) jsonObj.get("protectedAttributes");
+		if (!jsonArray.isEmpty()) {
+		for (Object str : jsonArray) {
+			try {
+				DecryptRequestDto decryptRequestDto = new DecryptRequestDto();
+				DecryptResponseDto decryptResponseDto = new DecryptResponseDto();
+				decryptRequestDto.setUserPin(encryptionPin);
+				decryptRequestDto.setData(data.getString(str.toString()));
+				request.setRequest(decryptRequestDto);
+				// response=(DecryptResponseDto)restApiClient.postApi(env.getProperty(ApiName.DECRYPTPINBASSED.name()),
+				// "", de, DecryptResponseDto.class)
+				response = (ResponseWrapper) restClientService.postApi(ApiName.DECRYPTPINBASSED, "", "", request,
+						ResponseWrapper.class);
+
+				decryptResponseDto = JsonUtil.readValue(JsonUtil.writeValueAsString(response.getResponse()),
+						DecryptResponseDto.class);
+				data.put((String) str, decryptResponseDto.getData());
+			} catch (ApisResourceAccessException e) {
+				printLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
+						null, "Error while parsing Json file" + ExceptionUtils.getStackTrace(e));
+				throw new ParsingException(PlatformErrorMessages.PRT_RGS_JSON_PARSING_EXCEPTION.getMessage(), e);
+			} catch (IOException e) {
+				printLogger.error(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
+						null, "Error while parsing Json file" + ExceptionUtils.getStackTrace(e));
+				throw new ParsingException(PlatformErrorMessages.PRT_RGS_JSON_PARSING_EXCEPTION.getMessage(), e);
+			}
+		}
+	}
+
+		return data;
+
+	}
+	/*
+	 * public String getPolicy(String credentialTYpe) throws Exception {
+	 *
+	 * if (credentialTYpe.equalsIgnoreCase("qrcode")) { return
+	 * "mpolicy-default-qrcode"; } else if (credentialTYpe.equalsIgnoreCase("euin"))
+	 * { return "mpolicy-default-euin"; } else if
+	 * (credentialTYpe.equalsIgnoreCase("reprint")) { return
+	 * "mpolicy-default-reprint"; } else { throw new
+	 * Exception("Credential Type is invalid"); } }
+	 */
+}
+
+
+
+
+
+
+
+
+
+	/**
+	 * Gets the vid.
+	 *
+	 * @param uin the uin
+	 * @return the vid
+	 * @throws ApisResourceAccessException the apis resource access exception
+	 * @throws VidCreationException        the vid creation exception
+	 * @throws IOException                 Signals that an I/O exception has
+	 *                                     occurred.
+	 */
+	private String getVid(String uin) throws ApisResourceAccessException, VidCreationException, IOException {
+		String vid;
+		VidRequestDto vidRequestDto = new VidRequestDto();
+		RequestWrapper<VidRequestDto> request = new RequestWrapper<>();
+		VidResponseDTO vidResponse;
+		vidRequestDto.setUIN(uin);
+		vidRequestDto.setVidType(env.getProperty(VID_TYPE));
+		request.setId(env.getProperty(VID_CREATE_ID));
+		request.setRequest(vidRequestDto);
+		DateTimeFormatter format = DateTimeFormatter.ofPattern(env.getProperty(DATETIME_PATTERN));
+		LocalDateTime localdatetime = LocalDateTime
+				.parse(DateUtils.getUTCCurrentDateTimeString(env.getProperty(DATETIME_PATTERN)), format);
+		request.setRequesttime(localdatetime);
+		request.setVersion(env.getProperty(REG_PROC_APPLICATION_VERSION));
+
+		printLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(), "",
+				"PrintServiceImpl::getVid():: post CREATEVID service call started with request data : "
+						+ JsonUtil.objectMapperObjectToJson(vidRequestDto));
+
+		vidResponse = (VidResponseDTO) restClientService.postApi(ApiName.CREATEVID, "", "", request,
+				VidResponseDTO.class);
+
+		printLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(), "",
+				"PrintServiceImpl::getVid():: post CREATEVID service call ended successfully");
+
+		if (vidResponse.getErrors() != null && !vidResponse.getErrors().isEmpty()) {
+			throw new VidCreationException(PlatformErrorMessages.PRT_PRT_VID_EXCEPTION.getCode(),
+					PlatformErrorMessages.PRT_PRT_VID_EXCEPTION.getMessage());
+
+		} else {
+			vid = vidResponse.getResponse().getVid();
+		}
+
+		return vid;
+	}
+
+	/**
+	 * Gets the password.
+	 *
+	 * @param uin
+	 *            the uin
+	 * @return the password
+	 * @throws IdRepoAppException
+	 *             the id repo app exception
+	 * @throws NumberFormatException
+	 *             the number format exception
+	 * @throws ApisResourceAccessException
+	 *             the apis resource access exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	private String getPassword(String uin) throws ApisResourceAccessException, IOException {
+		JSONObject jsonObject = utilities.retrieveIdrepoJson(uin);
+
+		String[] attributes = env.getProperty(UINCARDPASSWORD).split("\\|");
+		List<String> list = new ArrayList<>(Arrays.asList(attributes));
+
+		Iterator<String> it = list.iterator();
+		String uinCardPd = "";
+
+		while (it.hasNext()) {
+			String key = it.next().trim();
+
+			Object object = JsonUtil.getJSONValue(jsonObject, key);
+			if (object instanceof ArrayList) {
+				JSONArray node = JsonUtil.getJSONArray(jsonObject, key);
+				JsonValue[] jsonValues = JsonUtil.mapJsonNodeToJavaObject(JsonValue.class, node);
+				uinCardPd = uinCardPd.concat(getParameter(jsonValues, primaryLang));
+
+			} else if (object instanceof LinkedHashMap) {
+				JSONObject json = JsonUtil.getJSONObject(jsonObject, key);
+				uinCardPd = uinCardPd.concat((String) json.get(VALUE));
+			} else {
+				uinCardPd = uinCardPd.concat((String) object);
+			}
+
+		}
+
+		return uinCardPd;
+	}
+
+	/**
+	 * Gets the parameter.
+	 *
+	 * @param jsonValues
+	 *            the json values
+	 * @param langCode
+	 *            the lang code
+	 * @return the parameter
+	 */
+	private String getParameter(JsonValue[] jsonValues, String langCode) {
+
+		String parameter = null;
+		if (jsonValues != null) {
+			for (int count = 0; count < jsonValues.length; count++) {
+				String lang = jsonValues[count].getLanguage();
+				if (langCode.contains(lang)) {
+					parameter = jsonValues[count].getValue();
+					break;
+				}
+			}
+		}
+		return parameter;
+	}
+
+	public byte[] extractFaceImageData(byte[] decodedBioValue) {
+
+		try (DataInputStream din = new DataInputStream(new ByteArrayInputStream(decodedBioValue))) {
+
+			byte[] format = new byte[4];
+			din.read(format, 0, 4);
+			byte[] version = new byte[4];
+			din.read(version, 0, 4);
+			int recordLength = din.readInt();
+			short numberofRepresentionRecord = din.readShort();
+			byte certificationFlag = din.readByte();
+			byte[] temporalSequence = new byte[2];
+			din.read(temporalSequence, 0, 2);
+			int representationLength = din.readInt();
+			byte[] representationData = new byte[representationLength - 4];
+			din.read(representationData, 0, representationData.length);
+			try (DataInputStream rdin = new DataInputStream(new ByteArrayInputStream(representationData))) {
+				byte[] captureDetails = new byte[14];
+				rdin.read(captureDetails, 0, 14);
+				byte noOfQualityBlocks = rdin.readByte();
+				if (noOfQualityBlocks > 0) {
+					byte[] qualityBlocks = new byte[noOfQualityBlocks * 5];
+					rdin.read(qualityBlocks, 0, qualityBlocks.length);
+				}
+				short noOfLandmarkPoints = rdin.readShort();
+				byte[] facialInformation = new byte[15];
+				rdin.read(facialInformation, 0, 15);
+				if (noOfLandmarkPoints > 0) {
+					byte[] landmarkPoints = new byte[noOfLandmarkPoints * 8];
+					rdin.read(landmarkPoints, 0, landmarkPoints.length);
+				}
+				byte faceType = rdin.readByte();
+				byte imageDataType = rdin.readByte();
+				byte[] otherImageInformation = new byte[9];
+				rdin.read(otherImageInformation, 0, otherImageInformation.length);
+				int lengthOfImageData = rdin.readInt();
+
+				byte[] image = new byte[lengthOfImageData];
+				rdin.read(image, 0, lengthOfImageData);
+
+				return image;
+			}
+		} catch (Exception ex) {
+			throw new PDFGeneratorException(PDFGeneratorExceptionCodeConstant.PDF_EXCEPTION.getErrorCode(),
+					ex.getMessage() + ExceptionUtils.getStackTrace(ex));
+		}
+	}
+
+
+	private String getCrdentialSubject(String crdential) {
+		org.json.JSONObject jsonObject = new org.json.JSONObject(crdential);
+		String credentialSubject = jsonObject.get("credentialSubject").toString();
+		return credentialSubject;
+	}
+
 	private void printStatusUpdate(String requestId) {
 		CredentialStatusEvent creEvent = new CredentialStatusEvent();
 		LocalDateTime currentDtime = DateUtils.getUTCCurrentDateTime();
@@ -835,11 +1109,11 @@ public class PrintServiceImpl implements PrintService{
 		webSubSubscriptionHelper.printStatusUpdateEvent(topic, creEvent);
 	}
 }
-	
-	
-	
-	
 
 
-	
+
+
+
+
+
 

@@ -49,6 +49,7 @@ public class WebSubSubscriptionHelper {
 	public void initSubsriptions() {
 		LOGGER.info(LoggerFileConstant.SESSIONID.toString(), WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION,
 				"Initializing subscribptions..");
+		registerTopic(topic);
 		subscribeForPrintServiceEvents();
 	}
 
