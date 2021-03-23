@@ -2,7 +2,7 @@ package io.mosip.print.service;
 
 import io.mosip.print.model.EventModel;
 
-public interface PrintService<T> {
+public interface PrintService {
     
 	/**
 	 * Get the card

@@ -12,9 +12,9 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import io.mosip.print.cbeffutil.BIRType;
-import io.mosip.print.cbeffutil.CbeffValidator;
-import io.mosip.print.entity.BIR;
+import io.mosip.kernel.core.cbeffutil.common.CbeffValidator;
+import io.mosip.kernel.core.cbeffutil.entity.BIR;
+import io.mosip.kernel.core.cbeffutil.jaxbclasses.BIRType;
 import io.mosip.print.spi.CbeffUtil;
 
 /**
@@ -204,5 +204,4 @@ public class CbeffImpl implements CbeffUtil {
 //		byte[] fileContent = Files.readAllBytes(Paths.get("C:\\Users\\M1046464\\Downloads\\cbeff1.xml"));
 //		return fileContent;
 //	}
-
 }

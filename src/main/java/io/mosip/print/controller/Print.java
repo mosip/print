@@ -1,7 +1,5 @@
 package io.mosip.print.controller;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -12,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.mosip.print.annotation.PreAuthenticateContentAndVerifyIntent;
+import io.mosip.kernel.websub.api.annotation.PreAuthenticateContentAndVerifyIntent;
 import io.mosip.print.exception.RegPrintAppException;
 import io.mosip.print.model.EventModel;
 import io.mosip.print.service.PrintService;
@@ -23,7 +21,7 @@ public class Print {
 
 	/** The printservice. */
 	@Autowired
-	private PrintService<Map<String, byte[]>> printService;
+	private PrintService printService;
 	
 	@Value("${mosip.event.topic}")
 	private String topic;
