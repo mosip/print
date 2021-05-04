@@ -3,6 +3,7 @@ package io.mosip.print.util;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -49,7 +50,6 @@ public class WebSubSubscriptionHelper {
 	public void initSubsriptions() {
 		LOGGER.info(LoggerFileConstant.SESSIONID.toString(), WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION,
 				"Initializing subscribptions..");
-		registerTopic(topic);
 		subscribeForPrintServiceEvents();
 	}
 
@@ -70,7 +70,6 @@ public class WebSubSubscriptionHelper {
 	public void printStatusUpdateEvent(String topic, CredentialStatusEvent credentialStatusEvent) {
 		try {
 		HttpHeaders headers = new HttpHeaders();
-		registerTopic(topic);
 		pb.publishUpdate(topic, credentialStatusEvent, MediaType.APPLICATION_JSON_UTF8_VALUE, headers,
 				webSubHubUrl + "/publish");
 	} catch (WebSubClientException e) {
@@ -79,8 +78,8 @@ public class WebSubSubscriptionHelper {
 	}
 
 	}
-
-	private void registerTopic(String topic) {
+	@Cacheable(value = "topics", key = "{#topic}")
+	public void registerTopic(String topic) {
 		try {
 			pb.registerTopic(topic, webSubHubUrl + "/publish");
 		} catch (WebSubClientException e) {

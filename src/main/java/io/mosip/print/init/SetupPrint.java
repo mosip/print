@@ -28,12 +28,19 @@ implements ApplicationListener<ApplicationReadyEvent> {
 
 	@Autowired
 	private WebSubSubscriptionHelper webSubSubscriptionHelper;
+	
+	@Value("${mosip.event.topic}")
+	private String topic;
   
 	@Override
 	public void onApplicationEvent(final ApplicationReadyEvent event) {
 		logger.info(LoggerFileConstant.SESSIONID.toString(), "onApplicationEvent", this.getClass().getSimpleName(),
 				"Scheduling event subscriptions after (milliseconds): " + taskSubsctiptionDelay);
-		taskScheduler.schedule(this::initSubsriptions, new Date(System.currentTimeMillis() + taskSubsctiptionDelay));
+		taskScheduler.schedule(() -> {
+			webSubSubscriptionHelper.registerTopic(topic);
+			initSubsriptions();
+			
+		}, new Date(System.currentTimeMillis() + taskSubsctiptionDelay));
 	}
 
 	private void initSubsriptions() {
