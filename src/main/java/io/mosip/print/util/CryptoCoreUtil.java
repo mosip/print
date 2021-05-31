@@ -37,6 +37,7 @@ import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.encodings.OAEPEncoding;
 import org.bouncycastle.crypto.engines.RSAEngine;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.mosip.print.exception.CryptoManagerException;
@@ -48,6 +49,9 @@ public class CryptoCoreUtil {
 	private final static String RSA_ECB_OAEP_PADDING = "RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING";
 
 	private final static int THUMBPRINT_LENGTH = 32;
+
+	@Value("${mosip.print.prependThumbprint:true}")
+	private boolean isThumbprint;
 
 	public String decrypt(String data) throws Exception {
 		PrivateKeyEntry privateKeyEntry = loadP12();
@@ -67,7 +71,7 @@ public class CryptoCoreUtil {
 		return privateKeyEntry;
 	}
 
-	public static byte[] decryptData(byte[] requestData, PrivateKeyEntry privateKey) throws Exception {
+	public byte[] decryptData(byte[] requestData, PrivateKeyEntry privateKey) throws Exception {
 		String keySplitter = "#KEY_SPLITTER#";
 		SecretKey symmetricKey = null;
 		byte[] encryptedData = null;
@@ -77,11 +81,19 @@ public class CryptoCoreUtil {
 
 		int keyDemiliterIndex = getSplitterIndex(requestData, 0, keySplitter);
 		byte[] encryptedKey = copyOfRange(requestData, 0, keyDemiliterIndex);
+		byte[] decryptedSymmetricKey = null;
 		try {
 			encryptedData = copyOfRange(requestData, keyDemiliterIndex + keySplitterLength, cipherKeyandDataLength);
 			// byte[] dataThumbprint = Arrays.copyOfRange(encryptedKey, 0,
 			// THUMBPRINT_LENGTH);
-			encryptedSymmetricKey = Arrays.copyOfRange(encryptedKey, THUMBPRINT_LENGTH, encryptedKey.length);
+			if (isThumbprint) {
+				encryptedSymmetricKey = Arrays.copyOfRange(encryptedKey, THUMBPRINT_LENGTH, encryptedKey.length);
+				decryptedSymmetricKey = asymmetricDecrypt(privateKey.getPrivateKey(),
+						((RSAPrivateKey) privateKey.getPrivateKey()).getModulus(), encryptedSymmetricKey);
+			} else {
+				decryptedSymmetricKey = asymmetricDecrypt(privateKey.getPrivateKey(),
+						((RSAPrivateKey) privateKey.getPrivateKey()).getModulus(), encryptedKey);
+			}
 			// byte[] certThumbprint =
 			// getCertificateThumbprint(privateKey.getCertificate());
 
@@ -90,8 +102,6 @@ public class CryptoCoreUtil {
 			 * Exception("Error in generating Certificate Thumbprint."); }
 			 */
 
-			byte[] decryptedSymmetricKey = asymmetricDecrypt(privateKey.getPrivateKey(),
-					((RSAPrivateKey) privateKey.getPrivateKey()).getModulus(), encryptedSymmetricKey);
 			symmetricKey = new SecretKeySpec(decryptedSymmetricKey, 0, decryptedSymmetricKey.length, "AES");
 			return symmetricDecrypt(symmetricKey, encryptedData, null);
 		} catch (Exception e) {
