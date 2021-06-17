@@ -40,6 +40,7 @@ import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import io.mosip.kernel.core.crypto.exception.InvalidParamSpecException;
 import io.mosip.print.exception.CryptoManagerException;
 import io.mosip.print.exception.PlatformErrorMessages;
 
@@ -49,6 +50,9 @@ public class CryptoCoreUtil {
 	private final static String RSA_ECB_OAEP_PADDING = "RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING";
 
 	private final static int THUMBPRINT_LENGTH = 32;
+	private final static int NONCE = 12;
+	private final static int AADSize = 32;
+	public static final byte[] VERSION_RSA_2048 = "VER_R2".getBytes();
 
 	@Value("${mosip.print.prependThumbprint:true}")
 	private boolean isThumbprint;
@@ -57,8 +61,8 @@ public class CryptoCoreUtil {
 		PrivateKeyEntry privateKeyEntry = loadP12();
 		byte[] dataBytes = org.apache.commons.codec.binary.Base64.decodeBase64(data);
 		byte[] data1 = decryptData(dataBytes, privateKeyEntry);
-		String strData = new String(data1);
-		return strData;
+		String decryptedData = new String(data1);
+		return decryptedData;
 	}
 
 	public PrivateKeyEntry loadP12() throws KeyStoreException, NoSuchAlgorithmException, CertificateException,
@@ -81,33 +85,44 @@ public class CryptoCoreUtil {
 
 		int keyDemiliterIndex = getSplitterIndex(requestData, 0, keySplitter);
 		byte[] encryptedKey = copyOfRange(requestData, 0, keyDemiliterIndex);
+		byte[] headerBytes = parseEncryptKeyHeader(encryptedKey);
 		byte[] decryptedSymmetricKey = null;
 		try {
 			encryptedData = copyOfRange(requestData, keyDemiliterIndex + keySplitterLength, cipherKeyandDataLength);
-			// byte[] dataThumbprint = Arrays.copyOfRange(encryptedKey, 0,
-			// THUMBPRINT_LENGTH);
-			if (isThumbprint) {
+			if (Arrays.equals(headerBytes, VERSION_RSA_2048)) {
+				encryptedSymmetricKey = Arrays.copyOfRange(encryptedKey, THUMBPRINT_LENGTH + VERSION_RSA_2048.length,
+						encryptedKey.length);
+				byte[] aad = Arrays.copyOfRange(encryptedData, 0, AADSize);
+				byte[] nonce = Arrays.copyOfRange(aad, 0, NONCE);
+				byte[] encData = Arrays.copyOfRange(encryptedData, AADSize, encryptedData.length);
+				decryptedSymmetricKey = asymmetricDecrypt(privateKey.getPrivateKey(),
+						((RSAPrivateKey) privateKey.getPrivateKey()).getModulus(), encryptedSymmetricKey);
+				symmetricKey = new SecretKeySpec(decryptedSymmetricKey, 0, decryptedSymmetricKey.length, "AES");
+				return symmetricDecrypt(symmetricKey, encData, nonce, aad);
+			} else if (isThumbprint) {
 				encryptedSymmetricKey = Arrays.copyOfRange(encryptedKey, THUMBPRINT_LENGTH, encryptedKey.length);
 				decryptedSymmetricKey = asymmetricDecrypt(privateKey.getPrivateKey(),
 						((RSAPrivateKey) privateKey.getPrivateKey()).getModulus(), encryptedSymmetricKey);
+				symmetricKey = new SecretKeySpec(decryptedSymmetricKey, 0, decryptedSymmetricKey.length, "AES");
+				return symmetricDecrypt(symmetricKey, encryptedData, null);
 			} else {
 				decryptedSymmetricKey = asymmetricDecrypt(privateKey.getPrivateKey(),
 						((RSAPrivateKey) privateKey.getPrivateKey()).getModulus(), encryptedKey);
+				symmetricKey = new SecretKeySpec(decryptedSymmetricKey, 0, decryptedSymmetricKey.length, "AES");
+				return symmetricDecrypt(symmetricKey, encryptedData, null);
 			}
-			// byte[] certThumbprint =
-			// getCertificateThumbprint(privateKey.getCertificate());
-
-			/*
-			 * if (!Arrays.equals(dataThumbprint, certThumbprint)) { throw new
-			 * Exception("Error in generating Certificate Thumbprint."); }
-			 */
-
-			symmetricKey = new SecretKeySpec(decryptedSymmetricKey, 0, decryptedSymmetricKey.length, "AES");
-			return symmetricDecrypt(symmetricKey, encryptedData, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		throw new Exception("Not able to decrypt the data.");
+	}
+
+	public byte[] parseEncryptKeyHeader(byte[] encryptedKey) {
+		byte[] versionHeaderBytes = Arrays.copyOfRange(encryptedKey, 0, VERSION_RSA_2048.length);
+		if (!Arrays.equals(versionHeaderBytes, VERSION_RSA_2048)) {
+			return new byte[0];
+		}
+		return versionHeaderBytes;
 	}
 
 	private static int getSplitterIndex(byte[] encryptedData, int keyDemiliterIndex, String keySplitter) {
@@ -194,6 +209,44 @@ public class CryptoCoreUtil {
 			output = cipher.doFinal(Arrays.copyOf(data, data.length - cipher.getBlockSize()));
 		} catch (Exception e) {
 
+		}
+		return output;
+	}
+
+	public byte[] symmetricDecrypt(SecretKey key, byte[] data, byte[] nonce, byte[] aad)
+			throws InvalidAlgorithmParameterException {
+		// Objects.requireNonNull(key, null);
+		// CryptoUtils.verifyData(data);
+		byte[] output = null;
+		Cipher cipher;
+		try {
+			cipher = Cipher.getInstance("AES/GCM/PKCS5Padding");
+			SecretKeySpec keySpec = new SecretKeySpec(key.getEncoded(), "AES");
+			GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(128, nonce);
+			cipher.init(Cipher.DECRYPT_MODE, keySpec, gcmParameterSpec);
+			if (aad != null) {
+				cipher.updateAAD(aad);
+			}
+			output = cipher.doFinal(data, 0, data.length);
+		} catch (InvalidAlgorithmParameterException e) {
+			throw new InvalidParamSpecException(PlatformErrorMessages.PRT_INVALID_KEY_EXCEPTION.getCode(),
+					PlatformErrorMessages.PRT_INVALID_KEY_EXCEPTION.getMessage(), e);
+		} catch (IllegalBlockSizeException e) {
+			throw new CryptoManagerException(PlatformErrorMessages.CERTIFICATE_THUMBPRINT_ERROR.getCode(),
+					PlatformErrorMessages.CERTIFICATE_THUMBPRINT_ERROR.getMessage(), e);
+
+		} catch (BadPaddingException e) {
+			throw new CryptoManagerException(PlatformErrorMessages.CERTIFICATE_THUMBPRINT_ERROR.getCode(),
+					PlatformErrorMessages.CERTIFICATE_THUMBPRINT_ERROR.getMessage(), e);
+		} catch (NoSuchAlgorithmException e) {
+			throw new CryptoManagerException(PlatformErrorMessages.CERTIFICATE_THUMBPRINT_ERROR.getCode(),
+					PlatformErrorMessages.CERTIFICATE_THUMBPRINT_ERROR.getMessage(), e);
+		} catch (NoSuchPaddingException e) {
+			throw new CryptoManagerException(PlatformErrorMessages.CERTIFICATE_THUMBPRINT_ERROR.getCode(),
+					PlatformErrorMessages.CERTIFICATE_THUMBPRINT_ERROR.getMessage(), e);
+		} catch (InvalidKeyException e) {
+			throw new CryptoManagerException(PlatformErrorMessages.PRT_INVALID_KEY_EXCEPTION.getCode(),
+					PlatformErrorMessages.PRT_INVALID_KEY_EXCEPTION.getMessage(), e);
 		}
 		return output;
 	}
