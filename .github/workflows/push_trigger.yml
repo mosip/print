@@ -149,10 +149,13 @@ jobs:
       
       - name: Unzip and extract the print
         run: unzip -uj "release.zip" "target/*" -d "target"
+      - name: Get current date
+          id: date
+          run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       
       - name: Build image
         run: |
-          docker build . --file Dockerfile --tag ${{ env.SERVICE_NAME }}
+          docker build . --file Dockerfile --build-arg SOURCE=mosip --build-arg COMMIT_HASH=$(git rev-parse HEAD) --build-arg COMMIT_ID=$(git rev-parse --short HEAD) --build-arg BUILD_TIME=${{steps.date.outputs.date}} --tag ${{ env.SERVICE_NAME }}
       - name: Log into registry
         run: echo "${{ secrets.release_docker_hub }}" | docker login -u ${{ secrets.actor_docker_hub }} --password-stdin
         
@@ -217,7 +220,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          
+
       - uses: 8398a7/action-slack@v3
           with:
             status: ${{ job.status }}
