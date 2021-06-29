@@ -118,7 +118,7 @@ jobs:
         status: ${{ job.status }}
         fields: repo,message,commit,workflow,job # selectable (default: repo,message)
       env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }} # required
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK2 }} # required
       if: failure() # Pick up events even if the job fails or is canceled.
 
   docker-print:
@@ -150,8 +150,8 @@ jobs:
       - name: Unzip and extract the print
         run: unzip -uj "release.zip" "target/*" -d "target"
       - name: Get current date
-          id: date
-          run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+           id: date
+           run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       
       - name: Build image
         run: |
@@ -226,6 +226,6 @@ jobs:
             status: ${{ job.status }}
             fields: repo,message,commit,workflow,job # selectable (default: repo,message)
           env:
-            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }} # required
+            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK2 }} # required
           if: failure() # Pick up events even if the job fails or is canceled.
 
