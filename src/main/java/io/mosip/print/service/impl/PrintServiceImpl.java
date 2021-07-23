@@ -128,14 +128,6 @@ public class PrintServiceImpl implements PrintService{
 	/** The Constant VALUE. */
 	private static final String VALUE = "value";
 
-	/** The primary lang. */
-	@Value("${mosip.primary-language}")
-	private String primaryLang;
-
-	/** The secondary lang. */
-	@Value("${mosip.secondary-language}")
-	private String secondaryLang;
-
 	/** The Constant UIN_CARD_TEMPLATE. */
 	private static final String UIN_CARD_TEMPLATE = "RPR_UIN_CARD_TEMPLATE";
 
@@ -224,6 +216,12 @@ public class PrintServiceImpl implements PrintService{
 	@Value("${mosip.datashare.policy.id}")
 	private String policyId;
 
+	@Value("${mosip.template-language}")
+	private String templateLang;
+
+	@Value("#{'${mosip.mandatory-languages:}'.concat('${mosip.optional-languages:}')}")
+	private String supportedLang;
+
 	public byte[] generateCard(EventModel eventModel) throws Exception {
 		Map<String, byte[]> byteMap = new HashMap<>();
 		String decodedCrdential = null;
@@ -296,7 +294,7 @@ public class PrintServiceImpl implements PrintService{
 			}
 			if (credentialType.equalsIgnoreCase("qrcode")) {
 				boolean isQRcodeSet = setQrCode(decryptedJson.toString(), attributes);
-				InputStream uinArtifact = templateGenerator.getTemplate(template, attributes, primaryLang);
+				InputStream uinArtifact = templateGenerator.getTemplate(template, attributes, templateLang);
 				pdfbytes = uinCardGenerator.generateUinCard(uinArtifact, UinCardType.PDF,
 						password);
 
@@ -321,7 +319,7 @@ public class PrintServiceImpl implements PrintService{
 						PlatformErrorMessages.PRT_PRT_QRCODE_NOT_SET.name());
 			}
 			// getting template and placing original valuespng
-			InputStream uinArtifact = templateGenerator.getTemplate(template, attributes, primaryLang);
+			InputStream uinArtifact = templateGenerator.getTemplate(template, attributes, templateLang);
 			if (uinArtifact == null) {
 				printLogger.error(LoggerFileConstant.SESSIONID.toString(),
 						LoggerFileConstant.REGISTRATIONID.toString(), "UIN" +
@@ -499,10 +497,14 @@ public class PrintServiceImpl implements PrintService{
 					JSONArray node = JsonUtil.getJSONArray(demographicIdentity, value);
 					JsonValue[] jsonValues = JsonUtil.mapJsonNodeToJavaObject(JsonValue.class, node);
 					for (JsonValue jsonValue : jsonValues) {
-						if (jsonValue.getLanguage().equals(primaryLang))
-							printTextFileMap.put(value + "_" + primaryLang, jsonValue.getValue());
-						if (jsonValue.getLanguage().equals(secondaryLang))
-							printTextFileMap.put(value + "_" + secondaryLang, jsonValue.getValue());
+						/*
+						 * if (jsonValue.getLanguage().equals(primaryLang)) printTextFileMap.put(value +
+						 * "_" + primaryLang, jsonValue.getValue()); if
+						 * (jsonValue.getLanguage().equals(secondaryLang)) printTextFileMap.put(value +
+						 * "_" + secondaryLang, jsonValue.getValue());
+						 */
+						if (supportedLang.contains(jsonValue.getLanguage()))
+							printTextFileMap.put(value + "_" + jsonValue.getLanguage(), jsonValue.getValue());
 
 					}
 
@@ -648,10 +650,15 @@ public class PrintServiceImpl implements PrintService{
 						// JSONArray node = JsonUtil.getJSONArray(demographicIdentity, value);
 						JsonValue[] jsonValues = JsonUtil.mapJsonNodeToJavaObject(JsonValue.class, (JSONArray) obj);
 						for (JsonValue jsonValue : jsonValues) {
-							if (jsonValue.getLanguage().equals(primaryLang))
-								attribute.put(value + "_" + primaryLang, jsonValue.getValue());
-							if (jsonValue.getLanguage().equals(secondaryLang))
-								attribute.put(value + "_" + secondaryLang, jsonValue.getValue());
+							/*
+							 * if (jsonValue.getLanguage().equals(primaryLang)) attribute.put(value + "_" +
+							 * primaryLang, jsonValue.getValue()); if
+							 * (jsonValue.getLanguage().equals(secondaryLang)) attribute.put(value + "_" +
+							 * secondaryLang, jsonValue.getValue());
+							 */
+							if (supportedLang.contains(jsonValue.getLanguage()))
+								attribute.put(value + "_" + jsonValue.getLanguage(), jsonValue.getValue());
+
 
 						}
 
@@ -777,7 +784,7 @@ public class PrintServiceImpl implements PrintService{
 			if (object instanceof ArrayList) {
 				JSONArray node = JsonUtil.getJSONArray(jsonObject, key);
 				JsonValue[] jsonValues = JsonUtil.mapJsonNodeToJavaObject(JsonValue.class, node);
-				uinCardPd = uinCardPd.concat(getParameter(jsonValues, primaryLang));
+				uinCardPd = uinCardPd.concat(getParameter(jsonValues, templateLang));
 
 			} else if (object instanceof LinkedHashMap) {
 				JSONObject json = JsonUtil.getJSONObject(jsonObject, key);
