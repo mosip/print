@@ -23,7 +23,7 @@ implements ApplicationListener<ApplicationReadyEvent> {
 	@Autowired
 	private ThreadPoolTaskScheduler taskScheduler;
   
-	@Value("${mosip.event.delay :600}")
+	@Value("${mosip.event.delay:6000}")
 	private int taskSubsctiptionDelay;
 
 	@Autowired
