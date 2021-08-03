@@ -20,13 +20,11 @@ jobs:
         java-version: 11
         server-id: ossrh # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
-
     - name: Setup branch and env
       run: |
         # Strip git ref prefix from version
         echo "BRANCH_NAME=$(echo ${{ github.ref }} | sed -e 's,.*/\(.*\),\1,')" >> $GITHUB_ENV
         echo "GPG_TTY=$(tty)" >> $GITHUB_ENV
-
     - name: Setup branch and GPG public key 
       run: |
         # Strip git ref prefix from version
@@ -104,7 +102,6 @@ jobs:
     - name: Build with Maven
       run: |
         mvn -B package -s $GITHUB_WORKSPACE/settings.xml --file pom.xml
-        
     - name: Publish the maven package
       run: |
         mvn deploy -DskipTests -DaltDeploymentRepository=ossrh::default::${{ secrets.RELEASE_URL }} -s $GITHUB_WORKSPACE/settings.xml -f pom.xml
@@ -133,7 +130,6 @@ jobs:
         with:
           name: release
           path: ./
-
       - name: Setup branch name
         run: |
           # Strip git ref prefix from version
