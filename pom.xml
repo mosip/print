@@ -47,7 +47,7 @@
 		<commons-lang3>3.7</commons-lang3>
 		<commons-io>2.6</commons-io>
 		<commons-codec>1.11</commons-codec>
-		<bouncycastle.version>1.66</bouncycastle.version>
+		<bouncycastle.version>1.67</bouncycastle.version>
 		<jwt.version> 3.8.1</jwt.version>
 		<google.zxing.version>3.3.3</google.zxing.version>
 	</properties>
