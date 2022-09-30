@@ -234,6 +234,11 @@
 			<artifactId>vcverifier</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>${postgresql.version}</version>
+		</dependency>
 	</dependencies>
 	
     <repositories>
@@ -255,6 +260,10 @@
             <enabled>false</enabled>
             </snapshots>
         </repository>
+			<repository>
+				<id>danubetech-maven-public</id>
+				<url>https://repo.danubetech.com/repository/maven-public/</url>
+			</repository>
     </repositories>
 	
 	<distributionManagement>
