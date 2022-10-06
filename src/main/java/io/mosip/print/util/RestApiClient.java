@@ -40,7 +40,7 @@ public class RestApiClient {
 
 	/** The builder. */
 	@Autowired
-	@Qualifier("selfTokenRestTemplate")
+//	@Qualifier("selfTokenRestTemplate")
 	private RestTemplate restTemplate;
 
 	@Autowired
