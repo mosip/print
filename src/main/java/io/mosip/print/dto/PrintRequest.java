@@ -1,6 +1,5 @@
 package io.mosip.print.dto;
 
-import io.mosip.print.dto.BaseRestRequestDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

@@ -71,8 +71,12 @@ public enum PlatformErrorMessages {
 	CERTIFICATE_THUMBPRINT_ERROR(PlatformConstants.PRT_PRINT_PREFIX + "026", "certificate thumbprint failure"),
 	PRT_INVALID_KEY_EXCEPTION(PlatformConstants.PRT_PRINT_PREFIX + "027", "invalid key"),
 	PRT_PDF_SIGN_EXCEPTION(PlatformConstants.PRT_PRINT_PREFIX + "028", "error occured while signing pdf"),
-	PRT_UNKNOWN_DECRYPTION_EXCEPTION(PlatformConstants.PRT_PRINT_PREFIX + "029", "Unknown Error in data decryption.");
-	
+	PRT_UNKNOWN_DECRYPTION_EXCEPTION(PlatformConstants.PRT_PRINT_PREFIX + "029", "Unknown Error in data decryption."),
+	PRT_RID_MISSING_EXCEPTION(PlatformConstants.PRT_PRINT_PREFIX + "029", "RID is mandatory"),
+	PRT_STATUS_MISSING_EXCEPTION(PlatformConstants.PRT_PRINT_PREFIX + "030", "Printer Status Missing or Invalid"),
+	PRT_UNKNOWN_EXCEPTION(PlatformConstants.PRT_PRINT_PREFIX + "031", "Unknown Error"),
+	PRT_PRINT_ID_INVALID_EXCEPTION(PlatformConstants.PRT_PRINT_PREFIX + "032", "Entered Print Request id is invalid");
+
 
 
 	/** The error message. */

@@ -12,9 +12,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import io.mosip.print.constant.ApiName;
-import io.mosip.print.constant.LoggerFileConstant;
 import io.mosip.print.exception.ApisResourceAccessException;
-import io.mosip.print.exception.ExceptionUtils;
 import io.mosip.print.exception.PlatformErrorMessages;
 import io.mosip.print.logger.PrintLogger;
 import io.mosip.print.service.PrintRestClientService;

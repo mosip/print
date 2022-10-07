@@ -2,9 +2,7 @@ package io.mosip.print.util;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,12 +14,9 @@ import io.mosip.kernel.websub.api.exception.WebSubClientException;
 import io.mosip.kernel.websub.api.model.SubscriptionChangeRequest;
 import io.mosip.kernel.websub.api.model.SubscriptionChangeResponse;
 import io.mosip.kernel.websub.api.model.UnsubscriptionRequest;
-import io.mosip.print.constant.LoggerFileConstant;
 import io.mosip.print.logger.PrintLogger;
 import io.mosip.print.model.CredentialStatusEvent;
 import org.springframework.web.client.RestTemplate;
-
-import javax.annotation.PostConstruct;
 
 @Component
 public class WebSubSubscriptionHelper {
@@ -73,7 +68,7 @@ public class WebSubSubscriptionHelper {
 			LOGGER.info("subscription request : {}", subscriptionRequest);
 			sb.subscribe(subscriptionRequest);
 		} catch (WebSubClientException e) {
-			LOGGER.info("websub subscription error {} {}", WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION);
+			LOGGER.error("websub subscription error {} {}", WEBSUBSUBSCRIPTIONHEPLER, INITSUBSCRIPTION, e);
 		}
 	}
 
