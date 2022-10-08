@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.mosip.print.constant.ApiName;
-import io.mosip.print.constant.LoggerFileConstant;
 import io.mosip.print.constant.PDFGeneratorExceptionCodeConstant;
 import io.mosip.print.constant.UinCardType;
 import io.mosip.print.core.http.RequestWrapper;

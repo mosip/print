@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -36,11 +35,7 @@ import io.mosip.print.entity.MspCardEntity;
 import io.mosip.print.exception.*;
 import io.mosip.print.idrepo.dto.IdResponseDTO1;
 import io.mosip.print.repository.MspCardRepository;
-import io.mosip.vercred.CredentialsVerifier;
-import io.mosip.vercred.exception.ProofDocumentNotFoundException;
-import io.mosip.vercred.exception.ProofTypeNotFoundException;
-import io.mosip.vercred.exception.PubicKeyNotFoundException;
-import io.mosip.vercred.exception.UnknownException;
+
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
 import org.json.simple.JSONArray;
@@ -166,9 +161,6 @@ public class PrintServiceImpl implements PrintService{
 	@Autowired
 	private Environment env;
 
-	@Autowired
-	private CredentialsVerifier credentialsVerifier;
-
 	@Value("${mosip.datashare.partner.id}")
 	private String partnerId;
 
@@ -184,6 +176,8 @@ public class PrintServiceImpl implements PrintService{
 	@Value("${mosip.print.verify.credentials.flag:true}")
 	private boolean verifyCredentialsFlag;
 
+	@Value("${token.request.clientId}")
+	private String clientId;
 
 	@Autowired
 	@Qualifier("mspCardRepository")
@@ -256,52 +250,6 @@ public class PrintServiceImpl implements PrintService{
 		String signature = signHeader + "." + crdential + "." + signData;
 		return signature;
 	}
-
-	public boolean generateCardOl(EventModel eventModel) {
-		String credential = null;
-		boolean isPrinted = false;
-		boolean verified=false;
-		try {
-			if (eventModel.getEvent().getDataShareUri() == null || eventModel.getEvent().getDataShareUri().isEmpty()) {
-				credential = eventModel.getEvent().getData().get("credential").toString();
-			} else {
-				String dataShareUrl = eventModel.getEvent().getDataShareUri();
-				URI dataShareUri = URI.create(dataShareUrl);
-				credential = restApiClient.getApi(dataShareUri, String.class);
-			}
-			String ecryptionPin = eventModel.getEvent().getData().get("protectionKey").toString();
-			String decodedCredential = cryptoCoreUtil.decrypt(credential);
-			printLogger.debug("vc is printed security valuation.... : {}",decodedCredential);
-			if (verifyCredentialsFlag){
-				printLogger.info("Configured received credentials to be verified. Flag {}", verifyCredentialsFlag);
-				try {
-					verified=credentialsVerifier.verifyPrintCredentials(decodedCredential);
-					if (!verified) {
-						printLogger.error("Received Credentials failed in verifiable credential verify method. So, the credentials will not be printed." +
-								" Id: {}, Transaction Id: {}", eventModel.getEvent().getId(), eventModel.getEvent().getTransactionId());
-						return false;
-					}
-				}catch (ProofDocumentNotFoundException | ProofTypeNotFoundException e){
-					printLogger.error("Proof document is not available in the received credentials." +
-							" Id: {}, Transaction Id: {}", eventModel.getEvent().getId(), eventModel.getEvent().getTransactionId());
-				}catch (UnknownException | PubicKeyNotFoundException e){
-					printLogger.error("Received Credentials failed in verifiable credential verify method. So, the credentials will not be printed." +
-							" Id: {}, Transaction Id: {}", eventModel.getEvent().getId(), eventModel.getEvent().getTransactionId());
-					return false;
-				}
-			}
-			Map proofMap = new HashMap<String, String>();
-			proofMap = (Map) eventModel.getEvent().getData().get("proof");
-//			byte[] pdfbytes = getDocuments(decodedCredential,
-//					eventModel.getEvent().getData().get("credentialType").toString(), ecryptionPin,
-//					eventModel.getEvent().getTransactionId(), "UIN", false).get("uinPdf");
-			isPrinted = true; 
-		}catch (Exception e){
-			printLogger.error(e.getMessage() , e);
-			isPrinted = false;
-		}
-		return isPrinted;
-	}
 	private Map<String, Object> getDocuments(String credential, String credentialType, String encryptionPin,
 											 String requestId, String sign,
 											 String cardType,
@@ -315,6 +263,7 @@ public class PrintServiceImpl implements PrintService{
 		String uin = null;
 		LogDescription description = new LogDescription();
 		String password = null;
+		boolean isPhotoSet=false;
 		String individualBio = null;
 		Map<String, Object> attributes = new LinkedHashMap<>();
 		boolean isTransactionSuccessful = false;
@@ -326,14 +275,18 @@ public class PrintServiceImpl implements PrintService{
 			credentialSubject = getCrdentialSubject(credential);
 			org.json.JSONObject credentialSubjectJson = new org.json.JSONObject(credentialSubject);
 			org.json.JSONObject decryptedJson = decryptAttribute(credentialSubjectJson, encryptionPin, credential);
-			individualBio = decryptedJson.getString("biometrics");
-			String individualBiometric = new String(individualBio);
+			if(decryptedJson.has("biometrics")){
+				individualBio = decryptedJson.getString("biometrics");
+				String individualBiometric = new String(individualBio);
+				isPhotoSet = setApplicantPhoto(individualBiometric, attributes);
+				attributes.put("isPhotoSet",isPhotoSet);
+			}
+
 			uin = decryptedJson.getString("UIN");
 			if (isPasswordProtected) {
 				password = getPassword(uin);
 			}
 
-			boolean isPhotoSet = setApplicantPhoto(individualBiometric, attributes);
 			if (!isPhotoSet) {
 				printLogger.debug(LoggerFileConstant.SESSIONID.toString(),
 						LoggerFileConstant.REGISTRATIONID.toString(), uin +
@@ -341,12 +294,16 @@ public class PrintServiceImpl implements PrintService{
 			}
 			setTemplateAttributes(decryptedJson.toString(), attributes);
 			attributes.put(IdType.UIN.toString(), uin);
-			attributes.put(IdType.VID.toString(), vid);
+			if (vid != null)
+				attributes.put(IdType.VID.toString(), vid);
+			else
+				attributes.put(IdType.VID.toString(), "");
+
 
 			byte[] textFileByte = createTextFile(decryptedJson.toString());
 			byteMap.put(UIN_TEXT_FILE, textFileByte);
 
-			boolean isQRcodeSet = setQrCode(decryptedJson.toString(), attributes);
+			boolean isQRcodeSet = setQrCode(decryptedJson.toString(), attributes, isPhotoSet);
 			if (!isQRcodeSet) {
 				printLogger.debug(LoggerFileConstant.SESSIONID.toString(),
 						LoggerFileConstant.REGISTRATIONID.toString(), uin +
@@ -460,150 +417,7 @@ public class PrintServiceImpl implements PrintService{
 
 		return attributes;
 	}
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see io.mosip.print.service.PrintService#
-	 * getDocuments(io.mosip.registration.processor.core.constant.IdType,
-	 * java.lang.String, java.lang.String, boolean)
-	 */
-	private Map<String, byte[]> getDocumentsOld(String credential, String credentialType, String encryptionPin,
-			String requestId,
-			String cardType,
-			boolean isPasswordProtected) {
-		printLogger.debug("PrintServiceImpl::getDocuments()::entry");
-		String credentialSubject;
-		Map<String, byte[]> byteMap = new HashMap<>();
-		String uin = null;
-		LogDescription description = new LogDescription();
-		String password = null;
-		String individualBio = null;
-		Map<String, Object> attributes = new LinkedHashMap<>();
-		boolean isTransactionSuccessful = false;
-		String template = UIN_CARD_TEMPLATE;
-		byte[] pdfbytes = null;
-		try {
 
-			credentialSubject = getCrdentialSubject(credential);
-			org.json.JSONObject credentialSubjectJson = new org.json.JSONObject(credentialSubject);
-			org.json.JSONObject decryptedJson = decryptAttribute(credentialSubjectJson, encryptionPin, credential);
-			individualBio = decryptedJson.getString("biometrics");
-			String individualBiometric = new String(individualBio);
-			uin = decryptedJson.getString("UIN");
-			if (isPasswordProtected) {
-				password = getPassword(uin);
-			}
-			if (credentialType.equalsIgnoreCase("qrcode")) {
-				boolean isQRcodeSet = setQrCode(decryptedJson.toString(), attributes);
-				InputStream uinArtifact = templateGenerator.getTemplate(template, attributes, templateLang);
-				pdfbytes = uinCardGenerator.generateUinCard(uinArtifact, UinCardType.PDF,
-						password);
-
-			} else {
-
-			boolean isPhotoSet = setApplicantPhoto(individualBiometric, attributes);
-			if (!isPhotoSet) {
-				printLogger.debug(PlatformErrorMessages.PRT_PRT_APPLICANT_PHOTO_NOT_SET.name());
-			}
-			setTemplateAttributes(decryptedJson.toString(), attributes);
-			attributes.put(IdType.UIN.toString(), uin);
-
-			byte[] textFileByte = createTextFile(decryptedJson.toString());
-			byteMap.put(UIN_TEXT_FILE, textFileByte);
-
-			boolean isQRcodeSet = setQrCode(decryptedJson.toString(), attributes);
-			if (!isQRcodeSet) {
-				printLogger.debug(PlatformErrorMessages.PRT_PRT_QRCODE_NOT_SET.name());
-			}
-			// getting template and placing original valuespng
-			InputStream uinArtifact = templateGenerator.getTemplate(template, attributes, templateLang);
-			if (uinArtifact == null) {
-				printLogger.error(PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.name());
-				throw new TemplateProcessingFailureException(
-						PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.getCode());
-			}
-			pdfbytes = uinCardGenerator.generateUinCard(uinArtifact, UinCardType.PDF, password);
-
-		}
-			printStatusUpdate(requestId, pdfbytes, credentialType);
-			isTransactionSuccessful = true;
-
-		}
-		catch (QrcodeGenerationException e) {
-			description.setMessage(PlatformErrorMessages.PRT_PRT_QR_CODE_GENERATION_ERROR.getMessage());
-			description.setCode(PlatformErrorMessages.PRT_PRT_QR_CODE_GENERATION_ERROR.getCode());
-			printLogger.error(PlatformErrorMessages.PRT_PRT_QRCODE_NOT_GENERATED.name() , e);
-			throw new PDFGeneratorException(PDFGeneratorExceptionCodeConstant.PDF_EXCEPTION.getErrorCode(),
-					e.getErrorText());
-
-		} catch (UINNotFoundInDatabase e) {
-			description.setMessage(PlatformErrorMessages.PRT_PRT_UIN_NOT_FOUND_IN_DATABASE.getMessage());
-			description.setCode(PlatformErrorMessages.PRT_PRT_UIN_NOT_FOUND_IN_DATABASE.getCode());
-
-			printLogger.error(
-					PlatformErrorMessages.PRT_PRT_UIN_NOT_FOUND_IN_DATABASE.name() ,e);
-			throw new PDFGeneratorException(PDFGeneratorExceptionCodeConstant.PDF_EXCEPTION.getErrorCode(),
-					e.getErrorText());
-
-		} catch (TemplateProcessingFailureException e) {
-			description.setMessage(PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.getMessage());
-			description.setCode(PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.getCode());
-
-			printLogger.error(PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.name() ,e);
-			throw new TemplateProcessingFailureException(PlatformErrorMessages.PRT_TEM_PROCESSING_FAILURE.getMessage());
-
-		} catch (PDFGeneratorException e) {
-			description.setMessage(PlatformErrorMessages.PRT_PRT_PDF_NOT_GENERATED.getMessage());
-			description.setCode(PlatformErrorMessages.PRT_PRT_PDF_NOT_GENERATED.getCode());
-
-			printLogger.error(PlatformErrorMessages.PRT_PRT_PDF_NOT_GENERATED.name() ,e);
-			throw new PDFGeneratorException(PDFGeneratorExceptionCodeConstant.PDF_EXCEPTION.getErrorCode(),
-					e.getErrorText());
-
-		} catch (PDFSignatureException e) {
-			description.setMessage(PlatformErrorMessages.PRT_PRT_PDF_SIGNATURE_EXCEPTION.getMessage());
-			description.setCode(PlatformErrorMessages.PRT_PRT_PDF_SIGNATURE_EXCEPTION.getCode());
-
-			printLogger.error(PlatformErrorMessages.PRT_PRT_PDF_SIGNATURE_EXCEPTION.name() ,e);
-			throw new PDFSignatureException(PlatformErrorMessages.PRT_PRT_PDF_SIGNATURE_EXCEPTION.getMessage());
-
-		} catch (Exception ex) {
-			description.setMessage(PlatformErrorMessages.PRT_PRT_PDF_GENERATION_FAILED.getMessage());
-			description.setCode(PlatformErrorMessages.PRT_PRT_PDF_GENERATION_FAILED.getCode());
-			printLogger.error(ex.getMessage() ,ex);
-			throw new PDFGeneratorException(PDFGeneratorExceptionCodeConstant.PDF_EXCEPTION.getErrorCode(),
-					ex.getMessage() ,ex);
-
-		} finally {
-			String eventId = "";
-			String eventName = "";
-			String eventType = "";
-			if (isTransactionSuccessful) {
-				description.setMessage(PlatformSuccessMessages.RPR_PRINT_SERVICE_SUCCESS.getMessage());
-				description.setCode(PlatformSuccessMessages.RPR_PRINT_SERVICE_SUCCESS.getCode());
-
-				eventId = EventId.RPR_402.toString();
-				eventName = EventName.UPDATE.toString();
-				eventType = EventType.BUSINESS.toString();
-			} else {
-				description.setMessage(PlatformErrorMessages.PRT_PRT_PDF_GENERATION_FAILED.getMessage());
-				description.setCode(PlatformErrorMessages.PRT_PRT_PDF_GENERATION_FAILED.getCode());
-
-				eventId = EventId.RPR_405.toString();
-				eventName = EventName.EXCEPTION.toString();
-				eventType = EventType.SYSTEM.toString();
-			}
-			/** Module-Id can be Both Success/Error code */
-			String moduleId = isTransactionSuccessful ? PlatformSuccessMessages.RPR_PRINT_SERVICE_SUCCESS.getCode()
-					: description.getCode();
-			String moduleName = ModuleName.PRINT_SERVICE.toString();
-			auditLogRequestBuilder.createAuditRequestBuilder(description.getMessage(), eventId, eventName, eventType,
-					moduleId, moduleName, uin);
-		}
-		printLogger.debug("PrintServiceImpl::getDocuments()::exit");
-
-		return byteMap;
-	}
 
 	/**
 	 * Creates the text file.
@@ -672,11 +486,13 @@ public class PrintServiceImpl implements PrintService{
 	 *                                                            occurred.
 	 * @throws io.mosip.print.exception.QrcodeGenerationException
 	 */
-	private boolean setQrCode(String qrString, Map<String, Object> attributes)
+	private boolean setQrCode(String qrString, Map<String, Object> attributes,boolean isPhotoSet)
 			throws QrcodeGenerationException, IOException, io.mosip.print.exception.QrcodeGenerationException {
 		boolean isQRCodeSet = false;
 		JSONObject qrJsonObj = JsonUtil.objectMapperReadValue(qrString, JSONObject.class);
-		qrJsonObj.remove("biometrics");
+		if(isPhotoSet) {
+			qrJsonObj.remove("biometrics");
+		}
 		byte[] qrCodeBytes = qrCodeGenerator.generateQrCode(qrJsonObj.toString(), QrVersion.V30);
 		if (qrCodeBytes != null) {
 			String imageString = Base64.encodeBase64String(qrCodeBytes);
