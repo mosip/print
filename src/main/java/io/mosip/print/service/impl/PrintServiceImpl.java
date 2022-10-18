@@ -215,7 +215,7 @@ public class PrintServiceImpl implements PrintService{
 		org.json.simple.JSONObject obj = new org.json.simple.JSONObject();
 		obj.put("photo",attributes.get(APPLICANT_PHOTO));
 		obj.put("qrCode",attributes.get(QRCODE));
-		obj.put("address", ((attributes.get("address") != null && !attributes.get("address").equals("")) ? attributes.get("address").toString() : "N/A"));
+		obj.put("address", ((attributes.get("addressLine1") != null && !attributes.get("addressLine2").equals("")) ? attributes.get("addressLine3").toString() : "N/A"));
 		obj.put("locality", ((attributes.get("locality") != null && !attributes.get("locality").equals("")) ? attributes.get("locality").toString() : "N/A"));
 		obj.put("city", ((attributes.get("city") != null && !attributes.get("city").equals("")) ? attributes.get("city").toString() : "N/A"));
 		obj.put("state", ((attributes.get("state") != null && !attributes.get("state").equals("")) ? attributes.get("state").toString() : "N/A"));
