@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.mosip.kernel.core.util.StringUtils;
 import io.mosip.print.constant.*;
 import io.mosip.print.dto.CryptoWithPinRequestDto;
 import io.mosip.print.dto.CryptoWithPinResponseDto;
@@ -36,6 +35,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -193,7 +193,7 @@ public class PrintServiceImpl implements PrintService{
 		org.json.simple.JSONObject obj = new org.json.simple.JSONObject();
 		obj.put("photo",attributes.get(APPLICANT_PHOTO));
 		obj.put("qrCode",attributes.get(QRCODE));
-		String fullAddress = StringUtils.join(new Object[]{attributes.get("addressLine1"), attributes.get("addressLine2"), attributes.get("addressLine3")}, ',' );
+		String fullAddress = StringUtils.arrayToDelimitedString(new Object[]{attributes.get("addressLine1"), attributes.get("addressLine2"), attributes.get("addressLine3")}, ", " );
 		obj.put("address", (fullAddress != null && !fullAddress.equals("")) ? fullAddress : "N/A");
 		obj.put("locality", ((attributes.get("locality") != null && !attributes.get("locality").equals("")) ? attributes.get("locality").toString() : "N/A"));
 		obj.put("city", ((attributes.get("city") != null && !attributes.get("city").equals("")) ? attributes.get("city").toString() : "N/A"));
