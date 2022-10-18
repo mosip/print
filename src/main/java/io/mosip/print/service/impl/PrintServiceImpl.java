@@ -1,41 +1,29 @@
 package io.mosip.print.service.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
+import io.mosip.kernel.core.util.StringUtils;
 import io.mosip.print.constant.*;
+import io.mosip.print.dto.CryptoWithPinRequestDto;
+import io.mosip.print.dto.CryptoWithPinResponseDto;
+import io.mosip.print.dto.DataShare;
+import io.mosip.print.dto.JsonValue;
 import io.mosip.print.entity.MspCardEntity;
 import io.mosip.print.exception.*;
 import io.mosip.print.idrepo.dto.IdResponseDTO1;
+import io.mosip.print.logger.LogDescription;
+import io.mosip.print.logger.PrintLogger;
+import io.mosip.print.model.CredentialStatusEvent;
+import io.mosip.print.model.EventModel;
+import io.mosip.print.model.StatusEvent;
 import io.mosip.print.repository.MspCardRepository;
-
+import io.mosip.print.service.PrintService;
+import io.mosip.print.service.UinCardGenerator;
+import io.mosip.print.spi.CbeffUtil;
+import io.mosip.print.spi.QrCodeGenerator;
+import io.mosip.print.util.*;
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
 import org.json.simple.JSONArray;
@@ -49,30 +37,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import io.mosip.print.dto.CryptoWithPinRequestDto;
-import io.mosip.print.dto.CryptoWithPinResponseDto;
-import io.mosip.print.dto.DataShare;
-import io.mosip.print.dto.JsonValue;
-import io.mosip.print.logger.LogDescription;
-import io.mosip.print.logger.PrintLogger;
-import io.mosip.print.model.CredentialStatusEvent;
-import io.mosip.print.model.EventModel;
-import io.mosip.print.model.StatusEvent;
-import io.mosip.print.service.PrintService;
-import io.mosip.print.service.UinCardGenerator;
-import io.mosip.print.spi.CbeffUtil;
-import io.mosip.print.spi.QrCodeGenerator;
-import io.mosip.print.util.AuditLogRequestBuilder;
-import io.mosip.print.util.CbeffToBiometricUtil;
-import io.mosip.print.util.CryptoCoreUtil;
-import io.mosip.print.util.CryptoUtil;
-import io.mosip.print.util.DataShareUtil;
-import io.mosip.print.util.DateUtils;
-import io.mosip.print.util.JsonUtil;
-import io.mosip.print.util.RestApiClient;
-import io.mosip.print.util.TemplateGenerator;
-import io.mosip.print.util.Utilities;
-import io.mosip.print.util.WebSubSubscriptionHelper;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class PrintServiceImpl implements PrintService{
@@ -215,7 +193,8 @@ public class PrintServiceImpl implements PrintService{
 		org.json.simple.JSONObject obj = new org.json.simple.JSONObject();
 		obj.put("photo",attributes.get(APPLICANT_PHOTO));
 		obj.put("qrCode",attributes.get(QRCODE));
-		obj.put("address", ((attributes.get("addressLine1") != null && !attributes.get("addressLine1").equals("")) ? attributes.get("addressLine1").toString() : "N/A"));
+		String fullAddress = StringUtils.join(new Object[]{attributes.get("addressLine1"), attributes.get("addressLine2"), attributes.get("addressLine3")}, ',' );
+		obj.put("address", (fullAddress != null && !fullAddress.equals("")) ? fullAddress : "N/A");
 		obj.put("locality", ((attributes.get("locality") != null && !attributes.get("locality").equals("")) ? attributes.get("locality").toString() : "N/A"));
 		obj.put("city", ((attributes.get("city") != null && !attributes.get("city").equals("")) ? attributes.get("city").toString() : "N/A"));
 		obj.put("state", ((attributes.get("state") != null && !attributes.get("state").equals("")) ? attributes.get("state").toString() : "N/A"));
