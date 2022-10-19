@@ -38,7 +38,7 @@ public class Print {
 	 * @throws Exception
 	 */
 	@PostMapping(path = "/callback/notifyPrint", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	@PreAuthenticateContentAndVerifyIntent(secret = "${mosip.event.secret}", callback = "/v1/print/print/callback/notifyPrint", topic = "${mosip.event.topic}")
+	@PreAuthenticateContentAndVerifyIntent(secret = "${mosip.event.secret}", callback = "/v1/cardprint/print/callback/notifyPrint", topic = "${mosip.event.topic}")
 	public ResponseEntity<String> handleSubscribeEvent(@RequestBody EventModel eventModel) throws Exception {
 		printLogger.info("event recieved from websub"+", id: {}",eventModel.getEvent().getId());
 		boolean isPrinted = printService.generateCard(eventModel);
