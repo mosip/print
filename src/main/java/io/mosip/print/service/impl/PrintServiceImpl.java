@@ -193,8 +193,8 @@ public class PrintServiceImpl implements PrintService{
 		org.json.simple.JSONObject obj = new org.json.simple.JSONObject();
 		obj.put("photo",attributes.get(APPLICANT_PHOTO));
 		obj.put("qrCode",attributes.get(QRCODE));
-		String fullAddress = StringUtils.arrayToDelimitedString(new Object[]{attributes.get("addressLine1"), attributes.get("addressLine2"), attributes.get("addressLine3")}, ", " );
-		obj.put("address", (fullAddress != null && !fullAddress.equals("")) ? fullAddress : "N/A");
+		String fullAddress = getFullAddress(attributes);
+		obj.put("address", (fullAddress.length() > 0) ? fullAddress : "N/A");
 		obj.put("locality", ((attributes.get("locality") != null && !attributes.get("locality").equals("")) ? attributes.get("locality").toString() : "N/A"));
 		obj.put("city", ((attributes.get("city") != null && !attributes.get("city").equals("")) ? attributes.get("city").toString() : "N/A"));
 		obj.put("state", ((attributes.get("state") != null && !attributes.get("state").equals("")) ? attributes.get("state").toString() : "N/A"));
@@ -223,6 +223,16 @@ public class PrintServiceImpl implements PrintService{
 		}
 		return isPrinted;
 	}
+
+	private String getFullAddress(Map<String, Object> attributes) {
+		Object fullAddress[] = new Object[]{ attributes.get("addressLine1"),
+				attributes.get("addressLine2"), attributes.get("addressLine3")};
+		fullAddress = Arrays.stream(fullAddress)
+				.filter(s -> (s != null && !s.equals("")))
+				.toArray(Object[]::new);
+		return StringUtils.arrayToCommaDelimitedString(fullAddress);
+	}
+
 	private String getSignature(String sign, String crdential) {
 		String signHeader = sign.split("\\.")[0];
 		String signData = sign.split("\\.")[2];
