@@ -185,7 +185,7 @@ public class PrintServiceImpl implements PrintService{
 		Map<String, Object> attributes = getDocuments(decodedCrdential,
 				eventModel.getEvent().getData().get("credentialType").toString(), ecryptionPin,
 				eventModel.getEvent().getTransactionId(), getSignature(sign, credential), "UIN", false, eventModel.getEvent().getId(),
-				eventModel.getEvent().getData().get("registrationId").toString(), eventModel.getEvent().getData().get("vid").toString());
+				eventModel.getEvent().getData().get("registrationId").toString());
 
 
 		String printid = (String) eventModel.getEvent().getId();
@@ -242,7 +242,7 @@ public class PrintServiceImpl implements PrintService{
 	private Map<String, Object> getDocuments(String credential, String credentialType, String encryptionPin,
 											 String requestId, String sign,
 											 String cardType,
-											 boolean isPasswordProtected, String refId, String registrationId, String vid) {
+											 boolean isPasswordProtected, String refId, String registrationId) {
 		printLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
 				"PrintServiceImpl::getDocuments()::entry");
 
@@ -283,11 +283,6 @@ public class PrintServiceImpl implements PrintService{
 			}
 			setTemplateAttributes(decryptedJson.toString(), attributes);
 			attributes.put(IdType.UIN.toString(), uin);
-			if (vid != null)
-				attributes.put(IdType.VID.toString(), vid);
-			else
-				attributes.put(IdType.VID.toString(), "");
-
 
 			byte[] textFileByte = createTextFile(decryptedJson.toString());
 			byteMap.put(UIN_TEXT_FILE, textFileByte);
@@ -298,7 +293,6 @@ public class PrintServiceImpl implements PrintService{
 						LoggerFileConstant.REGISTRATIONID.toString(), uin +
 								PlatformErrorMessages.PRT_PRT_QRCODE_NOT_SET.name());
 			}
-
 
 			printStatusUpdate(requestId, credentialType, uin, refId, registrationId);
 			isTransactionSuccessful = true;
