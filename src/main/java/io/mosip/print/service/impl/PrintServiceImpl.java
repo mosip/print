@@ -51,6 +51,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -164,6 +165,9 @@ public class PrintServiceImpl implements PrintService{
 	@Value("${mosip.print.infant.max.age:5}")
 	private int defaultBabyAge;
 
+	@Value("${mosip.print.dob.formatter}")
+	private DateTimeFormatter dateTimeFormatter;
+
 	@Autowired
 	@Qualifier("mspCardRepository")
 	MspCardRepository mspCardRepository;
@@ -236,7 +240,7 @@ public class PrintServiceImpl implements PrintService{
 	}
 
 	private boolean isChildRegistration(Map<String, Object> attributes) {
-		LocalDate dateOfBirth = LocalDate.parse((String) attributes.get("dateOfBirth"));
+		LocalDate dateOfBirth = LocalDate.parse((String) attributes.get("dateOfBirth"), dateTimeFormatter);
 		if ((LocalDate.now().getYear() - dateOfBirth.getYear()) <= defaultBabyAge) {
 			return true;
 		}
