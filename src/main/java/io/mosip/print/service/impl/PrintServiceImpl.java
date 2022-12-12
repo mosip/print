@@ -172,9 +172,6 @@ public class PrintServiceImpl implements PrintService{
 	@Qualifier("mspCardRepository")
 	MspCardRepository mspCardRepository;
 
-	private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dobPattern);
-
-
 	public boolean generateCard(EventModel eventModel) {
 		Map<String, byte[]> byteMap = new HashMap<>();
 		String decodedCrdential = null;
@@ -242,7 +239,7 @@ public class PrintServiceImpl implements PrintService{
 	}
 
 	private boolean isChildRegistration(Map<String, Object> attributes) {
-
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dobPattern);
 		LocalDate dateOfBirth = LocalDate.parse((String) attributes.get("dateOfBirth"), dateTimeFormatter);
 		if ((LocalDate.now().getYear() - dateOfBirth.getYear()) <= defaultBabyAge) {
 			return true;
