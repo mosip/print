@@ -165,12 +165,14 @@ public class PrintServiceImpl implements PrintService{
 	@Value("${mosip.print.infant.max.age:5}")
 	private int defaultBabyAge;
 
-	@Value("${mosip.print.dob.formatter}")
-	private DateTimeFormatter dateTimeFormatter;
+	@Value("${mosip.print.dob.pattern}")
+	private String dobPattern;
 
 	@Autowired
 	@Qualifier("mspCardRepository")
 	MspCardRepository mspCardRepository;
+
+	private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dobPattern);
 
 
 	public boolean generateCard(EventModel eventModel) {
@@ -240,6 +242,7 @@ public class PrintServiceImpl implements PrintService{
 	}
 
 	private boolean isChildRegistration(Map<String, Object> attributes) {
+
 		LocalDate dateOfBirth = LocalDate.parse((String) attributes.get("dateOfBirth"), dateTimeFormatter);
 		if ((LocalDate.now().getYear() - dateOfBirth.getYear()) <= defaultBabyAge) {
 			return true;
