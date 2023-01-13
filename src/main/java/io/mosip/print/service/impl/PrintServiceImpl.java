@@ -49,7 +49,9 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -157,10 +159,18 @@ public class PrintServiceImpl implements PrintService{
 	@Value("${token.request.clientId}")
 	private String clientId;
 
+	@Value("${mosip.print.default.infant.photo:null}")
+	private String defaultBabyPhoto;
+
+	@Value("${mosip.print.infant.max.age:5}")
+	private int defaultBabyAge;
+
+	@Value("${mosip.print.dob.pattern}")
+	private String dobPattern;
+
 	@Autowired
 	@Qualifier("mspCardRepository")
 	MspCardRepository mspCardRepository;
-
 
 	public boolean generateCard(EventModel eventModel) {
 		Map<String, byte[]> byteMap = new HashMap<>();
@@ -185,14 +195,18 @@ public class PrintServiceImpl implements PrintService{
 		Map<String, Object> attributes = getDocuments(decodedCrdential,
 				eventModel.getEvent().getData().get("credentialType").toString(), ecryptionPin,
 				eventModel.getEvent().getTransactionId(), getSignature(sign, credential), "UIN", false, eventModel.getEvent().getId(),
-				eventModel.getEvent().getData().get("registrationId").toString(), eventModel.getEvent().getData().get("vid").toString());
+				eventModel.getEvent().getData().get("registrationId").toString());
 
 
 		String printid = (String) eventModel.getEvent().getId();
 
 		org.json.simple.JSONObject obj = new org.json.simple.JSONObject();
-		obj.put("photo",attributes.get(APPLICANT_PHOTO));
-		obj.put("qrCode",attributes.get(QRCODE));
+		Object photo = attributes.get(APPLICANT_PHOTO);
+		if (photo == null && isChildRegistration(attributes)) {
+			photo = defaultBabyPhoto;
+		}
+		obj.put("photo", photo);
+		obj.put("qrCode", attributes.get(QRCODE));
 		String fullAddress = getFullAddress(attributes);
 		obj.put("address", (fullAddress.length() > 0) ? fullAddress : "N/A");
 		obj.put("locality", ((attributes.get("locality") != null && !attributes.get("locality").equals("")) ? attributes.get("locality").toString() : "N/A"));
@@ -224,9 +238,18 @@ public class PrintServiceImpl implements PrintService{
 		return isPrinted;
 	}
 
+	private boolean isChildRegistration(Map<String, Object> attributes) {
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dobPattern);
+		LocalDate dateOfBirth = LocalDate.parse((String) attributes.get("dateOfBirth"), dateTimeFormatter);
+		if ((LocalDate.now().getYear() - dateOfBirth.getYear()) <= defaultBabyAge) {
+			return true;
+		}
+		return false;
+	}
+
 	private String getFullAddress(Map<String, Object> attributes) {
 		Object fullAddress[] = new Object[]{ attributes.get("addressLine1"),
-				attributes.get("addressLine2"), attributes.get("addressLine3")};
+				attributes.get("addressLine2"), attributes.get("addressLine3"), attributes.get("landmark")};
 		fullAddress = Arrays.stream(fullAddress)
 				.filter(s -> (s != null && !s.equals("")))
 				.toArray(Object[]::new);
@@ -242,7 +265,7 @@ public class PrintServiceImpl implements PrintService{
 	private Map<String, Object> getDocuments(String credential, String credentialType, String encryptionPin,
 											 String requestId, String sign,
 											 String cardType,
-											 boolean isPasswordProtected, String refId, String registrationId, String vid) {
+											 boolean isPasswordProtected, String refId, String registrationId) {
 		printLogger.debug(LoggerFileConstant.SESSIONID.toString(), LoggerFileConstant.REGISTRATIONID.toString(),
 				"PrintServiceImpl::getDocuments()::entry");
 
@@ -283,11 +306,6 @@ public class PrintServiceImpl implements PrintService{
 			}
 			setTemplateAttributes(decryptedJson.toString(), attributes);
 			attributes.put(IdType.UIN.toString(), uin);
-			if (vid != null)
-				attributes.put(IdType.VID.toString(), vid);
-			else
-				attributes.put(IdType.VID.toString(), "");
-
 
 			byte[] textFileByte = createTextFile(decryptedJson.toString());
 			byteMap.put(UIN_TEXT_FILE, textFileByte);
@@ -298,7 +316,6 @@ public class PrintServiceImpl implements PrintService{
 						LoggerFileConstant.REGISTRATIONID.toString(), uin +
 								PlatformErrorMessages.PRT_PRT_QRCODE_NOT_SET.name());
 			}
-
 
 			printStatusUpdate(requestId, credentialType, uin, refId, registrationId);
 			isTransactionSuccessful = true;
