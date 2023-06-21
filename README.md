@@ -30,6 +30,5 @@ Refer to the [configuration guide](docs/configuration.md).
 
 ## Test
 Automated functaionl tests available in [Functional Tests repo](https://github.com/mosip/mosip-functional-tests).
-
 ## License
 This project is licensed under the terms of [Mozilla Public License 2.0](LICENSE).
