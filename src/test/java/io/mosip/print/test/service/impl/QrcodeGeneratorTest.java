@@ -5,6 +5,7 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -17,7 +18,7 @@ import io.mosip.print.test.TestBootApplication;
 
 
 @SpringBootTest(classes = TestBootApplication.class)
-@RunWith(SpringRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class QrcodeGeneratorTest {
 
 	

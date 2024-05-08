@@ -19,6 +19,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
@@ -38,7 +39,7 @@ import io.mosip.print.spi.PDFGenerator;
 import io.mosip.print.test.TestBootApplication;
 
 @SpringBootTest(classes = TestBootApplication.class)
-@RunWith(SpringRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public class UinCardGeneratorImplTest {
 
 	@Mock

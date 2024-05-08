@@ -16,7 +16,7 @@ import io.mosip.print.spi.CbeffUtil;
 import io.mosip.vercred.CredentialsVerifier;
 
 
-@SpringBootApplication(scanBasePackages = { "io.mosip.print.*", "${mosip.auth.adapter.impl.basepackage}" }, exclude = { DataSourceAutoConfiguration.class,
+@SpringBootApplication(scanBasePackages = { "io.mosip.*", "${mosip.auth.adapter.impl.basepackage}" }, exclude = { DataSourceAutoConfiguration.class,
 		HibernateJpaAutoConfiguration.class,
 		CacheAutoConfiguration.class })
 @EnableScheduling

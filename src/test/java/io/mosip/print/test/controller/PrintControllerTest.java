@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -26,7 +27,7 @@ import io.mosip.print.model.EventModel;
 import io.mosip.print.service.PrintService;
 import io.mosip.print.test.TestBootApplication;
 
-@RunWith(SpringRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 @SpringBootTest(classes = TestBootApplication.class)
 @AutoConfigureMockMvc
 public class PrintControllerTest {
