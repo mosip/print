@@ -20,7 +20,7 @@ import io.mosip.vercred.CredentialsVerifier;
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class,
 		HibernateJpaAutoConfiguration.class,
 		CacheAutoConfiguration.class })
-@ComponentScan({"io.mosip.print.*","io.mosip.vercred.*","io.mosip.kernel.websub.api.*","io.mosip.kernel.core.websub.*", "io.mosip.kernel.auth.*"})
+@ComponentScan({"io.mosip.print.*","io.mosip.vercred.*","io.mosip.kernel.websub.api.*","io.mosip.kernel.core.websub.*", "${mosip.auth.adapter.impl.basepackage}"})
 @EnableScheduling
 @EnableAsync
 public class PrintPDFApplication {
