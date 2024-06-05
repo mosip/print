@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -16,9 +17,10 @@ import io.mosip.print.spi.CbeffUtil;
 import io.mosip.vercred.CredentialsVerifier;
 
 
-@SpringBootApplication(scanBasePackages = { "io.mosip.*", "${mosip.auth.adapter.impl.basepackage}" }, exclude = { DataSourceAutoConfiguration.class,
+@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class,
 		HibernateJpaAutoConfiguration.class,
 		CacheAutoConfiguration.class })
+@ComponentScan({"io.mosip.print.*","io.mosip.vercred.*","io.mosip.kernel.websub.api.*","io.mosip.kernel.core.websub.*", "io.mosip.kernel.auth.*"})
 @EnableScheduling
 @EnableAsync
 public class PrintPDFApplication {
