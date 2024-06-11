@@ -85,7 +85,7 @@ public class CryptoUtil {
 		}
 		Cipher cipher = null;
 		try {
-			cipher = Cipher.getInstance("AES/GCM/PKCS5Padding");
+			cipher = Cipher.getInstance("AES/GCM/NoPadding");
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
 			throw new CryptoManagerException(PlatformErrorMessages.PRT_INVALID_KEY_EXCEPTION.getCode(),
 					PlatformErrorMessages.PRT_INVALID_KEY_EXCEPTION.getMessage(), e);
