@@ -223,7 +223,7 @@ public class CryptoCoreUtil {
 		byte[] output = null;
 		Cipher cipher;
 		try {
-			cipher = Cipher.getInstance("AES/GCM/PKCS5Padding");
+			cipher = Cipher.getInstance("AES/GCM/NoPadding");
 			SecretKeySpec keySpec = new SecretKeySpec(key.getEncoded(), "AES");
 			GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(128, nonce);
 			cipher.init(Cipher.DECRYPT_MODE, keySpec, gcmParameterSpec);
