@@ -35,7 +35,7 @@ import com.google.gson.GsonBuilder;
 import io.mosip.vercred.CredentialsVerifier;
 import io.mosip.vercred.exception.ProofDocumentNotFoundException;
 import io.mosip.vercred.exception.ProofTypeNotSupportedException;
-import io.mosip.vercred.exception.PubicKeyNotFoundException;
+import io.mosip.vercred.exception.PublicKeyNotFoundException;
 import io.mosip.vercred.exception.UnknownException;
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
@@ -248,7 +248,7 @@ public class PrintServiceImpl implements PrintService {
                 printLogger.error("Proof document is not available in the received credentials." +
                         " Id: {}, Transaction Id: {}", eventModel.getEvent().getId(), eventModel.getEvent().getTransactionId());
                 return false;
-            } catch (UnknownException | PubicKeyNotFoundException e) {
+            } catch (UnknownException | PublicKeyNotFoundException e) {
                 printLogger.error("Received Credentials failed in verifiable credential verify method. So, the credentials will not be printed." +
                         " Id: {}, Transaction Id: {}", eventModel.getEvent().getId(), eventModel.getEvent().getTransactionId());
                 return false;
