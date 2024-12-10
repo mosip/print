@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>io.mosip.print</groupId>
 	<artifactId>print</artifactId>
-	<version>1.3.0-SNAPSHOT</version>
+	<version>1.3.0-beta.1</version>
 	<name>print</name>
 
 	<licenses>
