@@ -269,13 +269,22 @@
     <repositories>
         <repository>
             <id>ossrh</id>
-            <name>CentralRepository</name>
+            <name>LegacyMavenSnapshot</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
             <layout>default</layout>
             <snapshots>
             <enabled>true</enabled>
             </snapshots>
         </repository>
+		<repository>
+			<id>ossrh-central</id>
+			<name>MavenCentralRepository</name>
+			<url>https://central.sonatype.com/repository/maven-snapshots</url>
+			<layout>default</layout>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
         <repository>
             <id>central</id>
             <name>MavenCentral</name>
@@ -290,11 +299,11 @@
 	<distributionManagement>
                 <snapshotRepository>
                         <id>ossrh</id>
-                        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                        <url>https://central.sonatype.com/repository/maven-snapshots</url>
                 </snapshotRepository>
                 <repository>
                         <id>ossrh</id>
-                        <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                        <url>https://central.sonatype.com/api/v1/publisher</url>
                 </repository>
         </distributionManagement>
 	<build>
@@ -438,6 +447,7 @@
 					<doclint>none</doclint>
 				</configuration>
 			</plugin>
+<<<<<<< HEAD
 			<plugin>
 				<artifactId>maven-deploy-plugin</artifactId>
 				<version>${maven.deploy.plugin.version}</version>
@@ -459,7 +469,6 @@
 			</plugin>
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
 				<version>${nexus.staging.maven.plugin.version}</version>
 				<extensions>true</extensions>
 				<executions>
@@ -478,6 +487,21 @@
 				</configuration>
 			</plugin>
 			<plugin>
+=======
+
+			<plugin>
+				<groupId>org.sonatype.central</groupId>
+				<artifactId>central-publishing-maven-plugin</artifactId>
+				<version>0.7.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<publishingServerId>ossrh</publishingServerId>
+					<autoPublish>false</autoPublish>
+				</configuration>
+			</plugin>
+
+		<plugin>
+>>>>>>> 6de84d2... [MOSIP-41674] Updated the changes for mosip namespace migration from maven legacy sonartype to maven ossrh central
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-source-plugin</artifactId>
                   <version>2.2.1</version>
