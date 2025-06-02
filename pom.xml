@@ -447,7 +447,6 @@
 					<doclint>none</doclint>
 				</configuration>
 			</plugin>
-<<<<<<< HEAD
 			<plugin>
 				<artifactId>maven-deploy-plugin</artifactId>
 				<version>${maven.deploy.plugin.version}</version>
