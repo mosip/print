@@ -487,21 +487,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-=======
-
-			<plugin>
-				<groupId>org.sonatype.central</groupId>
-				<artifactId>central-publishing-maven-plugin</artifactId>
-				<version>0.7.0</version>
-				<extensions>true</extensions>
-				<configuration>
-					<publishingServerId>ossrh</publishingServerId>
-					<autoPublish>false</autoPublish>
-				</configuration>
-			</plugin>
-
-		<plugin>
->>>>>>> 6de84d2... [MOSIP-41674] Updated the changes for mosip namespace migration from maven legacy sonartype to maven ossrh central
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-source-plugin</artifactId>
                   <version>2.2.1</version>
