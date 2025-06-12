@@ -350,20 +350,13 @@
 				<version>3.2.3</version>
 				<executions>
 					<execution>
-						<id>build-info</id>
 						<goals>
-							<goal>build-info</goal> <!-- Generate build metadata -->
-						</goals>
-					</execution>
-					<execution>
-						<id>repackage-executable</id>
-						<goals>
-							<goal>repackage</goal> <!-- Create executable JAR -->
+							<goal>repackage</goal>
 						</goals>
 						<configuration>
-							<classifier>executable</classifier> <!-- Secondary artifact -->
-							<executable>true</executable> <!-- Makes JAR file executable on Unix -->
-							<attach>false</attach> <!-- CRITICAL: Don't publish to Maven Central -->
+							<executable>true</executable> <!-- default is false; just explicit here -->
+							<!-- No classifier -->
+							<!-- No layout -->
 						</configuration>
 					</execution>
 				</executions>
