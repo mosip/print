@@ -76,7 +76,7 @@ ENV loader_path_env=${loader_path}
 # change volume to whichever storage directory you want to use for this container.
 VOLUME ${work_dir}/logs ${work_dir}/Glowroot
 
-COPY ./target/print-*-executable.jar print.jar
+COPY ./target/print-*.jar print.jar
 
 # change permissions of file inside working dir
 RUN chown -R ${container_user}:${container_user} /home/${container_user}
