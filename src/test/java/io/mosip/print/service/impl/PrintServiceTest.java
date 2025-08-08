@@ -1,4 +1,4 @@
-package io.mosip.print.test.service.impl;
+package io.mosip.print.service.impl;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -26,10 +26,9 @@ import io.mosip.print.dto.ResponseDTO;
 import io.mosip.print.model.EventModel;
 import io.mosip.print.service.PrintRestClientService;
 import io.mosip.print.service.UinCardGenerator;
-import io.mosip.print.service.impl.PrintServiceImpl;
 import io.mosip.print.spi.CbeffUtil;
 import io.mosip.print.spi.QrCodeGenerator;
-import io.mosip.print.test.TestBootApplication;
+import io.mosip.print.TestBootApplication;
 import io.mosip.print.util.CryptoCoreUtil;
 import io.mosip.print.util.JsonUtil;
 import io.mosip.print.util.TemplateGenerator;

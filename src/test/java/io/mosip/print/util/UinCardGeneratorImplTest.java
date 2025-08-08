@@ -1,4 +1,4 @@
-package io.mosip.print.test.util;
+package io.mosip.print.util;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,7 +23,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import io.mosip.print.constant.UinCardType;
@@ -36,7 +35,7 @@ import io.mosip.print.exception.PDFSignatureException;
 import io.mosip.print.service.PrintRestClientService;
 import io.mosip.print.service.impl.UinCardGeneratorImpl;
 import io.mosip.print.spi.PDFGenerator;
-import io.mosip.print.test.TestBootApplication;
+import io.mosip.print.TestBootApplication;
 
 @SpringBootTest(classes = TestBootApplication.class)
 @RunWith(MockitoJUnitRunner.class)

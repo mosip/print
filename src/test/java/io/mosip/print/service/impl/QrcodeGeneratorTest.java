@@ -1,4 +1,4 @@
-package io.mosip.print.test.service.impl;
+package io.mosip.print.service.impl;
 
 import static org.hamcrest.CoreMatchers.isA;
 import static org.junit.Assert.assertThat;
@@ -7,13 +7,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import io.mosip.print.constant.QrVersion;
 import io.mosip.print.exception.QrcodeGenerationException;
-import io.mosip.print.service.impl.QrcodeGeneratorImpl;
 import io.mosip.print.spi.QrCodeGenerator;
-import io.mosip.print.test.TestBootApplication;
+import io.mosip.print.TestBootApplication;
 
 
 
