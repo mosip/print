@@ -18,6 +18,7 @@ import io.mosip.print.dto.AuditRequestDto;
 import io.mosip.print.dto.AuditResponseDto;
 import io.mosip.print.exception.ApisResourceAccessException;
 import io.mosip.print.service.PrintRestClientService;
+import io.mosip.kernel.core.util.DateUtils;
 
 /**
  * The Class AuditRequestBuilder.
