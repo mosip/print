@@ -18,6 +18,7 @@ import io.mosip.print.dto.AuditRequestDto;
 import io.mosip.print.dto.AuditResponseDto;
 import io.mosip.print.exception.ApisResourceAccessException;
 import io.mosip.print.service.PrintRestClientService;
+import io.mosip.kernel.core.util.DateUtils;
 
 /**
  * The Class AuditRequestBuilder.
@@ -69,7 +70,7 @@ public class AuditLogRequestBuilder {
 		ResponseWrapper<AuditResponseDto> responseWrapper = new ResponseWrapper<>();
 		try {
 			auditRequestDto.setDescription(description);
-			auditRequestDto.setActionTimeStamp(DateUtils.getUTCCurrentDateTimeString());
+			auditRequestDto.setActionTimeStamp(DateUtils.getUTCCurrentDateTimeWithZString());
 			auditRequestDto.setApplicationId(AuditLogConstant.MOSIP_4.toString());
 			auditRequestDto.setApplicationName(AuditLogConstant.REGISTRATION_PROCESSOR.toString());
 			auditRequestDto.setCreatedBy(AuditLogConstant.SYSTEM.toString());
@@ -123,7 +124,7 @@ public class AuditLogRequestBuilder {
 
 			auditRequestDto = new AuditRequestDto();
 			auditRequestDto.setDescription(description);
-			auditRequestDto.setActionTimeStamp(DateUtils.getUTCCurrentDateTimeString());
+			auditRequestDto.setActionTimeStamp(DateUtils.getUTCCurrentDateTimeWithZString());
 			auditRequestDto.setApplicationId(AuditLogConstant.MOSIP_4.toString());
 			auditRequestDto.setApplicationName(AuditLogConstant.REGISTRATION_PROCESSOR.toString());
 			auditRequestDto.setCreatedBy(AuditLogConstant.SYSTEM.toString());
