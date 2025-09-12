@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -32,6 +33,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -129,6 +131,7 @@ class PrintServiceImplTest {
      */
     @BeforeEach
     void setUp() throws Exception {
+        MockitoAnnotations.openMocks(this);
         ReflectionTestUtils.setField(printService, "partnerId", "partner123");
         ReflectionTestUtils.setField(printService, "policyId", "policy123");
         ReflectionTestUtils.setField(printService, "templateLang", "eng");
@@ -574,6 +577,92 @@ class PrintServiceImplTest {
         ReflectionTestUtils.setField(printService, "verifyCredentialsFlag", false);
         boolean result = (boolean) method.invoke(printService, mockEventModel, "credential");
         assertTrue(result);
+    }
+
+    /**
+     * Tests the getDocuments method for successful QR code generation.
+     * Verifies that the method processes credentials and generates documents correctly.
+     *
+     * @throws Exception if any error occurs during processing
+     */
+    @Test
+    void testGetDocuments_Success_QRCode() throws Exception {
+        String credential = "{\"credentialSubject\":\"{\\\"UIN\\\":\\\"1234567890\\\"}\"}";
+        String credentialType = "qrcode";
+        String encryptionPin = "1234";
+        String requestId = "req1";
+        boolean isPasswordProtected = false;
+
+        when(templateGenerator.getTemplate(anyString(), anyMap(), anyString()))
+                .thenReturn(new ByteArrayInputStream("template".getBytes()));
+        when(uinCardGenerator.generateUinCard(any(InputStream.class), any(UinCardType.class), anyString()))
+                .thenReturn("pdf".getBytes());
+        when(qrCodeGenerator.generateQrCode(anyString(), any(QrVersion.class)))
+                .thenReturn("qr".getBytes());
+        when(dataShareUtil.getDataShare(any(), anyString(), anyString()))
+                .thenReturn(mock(DataShare.class));
+        when(auditLogRequestBuilder.createAuditRequestBuilder(anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(null);
+
+        Method method = PrintServiceImpl.class.getDeclaredMethod(
+                "getDocuments", String.class, String.class, String.class, String.class, boolean.class);
+        method.setAccessible(true);
+
+        Map<String, byte[]> result = (Map<String, byte[]>) method.invoke(printService, credential, credentialType, encryptionPin, requestId, isPasswordProtected);
+        assertNotNull(result);
+    }
+    /**
+     * Creates a mock DataShare object for testing purposes.
+     *
+     * @return DataShare with test data including partner ID, policy ID, and request ID
+     */
+    @Test
+    void testGetDocuments_TemplateProcessingFailureException() throws Exception {
+        String credential = "{\"credentialSubject\":\"{\\\"UIN\\\":\\\"1234567890\\\"}\"}";
+        String credentialType = "UIN";
+        String encryptionPin = "1234";
+        String requestId = "req2";
+        boolean isPasswordProtected = false;
+
+        when(templateGenerator.getTemplate(anyString(), anyMap(), anyString())).thenReturn(null);
+
+        Method method = PrintServiceImpl.class.getDeclaredMethod(
+                "getDocuments", String.class, String.class, String.class, String.class, boolean.class);
+        method.setAccessible(true);
+
+        Exception exception = assertThrows(Exception.class, () ->
+                method.invoke(printService, credential, credentialType, encryptionPin, requestId, isPasswordProtected));
+
+        Throwable cause = exception.getCause();
+        assertTrue(cause instanceof PDFGeneratorException);
+        assertTrue(cause.getMessage().contains("argument \"content\" is null"));
+    }
+
+    /**
+     * Tests the getDocuments method when QR code generation fails.
+     * Verifies that QrcodeGenerationException is handled properly and the method throws PDFGeneratorException.
+     */
+    @Test
+    void testGetDocuments_QrcodeGenerationException() throws Exception {
+        String credential = "{\"credentialSubject\":\"{\\\"UIN\\\":\\\"1234567890\\\"}\"}";
+        String credentialType = "UIN";
+        String encryptionPin = "1234";
+        String requestId = "req3";
+        boolean isPasswordProtected = false;
+
+        // Setup mocks to trigger the exception
+        when(templateGenerator.getTemplate(anyString(), anyMap(), anyString())).thenReturn(null);
+
+        Method method = PrintServiceImpl.class.getDeclaredMethod(
+                "getDocuments", String.class, String.class, String.class, String.class, boolean.class);
+        method.setAccessible(true);
+
+        Exception exception = assertThrows(Exception.class, () ->
+                method.invoke(printService, credential, credentialType, encryptionPin, requestId, isPasswordProtected));
+
+        Throwable cause = exception.getCause();
+        assertTrue(cause instanceof PDFGeneratorException);
+        assertTrue(cause.getMessage().contains("argument \"content\" is null"));
     }
 
     /**

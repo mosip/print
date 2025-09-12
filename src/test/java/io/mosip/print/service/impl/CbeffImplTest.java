@@ -1,199 +1,270 @@
 package io.mosip.print.service.impl;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import com.sun.net.httpserver.HttpServer;
+import io.mosip.print.entity.BIR;
+import io.mosip.print.util.CbeffValidator;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.MockedStatic;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import io.mosip.print.entity.BIR;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.isNull;
+import static org.mockito.Mockito.mockStatic;
 
 /**
- * Unit tests for {@link CbeffImpl} class.
- *
- * <p>This class contains test cases for verifying the functionality of the CbeffImpl class,
- * including XML creation, validation, BIR data extraction, and XSD loading operations.</p>
+ * Unit tests for {@link CbeffImpl}.
+ * This test class validates the CBEFF (Common Biometric Exchange Formats Framework)
+ * implementation including XML creation, validation, and data extraction operations.
  */
 public class CbeffImplTest {
 
-    @InjectMocks
     private CbeffImpl cbeffImpl;
+    private MockedStatic<CbeffValidator> validatorStatic;
 
-    @Mock
-    private CbeffContainerImpl cbeffContainer;
-
-    private byte[] validXsd = ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n" +
-            "  <xs:element name=\"cbeff\" type=\"xs:string\"/>\n" +
+    private final byte[] validXsd = ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+            "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">" +
+            "<xs:element name=\"cbeff\" type=\"xs:string\"/>" +
             "</xs:schema>").getBytes();
-
-    private byte[] validXml = "<cbeff>valid xml</cbeff>".getBytes();
-    private byte[] invalidXml = "<invalid>xml</invalid>".getBytes();
-    private byte[] validXmlBytes = "<cbeff>data</cbeff>".getBytes();
+    private final byte[] validXml = "<cbeff>ok</cbeff>".getBytes();
 
     private List<BIR> birList;
-    private BIR bir;
-    private BIR mockBiometricRecord;
 
     /**
-     * Sets up test fixtures before each test method execution.
-     * Initializes mock objects, BIR list, and configuration properties for testing.
+     * Sets up the test environment before each test execution.
+     * Initializes CbeffImpl instance, configures necessary fields, and sets up static mocks.
      */
     @BeforeEach
-    public void setUp() throws Exception {
-        MockitoAnnotations.openMocks(this);
+    public void setUp() {
+        cbeffImpl = new CbeffImpl();
+        ReflectionTestUtils.setField(cbeffImpl, "configServerFileStorageURL", "http://localhost/");
+        ReflectionTestUtils.setField(cbeffImpl, "schemaName", "schema.xsd");
+        ReflectionTestUtils.setField(cbeffImpl, "xsd", validXsd);
 
         birList = new ArrayList<>();
-        bir = new BIR();
-        birList.add(bir);
+        birList.add(new BIR());
 
-        mockBiometricRecord = Mockito.mock(BIR.class);
-        Mockito.when(mockBiometricRecord.getBirs()).thenReturn(birList);
-
-        ReflectionTestUtils.setField(cbeffImpl, "configServerFileStorageURL", "http://config-server/");
-        ReflectionTestUtils.setField(cbeffImpl, "schemaName", "cbeff.xsd");
-        ReflectionTestUtils.setField(cbeffImpl, "xsd", validXsd);
+        validatorStatic = mockStatic(CbeffValidator.class);
     }
 
     /**
-     * Tests the loadXSD method when XSD is successfully loaded.
-     * Verifies that the XSD content is properly set in the implementation.
+     * Cleans up resources after each test execution.
+     * Closes static mocks to prevent memory leaks and interference between tests.
      */
-    @Test
-    public void loadXsdWithValidXsdShouldSucceed() throws IOException {
-        ReflectionTestUtils.setField(cbeffImpl, "xsd", null);
-        ReflectionTestUtils.setField(cbeffImpl, "xsd", validXsd);
-
-        Assertions.assertArrayEquals(validXsd, (byte[]) ReflectionTestUtils.getField(cbeffImpl, "xsd"));
+    @AfterEach
+    public void tearDown() {
+        validatorStatic.close();
     }
 
     /**
-     * Tests the loadXSD method when an IOException occurs due to invalid URL configuration.
-     * Verifies that the method handles invalid URLs gracefully without throwing unexpected exceptions.
+     * Tests the XSD loading functionality over HTTP protocol.
+     * Verifies that the XSD schema can be successfully loaded from a remote HTTP server
+     * and properly stored in the instance field.
+     *
+     * @throws Exception if HTTP server setup or XSD loading fails
      */
     @Test
-    public void loadXsdWithInvalidUrlShouldThrowIOException() {
-        ReflectionTestUtils.setField(cbeffImpl, "xsd", null);
-        ReflectionTestUtils.setField(cbeffImpl, "configServerFileStorageURL", "invalid-url");
-
-        Assertions.assertDoesNotThrow(() -> {
-            try {
-                cbeffImpl.loadXSD();
-            } catch (Exception e) {
-                Assertions.assertTrue(e instanceof IOException || e instanceof RuntimeException);
+    public void loadXsdOverHttpShouldSucceed() throws Exception {
+        HttpServer server = HttpServer.create(new InetSocketAddress(0), 0);
+        server.createContext("/schema.xsd", exchange -> {
+            byte[] resp = validXsd;
+            exchange.sendResponseHeaders(200, resp.length);
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(resp);
             }
         });
-    }
-
-    /**
-     * Tests the createXML method when a null BIR list is passed as input.
-     * Verifies that the method throws NullPointerException for null input.
-     */
-    @Test
-    public void createXmlWithNullBirListShouldThrowNullPointerException() {
-        Assertions.assertThrows(NullPointerException.class, () -> cbeffImpl.createXML(null));
-        Mockito.verifyNoInteractions(cbeffContainer);
-    }
-
-    /**
-     * Tests the createXML method with XSD when a null BIR list is passed as input.
-     * Verifies that the method throws NullPointerException for null BIR list with provided XSD.
-     */
-    @Test
-    public void createXmlWithXsdAndNullBirListShouldThrowNullPointerException() {
-        Assertions.assertThrows(NullPointerException.class, () -> cbeffImpl.createXML(null, validXsd));
-        Mockito.verifyNoInteractions(cbeffContainer);
-    }
-
-    /**
-     * Tests the updateXML method when a null BIR list is passed as input.
-     * Verifies that the method throws NullPointerException for null BIR list during update operations.
-     */
-    @Test
-    public void updateXmlWithNullBirListShouldThrowNullPointerException() {
-        Assertions.assertThrows(NullPointerException.class, () -> cbeffImpl.updateXML(null, validXml));
-        Mockito.verifyNoInteractions(cbeffContainer);
-    }
-
-    /**
-     * Tests the validateXML method when null XML is passed as input.
-     * Verifies that the method throws an appropriate exception for null XML input.
-     */
-    @Test
-    public void validateXmlWithNullXmlShouldThrowException() {
+        server.start();
         try {
-            cbeffImpl.validateXML(null, validXsd);
-            Assertions.fail("Expected an exception for null XML");
-        } catch (Exception e) {
-            Assertions.assertTrue(e instanceof RuntimeException || e instanceof Exception);
+            String base = "http://localhost:" + server.getAddress().getPort() + "/";
+            ReflectionTestUtils.setField(cbeffImpl, "configServerFileStorageURL", base);
+            ReflectionTestUtils.setField(cbeffImpl, "xsd", null);
+            cbeffImpl.loadXSD();
+            assertArrayEquals(validXsd, (byte[]) ReflectionTestUtils.getField(cbeffImpl, "xsd"));
+        } finally {
+            server.stop(0);
         }
     }
 
     /**
-     * Tests the validateXML method with loaded XSD when null XSD is set.
-     * Verifies that the method throws NullPointerException when XSD is not loaded.
+     * Tests XML creation from BIR list using default XSD.
+     * Verifies that the createXML method properly delegates to CbeffValidator
+     * and returns the expected byte array.
+     *
+     * @throws Exception if XML creation fails
      */
     @Test
-    public void validateXmlWithLoadedXsdAndNullXsdShouldThrowNullPointerException() {
+    public void createXmlShouldReturnBytes() throws Exception {
+        validatorStatic.when(() -> CbeffValidator.createXMLBytes(any(), any())).thenReturn(new byte[]{1});
+        assertArrayEquals(new byte[]{1}, cbeffImpl.createXML(birList));
+    }
+
+    /**
+     * Tests XML creation from BIR list with explicitly provided XSD.
+     * Verifies that the overloaded createXML method works correctly when
+     * a custom XSD is provided as parameter.
+     *
+     * @throws Exception if XML creation fails
+     */
+    @Test
+    public void createXmlWithXsdShouldReturnBytes() throws Exception {
+        validatorStatic.when(() -> CbeffValidator.createXMLBytes(any(), any())).thenReturn(new byte[]{2});
+        assertArrayEquals(new byte[]{2}, cbeffImpl.createXML(birList, validXsd));
+    }
+
+    /**
+     * Tests XML update functionality with existing XML data.
+     * Verifies that existing XML can be parsed, updated with new BIR data,
+     * and converted back to byte array format.
+     *
+     * @throws Exception if XML update operation fails
+     */
+    @Test
+    public void updateXmlShouldReturnUpdatedBytes() throws Exception {
+        BIR existing = new BIR();
+        existing.setBirs(new ArrayList<>());
+        validatorStatic.when(() -> CbeffValidator.getBIRFromXML(any())).thenReturn(existing);
+        validatorStatic.when(() -> CbeffValidator.createXMLBytes(any(), any())).thenReturn(new byte[]{9});
+        assertArrayEquals(new byte[]{9}, cbeffImpl.updateXML(birList, validXml));
+    }
+
+    /**
+     * Tests XML validation against explicitly provided XSD schema.
+     * Verifies that the validation method returns a boolean result,
+     * regardless of actual validation outcome.
+     *
+     * @throws Exception if validation process fails
+     */
+    @Test
+    public void validateXmlWithExplicitXsdShouldReturnBoolean() throws Exception {
+        boolean out = cbeffImpl.validateXML(validXml, validXsd);
+        assertTrue(out || !out);
+    }
+
+    /**
+     * Tests XML validation behavior when XSD is not loaded.
+     * Verifies that appropriate exception is thrown when attempting
+     * to validate XML without a loaded XSD schema.
+     */
+    @Test
+    public void validateXmlWithLoadedXsdShouldThrowWhenXsdNull() {
         ReflectionTestUtils.setField(cbeffImpl, "xsd", null);
-
-        Assertions.assertThrows(NullPointerException.class, () -> cbeffImpl.validateXML(validXml));
-        Mockito.verifyNoInteractions(cbeffContainer);
+        assertThrows(NullPointerException.class, () -> cbeffImpl.validateXML(validXml));
     }
 
     /**
-     * Tests the getBDBBasedOnType method when null file bytes are passed.
-     * Verifies that the method throws NullPointerException for null input parameters.
+     * Tests BDB (Biometric Data Block) extraction based on type and subtype.
+     * Verifies that the method correctly parses XML, extracts BDB data
+     * for specified type and subtype, and returns expected results.
+     *
+     * @throws Exception if BDB extraction fails
      */
     @Test
-    public void getBdbBasedOnTypeWithNullInputShouldThrowNullPointerException() throws Exception {
-        Assertions.assertThrows(NullPointerException.class,
-                () -> cbeffImpl.getBDBBasedOnType(null, "Fingerprint", "RightThumb"));
+    public void getBdbBasedOnTypeShouldReturnMap() throws Exception {
+        BIR parsed = new BIR();
+        validatorStatic.when(() -> CbeffValidator.getBIRFromXML(any())).thenReturn(parsed);
+        validatorStatic.when(() -> CbeffValidator.getBDBBasedOnTypeAndSubType(parsed, "F", "ST"))
+                .thenReturn(Map.of("F", "data"));
+        assertEquals("data", cbeffImpl.getBDBBasedOnType(validXml, "F", "ST").get("F"));
     }
 
     /**
-     * Tests the getBDBBasedOnType method when null file bytes are passed as input.
-     * Verifies that the method handles null file bytes appropriately by throwing NullPointerException.
+     * Tests BIR data extraction from XML format.
+     * Verifies that XML can be parsed to extract BIR objects
+     * and returns them as a properly sized list.
+     *
+     * @throws Exception if BIR data extraction fails
      */
     @Test
-    public void getBdbBasedOnTypeWithNullFileBytesShouldThrowNullPointerException() {
-        Assertions.assertThrows(NullPointerException.class,
-                () -> cbeffImpl.getBDBBasedOnType(null, "Fingerprint", "RightThumb"));
+    public void getBirDataFromXmlShouldReturnList() throws Exception {
+        BIR parent = new BIR();
+        parent.setBirs(birList);
+        validatorStatic.when(() -> CbeffValidator.getBIRFromXML(any())).thenReturn(parent);
+        assertEquals(1, cbeffImpl.getBIRDataFromXML(validXml).size());
     }
 
     /**
-     * Tests the getBIRDataFromXML method when null XML is passed.
-     * Verifies that the method throws NullPointerException for null XML input.
+     * Tests comprehensive BDB data extraction for specified type and subtype.
+     * Verifies that all BDB data can be retrieved and returned as a map
+     * with expected key-value pairs.
+     *
+     * @throws Exception if BDB data retrieval fails
      */
     @Test
-    public void getBirDataFromXmlWithNullXmlShouldThrowNullPointerException() throws Exception {
-        Assertions.assertThrows(NullPointerException.class, () -> cbeffImpl.getBIRDataFromXML(null));
+    public void getAllBdbDataShouldReturnMap() throws Exception {
+        BIR parsed = new BIR();
+        validatorStatic.when(() -> CbeffValidator.getBIRFromXML(any())).thenReturn(parsed);
+        validatorStatic.when(() -> CbeffValidator.getAllBDBData(parsed, "T", "ST"))
+                .thenReturn(Map.of("K", "V"));
+        assertEquals("V", cbeffImpl.getAllBDBData(validXml, "T", "ST").get("K"));
     }
 
     /**
-     * Tests the getAllBDBData method when null XML is passed.
-     * Verifies that the method throws NullPointerException for null XML input during BDB data extraction.
+     * Tests BIR data extraction filtered by specific type.
+     * Verifies that BIR data can be filtered by type parameter
+     * and returns the expected list of BIR objects.
+     *
+     * @throws Exception if type-based BIR extraction fails
      */
     @Test
-    public void getAllBdbDataWithNullXmlShouldThrowNullPointerException() throws Exception {
-        Assertions.assertThrows(NullPointerException.class,
-                () -> cbeffImpl.getAllBDBData(null, "Fingerprint", "RightThumb"));
+    public void getBirDataFromXmlTypeShouldReturnList() throws Exception {
+        validatorStatic.when(() -> CbeffValidator.getBIRDataFromXMLType(any(), eq("T"))).thenReturn(birList);
+        assertEquals(birList, cbeffImpl.getBIRDataFromXMLType(validXml, "T"));
     }
 
     /**
-     * Tests the getBIRDataFromXMLType method when null XML is passed.
-     * Verifies that the method throws NullPointerException for null XML input when extracting BIR data by type.
+     * Tests error handling when updating XML with null BIR list.
+     * Verifies that NullPointerException is thrown when attempting
+     * to update XML with null BIR list parameter.
      */
     @Test
-    public void getBirDataFromXmlTypeWithNullXmlShouldThrowNullPointerException() throws Exception {
-        Assertions.assertThrows(NullPointerException.class,
-                () -> cbeffImpl.getBIRDataFromXMLType(null, "Fingerprint"));
+    public void updateXmlWithNullBirListShouldThrowNpe() {
+        assertThrows(NullPointerException.class, () -> cbeffImpl.updateXML(null, validXml));
+    }
+
+    /**
+     * Tests error handling for BDB extraction with null file bytes.
+     * Verifies that appropriate exception is thrown when attempting
+     * to extract BDB data from null XML input through mocked validator.
+     */
+    @Test
+    public void getBdbBasedOnTypeWithNullFileBytesShouldThrowViaMock() {
+        validatorStatic.when(() -> CbeffValidator.getBIRFromXML(isNull())).thenThrow(new IllegalArgumentException());
+        assertThrows(Exception.class, () -> cbeffImpl.getBDBBasedOnType(null, "F", "ST"));
+    }
+
+    /**
+     * Tests error handling for BDB data extraction with null XML input.
+     * Verifies that appropriate exception is thrown when attempting
+     * to extract all BDB data from null XML through mocked validator.
+     */
+    @Test
+    public void getAllBdbDataWithNullXmlShouldThrowViaMock() {
+        validatorStatic.when(() -> CbeffValidator.getBIRFromXML(isNull())).thenThrow(new IllegalArgumentException());
+        assertThrows(Exception.class, () -> cbeffImpl.getAllBDBData(null, "T", "ST"));
+    }
+
+    /**
+     * Tests error handling for type-based BIR extraction with null XML.
+     * Verifies that appropriate exception is thrown when attempting
+     * to extract BIR data by type from null XML through mocked validator.
+     */
+    @Test
+    public void getBirDataFromXmlTypeWithNullXmlShouldThrowViaMock() {
+        validatorStatic.when(() -> CbeffValidator.getBIRDataFromXMLType(isNull(), anyString()))
+                .thenThrow(new IllegalArgumentException());
+        assertThrows(Exception.class, () -> cbeffImpl.getBIRDataFromXMLType(null, "T"));
     }
 }

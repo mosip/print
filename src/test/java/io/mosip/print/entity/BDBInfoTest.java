@@ -10,25 +10,24 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 /**
- * Unit tests for {@link BDBInfo}
+ * Unit tests for {@link BDBInfo}.
  */
 class BDBInfoTest {
 
     /**
-     * Test default constructor and check if all fields are null or empty.
+     * Verifies default constructor creates an object with all fields unset.
      */
     @Test
-    void defaultConstructor() {
+    void verifyDefaultConstructor() {
         BDBInfo info = new BDBInfo();
-        assertNotNull(info);
         assertNull(info.getChallengeResponse());
         assertNull(info.getIndex());
         assertNull(info.getFormat());
@@ -49,12 +48,12 @@ class BDBInfoTest {
     }
 
     /**
-     * Test builder pattern and getter/setter methods for all fields.
+     * Verifies builder assigns all fields correctly.
      */
     @Test
-    void builderAndGetterSetter() {
+    void verifyBuilderPopulatesFields() {
         byte[] challengeResponse = {1, 2, 3};
-        String index = "1";
+        String index = "IDX";
         RegistryIDType format = new RegistryIDType();
         Boolean encryption = Boolean.TRUE;
         LocalDateTime now = LocalDateTime.now();
@@ -109,42 +108,39 @@ class BDBInfoTest {
     }
 
     /**
-     * Test equals() and hashCode() implementations for logical equality.
+     * Verifies equals and hashCode for multiple branches.
      */
     @Test
-    void equalsAndHashCode() {
-        BDBInfo.BDBInfoBuilder builder = new BDBInfo.BDBInfoBuilder()
-                .withIndex("10");
-
-        BDBInfo info1 = builder.build();
-        BDBInfo info2 = builder.build();
+    void verifyEqualsAndHashCode() {
+        BDBInfo info1 = new BDBInfo.BDBInfoBuilder().withIndex("IDX").build();
+        BDBInfo info2 = new BDBInfo.BDBInfoBuilder().withIndex("IDX").build();
+        BDBInfo info3 = new BDBInfo.BDBInfoBuilder().withIndex("DIFF").build();
 
         assertEquals(info1, info2);
         assertEquals(info1.hashCode(), info2.hashCode());
-
-        BDBInfo info3 = new BDBInfo.BDBInfoBuilder().withIndex("20").build();
+        assertEquals(info1, info1);
+        assertNotEquals(info1, null);
+        assertNotEquals(info1, "string");
         assertNotEquals(info1, info3);
+        assertNotEquals(info1.hashCode(), info3.hashCode());
     }
 
     /**
-     * Test toString() method for non-null and expected content.
+     * Verifies toString produces a non-empty representation.
      */
     @Test
-    void toStringMethod() {
-        BDBInfo info = new BDBInfo.BDBInfoBuilder()
-                .withIndex("123")
-                .build();
-
-        String toString = info.toString();
-        assertNotNull(toString);
-        assertTrue(toString.contains("123"));
+    void verifyToString() {
+        BDBInfo info = new BDBInfo.BDBInfoBuilder().withIndex("123").build();
+        String out = info.toString();
+        assertNotNull(out);
+        assertTrue(out.contains("123"));
     }
 
     /**
-     * Test builder when all fields are set to null.
+     * Verifies builder behaves correctly when all values are null.
      */
     @Test
-    void builderWithNullValues() {
+    void verifyBuilderWithNulls() {
         BDBInfo info = new BDBInfo.BDBInfoBuilder()
                 .withChallengeResponse(null)
                 .withIndex(null)
