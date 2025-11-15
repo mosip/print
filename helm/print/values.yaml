@@ -116,8 +116,8 @@ resources:
     cpu: 300m
     memory: 3000Mi
   requests:
-    cpu: 300m
-    memory: 3000Mi
+    cpu: 100m
+    memory: 1000Mi
 additionalResources:
   ## Specify any JAVA_OPTS string here. These typically will be specified in conjunction with above resources
   ## Example: java_opts: "-Xms500M -Xmx500M"
@@ -191,16 +191,7 @@ podAnnotations: {}
 
 ## lifecycleHooks for the  container to automate configuration before or after startup.
 ##
-lifecycleHooks:
-  preStop:
-    exec:
-      command:
-        - sh
-        - -c
-        - sleep 30
-
-## Termination grace perios : the maximum amount of time (in seconds) Kubernetes will wait for a container to gracefully shut down
-terminationGracePeriodSeconds: 60
+lifecycleHooks: {}
 ## Custom Liveness probes for
 ##
 customLivenessProbe: {}
@@ -286,8 +277,8 @@ volumePermissions:
   enabled: false
   image:
     registry: docker.io
-    repository: mosipid/os-shell
-    tag: "12-debian-12-r46"
+    repository: bitnami/bitnami-shell
+    tag: "10"
     pullPolicy: Always
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
