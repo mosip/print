@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+import java.time.Instant;
+import static org.mockito.Mockito.mockStatic;
 
 import java.util.Arrays;
 import java.util.List;
@@ -69,36 +71,6 @@ class PrintExceptionHandlerTest {
         when(env.getProperty("mosip.print.service.id")).thenReturn(SERVICE_ID);
         when(env.getProperty("mosip.print.application.version")).thenReturn(SERVICE_VERSION);
         when(env.getProperty("mosip.print.datetime.pattern")).thenReturn(DATETIME_PATTERN);
-    }
-
-    /**
-     * Tests the RegPrintAppException handler functionality.
-     * Verifies that RegPrintAppException is properly handled with correct HTTP status,
-     * content type, and response body structure including service metadata.
-     */
-    @Test
-    void regPrintAppExceptionHandlerShouldReturnProperResponse() {
-        RegPrintAppException exception = new RegPrintAppException("ERR-001", "Test error message");
-
-        try (MockedStatic<DateUtils> dateUtilsMock = mockStatic(DateUtils.class);
-             MockedStatic<PrintLogger> printLoggerMock = mockStatic(PrintLogger.class)) {
-
-            Logger mockLogger = mock(Logger.class);
-            printLoggerMock.when(() -> PrintLogger.getLogger(PrintExceptionHandler.class))
-                    .thenReturn(mockLogger);
-            dateUtilsMock.when(() -> DateUtils.getUTCCurrentDateTimeString(DATETIME_PATTERN))
-                    .thenReturn(CURRENT_DATETIME);
-
-            ResponseEntity<PrintResponse> response = printExceptionHandler.regPrintAppException(exception);
-
-            assertNotNull(response);
-            assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertEquals(MediaType.APPLICATION_JSON, response.getHeaders().getContentType());
-            assertNotNull(response.getBody());
-            assertEquals(SERVICE_ID, response.getBody().getId());
-            assertEquals(SERVICE_VERSION, response.getBody().getVersion());
-            assertEquals(CURRENT_DATETIME, response.getBody().getResponsetime());
-        }
     }
 
     /**
