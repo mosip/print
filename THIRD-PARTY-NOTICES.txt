@@ -114,7 +114,7 @@ Homepage: [https://github.com/mosip/](https://github.com/mosip/)
 
 ================================================================================
 Package: SLF4J API (org.slf4j:slf4j-api, org.slf4j:jcl-over-slf4j, org.slf4j:jul-to-slf4j)
-Version: 1.7.5 (for bridges), (not specified for API)
+Version: 2.0.13 (for bridges), (not specified for API)
 License: MIT License (Inferred from project’s official repository)
 Homepage: [http://www.slf4j.org/](http://www.slf4j.org/)
 ================================================================================
@@ -122,8 +122,8 @@ Homepage: [http://www.slf4j.org/](http://www.slf4j.org/)
 ================================================================================
 Package: H2 Database (com.h2database:h2)
 Version: (Not specified)
-License: EPL 1.0 (Inferred from project’s official repository)
-Homepage: [https://www.h2database.com/](https://www.h2database.com/)
+License: MPL 2.0 OR EPL 1.0 (dual-licensed)
+Homepage: https://www.h2database.com/
 ================================================================================
 
 ================================================================================
@@ -187,6 +187,132 @@ Package: Google Gson (com.google.code.gson:gson)
 Version: 2.10.1
 License: Apache License 2.0
 Homepage: [https://github.com/google/gson](https://github.com/google/gson)
+================================================================================
+
+================================================================================
+Package: iText 7 Core (com.itextpdf:itext7-core)
+Version: 7.1.0
+License: GNU Affero General Public License v3.0 (AGPL-3.0)
+Homepage: https://itextpdf.com/
+================================================================================
+
+================================================================================
+Package: iText HTML to PDF (com.itextpdf:html2pdf)
+Version: 2.0.0
+License: GNU Affero General Public License v3.0 (AGPL-3.0)
+Homepage: https://itextpdf.com/
+================================================================================
+
+================================================================================
+Package: iText 5 PDF Library (com.itextpdf:itextpdf)
+Version: 5.5.13.3
+License: GNU Affero General Public License v3.0 (AGPL-3.0)
+Homepage: https://itextpdf.com/
+================================================================================
+
+================================================================================
+Package: iText XML Worker (com.itextpdf.tool:xmlworker)
+Version: 5.5.13.3
+License: GNU Affero General Public License v3.0 (AGPL-3.0)
+Homepage: https://itextpdf.com/
+================================================================================
+
+================================================================================
+Package: Apache Commons IO (commons-io:commons-io)
+Version: 2.6
+License: Apache License 2.0
+Homepage: https://commons.apache.org/proper/commons-io/
+================================================================================
+
+================================================================================
+Package: Apache Commons Lang (org.apache.commons:commons-lang3)
+Version: Not specified
+License: Apache License 2.0
+Homepage: https://commons.apache.org/proper/commons-lang/
+================================================================================
+
+================================================================================
+Package: Apache Commons Codec (commons-codec:commons-codec)
+Version: 1.11
+License: Apache License 2.0
+Homepage: https://commons.apache.org/proper/commons-codec/
+================================================================================
+
+================================================================================
+Package: Apache Velocity (org.apache.velocity:velocity)
+Version: 1.7
+License: Apache License 2.0
+Homepage: https://velocity.apache.org/
+================================================================================
+
+================================================================================
+Package: Apache Velocity Tools (org.apache.velocity:velocity-tools)
+Version: 2.0
+License: Apache License 2.0
+Homepage: https://velocity.apache.org/tools/
+================================================================================
+
+================================================================================
+Package: Joda-Time (joda-time:joda-time)
+Version: 2.8.1
+License: Apache License 2.0
+Homepage: https://www.joda.org/joda-time/
+================================================================================
+
+================================================================================
+Package: ZXing Java SE (com.google.zxing:javase)
+Version: 3.4.1
+License: Apache License 2.0
+Homepage: https://github.com/zxing/zxing
+================================================================================
+
+================================================================================
+Package: Apache HttpClient (org.apache.httpcomponents:httpclient)
+Version: Not specified
+License: Apache License 2.0
+Homepage: https://hc.apache.org/
+================================================================================
+
+================================================================================
+Package: Jackson Core (com.fasterxml.jackson.core:jackson-core)
+Version: Not specified
+License: Apache License 2.0
+Homepage: https://github.com/FasterXML/jackson-core
+================================================================================
+
+================================================================================
+Package: Jackson Annotations (com.fasterxml.jackson.core:jackson-annotations)
+Version: Not specified
+License: Apache License 2.0
+Homepage: https://github.com/FasterXML/jackson-annotations
+================================================================================
+
+================================================================================
+Package: Jackson Databind (com.fasterxml.jackson.core:jackson-databind)
+Version: Not specified
+License: Apache License 2.0
+Homepage: https://github.com/FasterXML/jackson-databind
+================================================================================
+
+================================================================================
+Package: Spring Cloud Starter Config
+Version: Not specified
+License: Apache License 2.0
+Homepage: https://spring.io/projects/spring-cloud-config
+================================================================================
+
+================================================================================
+Package: Javax Activation (javax.activation:activation)
+Version: Not specified
+License: CDDL 1.0 OR GPL-2.0 with Classpath Exception
+Homepage: https://javaee.github.io/javactivation/
+================================================================================
+
+================================================================================
+Package: MOSIP VerCred Verifier (io.mosip.vercred:vcverifier)
+Version: 1.0.0
+License: Mozilla Public License 2.0
+Homepage: https://github.com/mosip/credential-service
 ================================================================================
 
 Full license texts and additional details for each of the above packages are available in the license/ directory of this repository. Please refer to those files or the original source of each package for complete legal terms and conditions.
