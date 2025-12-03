@@ -42,8 +42,8 @@ Homepage: [https://github.com/sonatype-nexus-community/central-publishing](https
 ================================================================================
 Package: Git Commit ID Maven Plugin (pl.project13.maven:git-commit-id-plugin)
 Version: 3.0.1
-License: Apache License 2.0 (Inferred from project’s official repository)
-Homepage: [https://github.com/git-commit-id/git-commit-id-maven-plugin](https://github.com/git-commit-id/git-commit-id-maven-plugin)
+License: GNU Lesser General Public License v3.0 (LGPL-3.0)
+Homepage: https://github.com/git-commit-id/git-commit-id-maven-plugin
 ================================================================================
 
 ================================================================================
@@ -141,10 +141,10 @@ Homepage: [https://projects.eclipse.org/projects/ee4j.ja](https://projects.eclip
 ================================================================================
 
 ================================================================================
-Package: Jakarta XML Bind (jakarta.xml.bind:jakarta.xml.bind-api, javax.xml.bind:jaxb-api)
+Package: Jakarta XML Bind (jakarta.xml.bind:jakarta.xml.bind-api)
 Version: (Not specified)
-License: Eclipse Public License 2.0 (Inferred from project’s official repository)
-Homepage: [https://projects.eclipse.org/projects/ee4j.jaxb/](https://projects.eclipse.org/projects/ee4j.jaxb/)
+License: BSD-3-Clause (EDL 1.0)
+Homepage: https://projects.eclipse.org/projects/ee4j.jaxb/
 ================================================================================
 
 ================================================================================
