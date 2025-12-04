@@ -336,5 +336,11 @@ License: Eclipse Distribution License 1.0 (BSD-3-Clause)
 Homepage: https://eclipse-ee4j.github.io/jaxb-ri/
 ================================================================================
 
+================================================================================
+Package: JavaBeans Activation Framework (javax.activation:activation)
+Version: (Specify version from pom.xml)
+License: CDDL 1.0 OR GPL-2.0 with Classpath Exception
+Homepage: https://javaee.github.io/javactivation/
+================================================================================
 
 Full license texts and additional details for each of the above packages are available in the license/ directory of this repository. Please refer to those files or the original source of each package for complete legal terms and conditions.
