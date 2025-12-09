@@ -1,4 +1,4 @@
-package io.mosip.print.test.controller;
+package io.mosip.print.controller;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -14,7 +14,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -22,10 +21,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import io.mosip.print.controller.Print;
 import io.mosip.print.model.EventModel;
 import io.mosip.print.service.PrintService;
-import io.mosip.print.test.TestBootApplication;
+import io.mosip.print.TestBootApplication;
 
 @RunWith(MockitoJUnitRunner.class)
 @SpringBootTest(classes = TestBootApplication.class)
