@@ -9,7 +9,7 @@ The **Print Service** is a reference implementation in MOSIP that handles the pr
 
 It operates in an event-driven flow:
 1. **Receive Event**: Listens for print request events from WebSub.
-2. **Fetch Template**: Retreives the appropriate template from Masterdata.
+2. **Fetch Template**: Retrieves the appropriate template from Masterdata.
 3. **Generate PDF**: Decrypts resident data and converts it into a PDF card using the template.
 4. **Upload**: Uploads the generated PDF to [DataShare](https://docs.mosip.io/1.2.0/modules/data-share).
 5. **Notify**: Publishes a status event with the DataShare link back to WebSub.
