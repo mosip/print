@@ -1,7 +1,7 @@
 # Print Service
 
-[![Maven Package upon a push](https://github.com/mosip/print/actions/workflows/push-trigger.yml/badge.svg?branch=release-1.3.x)](https://github.com/mosip/print/actions/workflows/push-trigger.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?branch=release-1.3.x&project=mosip_print&id=mosip_print&metric=alert_status)](https://sonarcloud.io/dashboard?branch=release-1.3.x&id=mosip_print)
+[![Maven Package upon a push](https://github.com/mosip/print/actions/workflows/push-trigger.yml/badge.svg?branch=develop)](https://github.com/mosip/print/actions/workflows/push-trigger.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?branch=develop&project=mosip_print&id=mosip_print&metric=alert_status)](https://sonarcloud.io/summary/overall?id=mosip_print&branch=develop)
 
 ## Overview
 
@@ -42,7 +42,7 @@ To deploy print service in production follow the given steps:
 
 1. Onboard your organisation as [Credential Partner](https://docs.mosip.io/1.2.0/partners).
 2. Place your `.p12` file in `../src/main/resources` folder.
-3. Set configuration as in given [here](https://github.com/mosip/mosip-config/blob/release-1.3.x/print-default.properties).
+3. Set configuration as in given [here](https://github.com/mosip/mosip-config/blob/develop/print-default.properties).
 4. Build and run as given [here](docs/build-and-run.md).
 
 ## Test
@@ -73,7 +73,7 @@ Ensure the following artifacts are available in the classpath or loader path:
 
 ### Configuration
 Print uses properties from **mosip-config**.  
-You can check the configuration here: [print-default.properties](https://github.com/mosip/mosip-config/blob/release-1.3.x/print-default.properties)
+You can check the configuration here: [print-default.properties](https://github.com/mosip/mosip-config/blob/develop/print-default.properties)
 ### Local Setup (for Development or Contribution)
 
 1. Ensure the **Config Server** is running and accessible.To run config server [check here.](https://github.com/mosip/mosip-config/blob/master/README.md)
