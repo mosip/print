@@ -1,7 +1,7 @@
 # Print Service
 
 [![Maven Package upon a push](https://github.com/mosip/print/actions/workflows/push-trigger.yml/badge.svg?branch=release-1.3.x)](https://github.com/mosip/print/actions/workflows/push-trigger.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?branch=release-1.3.x&project=mosip_admin-services&id=mosip_admin-services&metric=alert_status)](https://sonarcloud.io/dashboard?branch=release-1.3.x&id=mosip_admin-services)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?branch=release-1.3.x&project=mosip_print&id=mosip_print&metric=alert_status)](https://sonarcloud.io/dashboard?branch=release-1.3.x&id=mosip_print)
 
 ## Overview
 
@@ -65,7 +65,7 @@ Ensure the following artifacts are available in the classpath or loader path:
 
 ### Local Setup (for Development or Contribution)
 
-1. Ensure the **Config Server** is running and accessible.
+1. Ensure the **Config Server** is running and accessible.To run config server [check here.](https://github.com/mosip/mosip-config/blob/master/README.md)
 
 2. Clone the repository:
 
@@ -83,9 +83,9 @@ mvn clean install -Dmaven.javadoc.skip=true -Dgpg.skip=true
 4. Start the application:
     - Run via IDE or command line:
       ```text
-      java -jar target/print-*.jar
+      java -Dloader.path=<path-to-kernel-auth-adapter-jar> \
+      -jar target/print-*.jar
       ```
-    - **Note**: Ensure you provide the necessary VM arguments for the Config Server location and loader path for `kernel-auth-adapter.jar` if required.
 
 ### Local Setup with Docker (Easy Setup for Demos)
 
