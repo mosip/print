@@ -5,7 +5,7 @@
 
 ## Overview
 
-The **Print Service** is a reference implementation in MOSIP that handles the printing of credentials such as `euin`, `reprint`, and `qrcode` in PDF format. This service is designed to be customized and utilized by card printing agencies onboarding as [Credential Partners](https://docs.mosip.io/1.2.0/partners#credential-partner-cp).This reference implementation can be referred by any credential sharing request.
+The **Print Service** is a reference implementation in MOSIP that handles the printing of credentials such as `euin`, `reprint`, and `qrcode` [credential types](https://docs.mosip.io/1.2.0/modules/id-repository#credential-types) in PDF format. This service is designed to be customized and utilized by card printing agencies onboarding as [Credential Partners](https://docs.mosip.io/1.2.0/partners#credential-partner-cp).This reference implementation can be referred by any credential sharing request.
 
 It operates in an event-driven flow:
 1. **Receive Event**: Listens for print request events from WebSub.
