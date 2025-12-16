@@ -5,7 +5,7 @@
 
 ## Overview
 
-The **Print Service** is a reference implementation in MOSIP that handles the printing of credentials such as `euin`, `reprint`, and `qrcode` in PDF format. This service is designed to be customized and utilized by card printing agencies onboarding as [Credential Partners](https://docs.mosip.io/1.2.0/partners#credential-partner-cp).
+The **Print Service** is a reference implementation in MOSIP that handles the printing of credentials such as `euin`, `reprint`, and `qrcode` in PDF format. This service is designed to be customized and utilized by card printing agencies onboarding as [Credential Partners](https://docs.mosip.io/1.2.0/partners#credential-partner-cp).This reference implementation can be referred by any credential sharing request.
 
 It operates in an event-driven flow:
 1. **Receive Event**: Listens for print request events from WebSub.
@@ -34,6 +34,20 @@ The Print project consists of the following service:
 ## Database
 NA (The service relies on Object Store/DataShare and Masterdata; it does not maintain its own primary database).
 
+## Build and run (for developers)
+Refer [Build and Run](docs/build-and-run.md).
+
+## Deploy
+To deploy print service in production follow the given steps:
+
+1. Onboard your organisation as [Credential Partner](https://docs.mosip.io/1.2.0/partners).
+2. Place your `.p12` file in `../src/main/resources` folder.
+3. Set configuration as in given [here](https://github.com/mosip/mosip-config/blob/release-1.3.x/print-default.properties).
+4. Build and run as given [here](docs/build-and-run.md).
+
+## Test
+Automated functional tests available in [Functional Tests repo](https://github.com/mosip/mosip-functional-tests).
+
 ## Local Setup
 
 The project can be set up in two ways:
@@ -55,14 +69,11 @@ Ensure the following artifacts are available in the classpath or loader path:
 
 - `kernel-auth-adapter.jar` - For IAM authentication.
 
-### Configuration
-
-- Print Service uses configuration files from the **[mosip-config repository](https://github.com/mosip/mosip-config/tree/master)**.
-- Refer to the tagged version corresponding to your release.
-- **Partner Key**: For local development, place your partner `.p12` file in the `src/main/resources` folder to enable decryption.
-
 ## Installation
 
+### Configuration
+Print uses properties from **mosip-config**.  
+You can check the configuration here: [print-default.properties](https://github.com/mosip/mosip-config/blob/release-1.3.x/print-default.properties)
 ### Local Setup (for Development or Contribution)
 
 1. Ensure the **Config Server** is running and accessible.To run config server [check here.](https://github.com/mosip/mosip-config/blob/master/README.md)
@@ -131,11 +142,7 @@ docker ps
 
 The service runs on port `8099` by default.
 
-## Deployment
 
-### Kubernetes
-
-To deploy Print Service on a Kubernetes cluster, refer to the [Sandbox Deployment Guide](https://docs.mosip.io/1.2.0/deploymentnew/v3-installation).
 
 ## Documentation
 
