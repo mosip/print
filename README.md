@@ -16,7 +16,7 @@ It operates in an event-driven flow:
 
 The flow is visualized below:
 
-![](docs/print-service.png)
+![Print Service workflow diagram showing the event-driven process: Receive Event → Fetch Template → Generate PDF → Upload → Notify](docs/print-service.png)
 
 ## Features
 
