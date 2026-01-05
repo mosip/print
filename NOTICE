@@ -1,0 +1,108 @@
+NOTICES
+
+This project includes components licensed under various open-source licenses.
+Attributions and required notices for these components are provided below.
+
+-------------------------------------------------------------------------------
+Project Copyright
+-------------------------------------------------------------------------------
+© 2024 This project includes software developed and maintained by its contributors.
+
+-------------------------------------------------------------------------------
+MOSIP Copyright
+-------------------------------------------------------------------------------
+This project includes components from the MOSIP Platform:
+
+    © 2022 Modular Open Source Identity Platform (MOSIP)
+    All rights reserved.
+
+MOSIP components are licensed under the Mozilla Public License 2.0 (MPL-2.0).
+Original notices from MOSIP are retained as required by MPL-2.0.
+
+-------------------------------------------------------------------------------
+Apache License 2.0 – Required Notice Attribution
+-------------------------------------------------------------------------------
+This project includes software licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Portions of this software are derived from or include contributions from:
+    • Spring Boot & Spring Security
+    • SpringDoc OpenAPI
+    • Apache Maven Plugins (compiler, jar, javadoc, surefire, source,
+      war, shade, resources, antrun, gpg)
+    • Git Commit ID Maven Plugin
+    • Central Publishing Maven Plugin
+    • ModelMapper
+    • Log4j API
+    • Jackson Datatype (JSR310)
+    • Spring Batch Extensions
+    • Apache POI
+    • Google Gson
+    • PowerMock
+    • AWS Java SDK (if applicable)
+
+-------------------------------------------------------------------------------
+Mozilla Public License 2.0 – Required Notice Attribution
+-------------------------------------------------------------------------------
+This project includes components licensed under the MPL-2.0:
+
+    • MOSIP Kernel Components:
+        - kernel-bom
+        - kernel-core
+        - kernel-logger-logback
+        - kernel-auth-adapter
+        - kernel-auditmanager-api
+        - kernel-keymanager-service
+        - kernel-applicanttype-api
+        - kernel-idvalidator-rid
+        - kernel-idgenerator-machineid
+        - kernel-idgenerator-regcenterid
+        - kernel-dataaccess-hibernate
+        - kernel-openid-bridge-api
+        - kernel-datamapper-orika
+        - kernel-cbeffutil-api
+        - kernel-websubclient-api
+
+These components are governed by the MPL-2.0 terms:
+    https://www.mozilla.org/MPL/2.0/
+
+-------------------------------------------------------------------------------
+BSD License Attribution (BSD-2-Clause / BSD-3-Clause)
+-------------------------------------------------------------------------------
+This project includes components licensed under BSD licenses:
+
+    • PostgreSQL JDBC Driver (BSD-2-Clause)
+    • Jakarta Activation API (BSD-3-Clause)
+    • Jakarta Persistence API (BSD-3-Clause)
+    • Additional transitive BSD-licensed components
+
+-------------------------------------------------------------------------------
+Eclipse Public License Attribution (EPL-2.0)
+-------------------------------------------------------------------------------
+The following components are licensed under EPL:
+
+    • JUnit (EPL-2.0)
+    • JUnit Vintage Engine (EPL-2.0)
+    • JaCoCo Maven Plugin (EPL-2.0)
+    • Jakarta XML Bind API (EPL-2.0)
+  
+
+-------------------------------------------------------------------------------
+MIT License Attribution
+-------------------------------------------------------------------------------
+This project includes MIT-licensed software:
+
+    • SLF4J (slf4j-api, jcl-over-slf4j, jul-to-slf4j)
+    • Mockito (mockito-core, mockito-inline)
+    • Bouncy Castle (bcutil-jdk18on)
+
+-------------------------------------------------------------------------------
+Additional Notes
+-------------------------------------------------------------------------------
+Some components may include their own NOTICE files. Where applicable, those
+notices have been preserved as required.
+
+Full license texts for each dependency are available in the `license/`
+directory of this repository.
