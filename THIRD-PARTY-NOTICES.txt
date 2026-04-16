@@ -1,0 +1,332 @@
+THIRD-PARTY-NOTICES
+
+This project includes third-party packages that are distributed under various open-source licenses. Below is a list of packages and their associated licenses.
+
+================================================================================
+Package: Spring Boot & Spring Security
+(Starter Cache, Starter Security, Starter Validation, Starter Data JPA, Starter Web, Starter Batch, Starter Test, Configuration Processor, Spring Boot Maven Plugin)
+Version: 3.2.3 (most packages) or 3.x family
+License: Apache License 2.0
+Homepage: [https://spring.io/projects/spring-boot](https://spring.io/projects/spring-boot)
+================================================================================
+
+================================================================================
+Package: SpringDoc OpenAPI
+(SpringDoc OpenAPI Maven Plugin, SpringDoc OpenAPI Starter WebMVC UI)
+Version: 0.2, 1.3, 1.4, 2.5.0
+License: Apache License 2.0 (Inferred from project’s official repository)
+Homepage: [https://springdoc.org](https://springdoc.org)
+================================================================================
+
+================================================================================
+Package: PostgreSQL JDBC Driver (org.postgresql:postgresql)
+Version: 42.2.2, 42.7.2
+License: BSD-2-Clause (Inferred from project’s official repository)
+Homepage: [https://jdbc.postgresql.org/](https://jdbc.postgresql.org/)
+================================================================================
+
+================================================================================
+Package: JSON Simple (com.googlecode.json-simple:json-simple)
+Version: (Not specified)
+License: Apache License 2.0 (Inferred from project’s official repository)
+Homepage: [https://code.google.com/archive/p/json-simple/](https://code.google.com/archive/p/json-simple/)
+================================================================================
+
+================================================================================
+Package: Apache Maven Plugins
+(maven-resources-plugin, maven-shade-plugin, maven-surefire-plugin, maven-gpg-plugin,
+maven-javadoc-plugin, maven-source-plugin, maven-jar-plugin, maven-war-plugin, maven-compiler-plugin,
+maven-antrun-plugin)
+Version:
+  - maven-resources-plugin: 3.3.1
+  - maven-shade-plugin: 3.2.4
+  - maven-surefire-plugin: 2.22.0
+  - maven-gpg-plugin: 1.5
+  - maven-javadoc-plugin: 3.2.0, 3.6.3
+  - maven-source-plugin: 2.2.1
+  - maven-jar-plugin: 3.0.2
+  - maven-war-plugin: 3.1.0
+  - maven-compiler-plugin: 3.8.0
+  - maven-antrun-plugin: 3.0.0
+License: Apache License 2.0
+Homepage: [https://maven.apache.org/plugins/](https://maven.apache.org/plugins/)
+================================================================================
+
+================================================================================
+Package: JUnit (junit:junit, org.junit.vintage:junit-vintage-engine)
+Version: 4.12 (JUnit), (not specified for vintage)
+License: Eclipse Public License 1.0/2.0 (Inferred from project’s official repository)
+Homepage: [https://junit.org/junit4/](https://junit.org/junit4/)
+================================================================================
+
+================================================================================
+Package: JaCoCo Maven Plugin (org.jacoco:jacoco-maven-plugin)
+Version: 0.8.11
+License: Eclipse Public License 2.0
+Homepage: [https://www.eclemma.org/jacoco/](https://www.eclemma.org/jacoco/)
+================================================================================
+
+================================================================================
+Package: ModelMapper (org.modelmapper:modelmapper)
+Version: (Not specified)
+License: Apache License 2.0
+Homepage: [http://modelmapper.org/](http://modelmapper.org/)
+================================================================================
+
+================================================================================
+Package: Log4j API (org.apache.logging.log4j:log4j-api)
+Version: (Not specified)
+License: Apache License 2.0
+Homepage: [https://logging.apache.org/log4j/2.x/](https://logging.apache.org/log4j/2.x/)
+================================================================================
+
+================================================================================
+Package: Jackson (com.fasterxml.jackson.datatype:jackson-datatype-jsr310)
+Version: (Not specified)
+License: Apache License 2.0
+Homepage: [https://github.com/FasterXML/jackson-datatype-jsr310](https://github.com/FasterXML/jackson-datatype-jsr310)
+================================================================================
+
+================================================================================
+Package: MOSIP Kernel
+(kernel-bom, kernel-core, kernel-logger-logback, kernel-auth-adapter, kernel-auditmanager-api,
+kernel-keymanager-service, kernel-applicanttype-api, kernel-idvalidator-rid, kernel-idgenerator-machineid,
+kernel-idgenerator-regcenterid, kernel-dataaccess-hibernate, kernel-openid-bridge-api,
+kernel-datamapper-orika, kernel-cbeffutil-api, kernel-websubclient-api)
+Version: 1.3.0-SNAPSHOT
+License: Mozilla Public License 2.0 (Inferred from project’s official repository)
+Homepage: [https://github.com/mosip/](https://github.com/mosip/)
+================================================================================
+
+================================================================================
+Package: SLF4J API (org.slf4j:slf4j-api, org.slf4j:jcl-over-slf4j, org.slf4j:jul-to-slf4j)
+Version: 2.0.13 (for bridges), (not specified for API)
+License: MIT License (Inferred from project’s official repository)
+Homepage: [http://www.slf4j.org/](http://www.slf4j.org/)
+================================================================================
+
+================================================================================
+Package: H2 Database (com.h2database:h2)
+Version: (Not specified)
+License: MPL 2.0 OR EPL 1.0 (dual-licensed)
+Homepage: https://www.h2database.com/
+================================================================================
+
+================================================================================
+Package: Jakarta Activation (jakarta.activation:jakarta.activation-api)
+Version: 2.1.3
+License: BSD-3-Clause (Inferred from project’s official repository)
+Homepage: [https://github.com/eclipse-ee4j/jaf](https://github.com/eclipse-ee4j/jaf)
+================================================================================
+
+================================================================================
+Package: Jakarta Persistence (jakarta.persistence:jakarta.persistence-api)
+Version: 3.1.0
+License: BSD-3-Clause OR EPL-2.0 (Inferred from project’s official repository)
+Homepage: [https://projects.eclipse.org/projects/ee4j.ja](https://projects.eclipse.org/projects/ee4j.ja)
+================================================================================
+
+================================================================================
+Package: Jakarta XML Bind (jakarta.xml.bind:jakarta.xml.bind-api)
+Version: (Not specified)
+License: BSD-3-Clause (EDL 1.0)
+Homepage: https://projects.eclipse.org/projects/ee4j.jaxb/
+================================================================================
+
+================================================================================
+Package: Spring Batch Extensions (org.springframework.batch.extensions:spring-batch-excel)
+Version: 0.1.0
+License: Apache License 2.0 (Inferred from project’s official repository)
+Homepage: [https://github.com/kulmam92/spring-batch-excel](https://github.com/kulmam92/spring-batch-excel)
+================================================================================
+
+================================================================================
+Package: Mockito (org.mockito:mockito-core, org.mockito:mockito-inline)
+Version: 3.11.2, 5.2.0
+License: MIT License (Inferred from project’s official repository)
+Homepage: [https://site.mockito.org/](https://site.mockito.org/)
+================================================================================
+
+================================================================================
+Package: Powermock (org.powermock:powermock-api-mockito2, org.powermock:powermock-module-junit4)
+Version: (Not specified)
+License: Apache License 2.0 (Inferred from project’s official repository)
+Homepage: [https://github.com/powermock/powermock](https://github.com/powermock/powermock)
+================================================================================
+
+================================================================================
+Package: Bouncy Castle (org.bouncycastle:bcprov-jdk15on, org.bouncycastle:bcpkix-jdk15on)
+Version: 1.66
+License: MIT License
+Homepage: https://www.bouncycastle.org/
+================================================================================
+
+================================================================================
+Package: Apache POI (org.apache.poi:poi-ooxml)
+Version: 5.2.5
+License: Apache License 2.0
+Homepage: [https://poi.apache.org/](https://poi.apache.org/)
+================================================================================
+
+================================================================================
+Package: Google Gson (com.google.code.gson:gson)
+Version: 2.10.1
+License: Apache License 2.0
+Homepage: [https://github.com/google/gson](https://github.com/google/gson)
+================================================================================
+
+================================================================================
+Package: iText 7 Core (com.itextpdf:itext7-core)
+Version: 7.1.0
+License: GNU Affero General Public License v3.0 (AGPL-3.0)
+Homepage: https://itextpdf.com/
+================================================================================
+
+================================================================================
+Package: iText HTML to PDF (com.itextpdf:html2pdf)
+Version: 2.0.0
+License: GNU Affero General Public License v3.0 (AGPL-3.0)
+Homepage: https://itextpdf.com/
+================================================================================
+
+================================================================================
+Package: iText 5 PDF Library (com.itextpdf:itextpdf)
+Version: 5.5.13.3
+License: GNU Affero General Public License v3.0 (AGPL-3.0)
+Homepage: https://itextpdf.com/
+================================================================================
+
+================================================================================
+Package: iText XML Worker (com.itextpdf.tool:xmlworker)
+Version: 5.5.13.3
+License: GNU Affero General Public License v3.0 (AGPL-3.0)
+Homepage: https://itextpdf.com/
+================================================================================
+
+================================================================================
+Package: Apache Commons IO (commons-io:commons-io)
+Version: 2.6
+License: Apache License 2.0
+Homepage: https://commons.apache.org/proper/commons-io/
+================================================================================
+
+================================================================================
+Package: Apache Commons Lang (org.apache.commons:commons-lang3)
+Version: Not specified
+License: Apache License 2.0
+Homepage: https://commons.apache.org/proper/commons-lang/
+================================================================================
+
+================================================================================
+Package: Apache Commons Codec (commons-codec:commons-codec)
+Version: 1.11
+License: Apache License 2.0
+Homepage: https://commons.apache.org/proper/commons-codec/
+================================================================================
+
+================================================================================
+Package: Apache Velocity (org.apache.velocity:velocity)
+Version: 1.7
+License: Apache License 2.0
+Homepage: https://velocity.apache.org/
+================================================================================
+
+================================================================================
+Package: Apache Velocity Tools (org.apache.velocity:velocity-tools)
+Version: 2.0
+License: Apache License 2.0
+Homepage: https://velocity.apache.org/tools/
+================================================================================
+
+================================================================================
+Package: Joda-Time (joda-time:joda-time)
+Version: 2.8.1
+License: Apache License 2.0
+Homepage: https://www.joda.org/joda-time/
+================================================================================
+
+================================================================================
+Package: ZXing Java SE (com.google.zxing:javase)
+Version: 3.4.1
+License: Apache License 2.0
+Homepage: https://github.com/zxing/zxing
+================================================================================
+
+================================================================================
+Package: Apache HttpClient (org.apache.httpcomponents:httpclient)
+Version: Not specified
+License: Apache License 2.0
+Homepage: https://hc.apache.org/
+================================================================================
+
+================================================================================
+Package: Jackson Core (com.fasterxml.jackson.core:jackson-core)
+Version: Not specified
+License: Apache License 2.0
+Homepage: https://github.com/FasterXML/jackson-core
+================================================================================
+
+================================================================================
+Package: Jackson Annotations (com.fasterxml.jackson.core:jackson-annotations)
+Version: Not specified
+License: Apache License 2.0
+Homepage: https://github.com/FasterXML/jackson-annotations
+================================================================================
+
+================================================================================
+Package: Jackson Databind (com.fasterxml.jackson.core:jackson-databind)
+Version: Not specified
+License: Apache License 2.0
+Homepage: https://github.com/FasterXML/jackson-databind
+================================================================================
+
+================================================================================
+Package: Spring Cloud Starter Config
+Version: Not specified
+License: Apache License 2.0
+Homepage: https://spring.io/projects/spring-cloud-config
+================================================================================
+
+================================================================================
+Package: JAXB API (javax.xml.bind:jaxb-api)
+Version: (Specify version from pom.xml)
+License: CDDL 1.1 OR GPL-2.0 with Classpath Exception
+Homepage: https://javaee.github.io/jaxb-v2/
+================================================================================
+
+================================================================================
+Package: MOSIP VerCred Verifier (io.mosip.vercred:vcverifier)
+Version: 1.0.0
+License: Mozilla Public License 2.0
+Homepage: https://github.com/mosip/credential-service
+================================================================================
+
+================================================================================
+Package: JSON in Java (org.json:json)
+Version: (Specify version from pom.xml)
+License: JSON License ("shall be used for Good, not Evil")
+Homepage: https://github.com/stleary/JSON-java
+================================================================================
+
+================================================================================
+Package: Project Lombok (org.projectlombok:lombok)
+Version: (Specify version from pom.xml)
+License: MIT License
+Homepage: https://projectlombok.org/
+================================================================================
+
+================================================================================
+Package: Glassfish JAXB Runtime (org.glassfish.jaxb:jaxb-runtime)
+Version: (Specify version from pom.xml)
+License: Eclipse Distribution License 1.0 (BSD-3-Clause)
+Homepage: https://eclipse-ee4j.github.io/jaxb-ri/
+================================================================================
+
+================================================================================
+Package: JavaBeans Activation Framework (javax.activation:activation)
+Version: (Specify version from pom.xml)
+License: CDDL 1.0 OR GPL-2.0 with Classpath Exception
+Homepage: https://javaee.github.io/javactivation/
+================================================================================
+
+Full license texts and additional details for each of the above packages are available in the license/ directory of this repository. Please refer to those files or the original source of each package for complete legal terms and conditions.
