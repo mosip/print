@@ -64,7 +64,7 @@
 		<central.publishing.maven.plugin.version>0.7.0</central.publishing.maven.plugin.version>
 
 		<!-- Versions for testing dependencies -->
-		<mockito.inline.version>4.11.0</mockito.inline.version>
+		<mockito.version>4.11.0</mockito.version>
 		<junit.jupiter.version>5.10.2</junit.jupiter.version>
 
 		<!-- sonar exclusions -->
@@ -73,6 +73,19 @@
 	</properties>
 	<dependencyManagement>
 		<dependencies>
+			<!-- Override kernel-bom's mockito-core:3.4.3 to match mockito-inline:4.11.0 -->
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>${mockito.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-junit-jupiter</artifactId>
+				<version>${mockito.version}</version>
+				<scope>test</scope>
+			</dependency>
 			<dependency>
 				<groupId>io.mosip.kernel</groupId>
 				<artifactId>kernel-bom</artifactId>
@@ -278,7 +291,7 @@
         <dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-inline</artifactId>
-			<version>${mockito.inline.version}</version>
+			<version>${mockito.version}</version>
 			<scope>test</scope>
 		</dependency>
     </dependencies>
