@@ -238,7 +238,7 @@ Do not modify `CryptoUtil.java` without understanding the P12 key usage. The par
 - JaCoCo generates a coverage report under `target/site/jacoco/`.
 
 ### Docker image
-The `Dockerfile` copies the built JAR and runs it. The image is published to Docker Hub as `mosipid/print-service`. The current version under development is `1.4.0-SNAPSHOT`.
+The `Dockerfile` copies the built JAR and runs it. The image is published to Docker Hub as `mosipid/print-service`.
 
 ---
 
