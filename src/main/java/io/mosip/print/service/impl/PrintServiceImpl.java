@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import io.mosip.kernel.core.util.DateUtils2;
 import io.mosip.vercred.CredentialsVerifier;
 import io.mosip.vercred.exception.ProofDocumentNotFoundException;
 import io.mosip.vercred.exception.ProofTypeNotFoundException;
@@ -91,13 +92,11 @@ import io.mosip.print.util.CbeffToBiometricUtil;
 import io.mosip.print.util.CryptoCoreUtil;
 import io.mosip.print.util.CryptoUtil;
 import io.mosip.print.util.DataShareUtil;
-import io.mosip.print.util.DateUtils;
 import io.mosip.print.util.JsonUtil;
 import io.mosip.print.util.RestApiClient;
 import io.mosip.print.util.TemplateGenerator;
 import io.mosip.print.util.Utilities;
 import io.mosip.print.util.WebSubSubscriptionHelper;
-import io.mosip.vercred.CredentialsVerifier;
 
 @Service
 public class PrintServiceImpl implements PrintService {
@@ -774,7 +773,7 @@ public class PrintServiceImpl implements PrintService {
     private void printStatusUpdate(String requestId, String status, String datashareUrl) {
 
         CredentialStatusEvent creEvent = new CredentialStatusEvent();
-        LocalDateTime currentDtime = DateUtils.getUTCCurrentDateTime();
+        LocalDateTime currentDtime = DateUtils2.getUTCCurrentDateTime();
         StatusEvent sEvent = new StatusEvent();
         sEvent.setId(UUID.randomUUID().toString());
         sEvent.setRequestId(requestId);

@@ -75,19 +75,19 @@ This project includes components licensed under BSD licenses:
 
     • PostgreSQL JDBC Driver (BSD-2-Clause)
     • Jakarta Activation API (BSD-3-Clause)
-    • Jakarta Persistence API (BSD-3-Clause)
+    • Jakarta Persistence API (BSD-3-Clause or EPL-2.0)
     • Additional transitive BSD-licensed components
 
 -------------------------------------------------------------------------------
-Eclipse Public License Attribution (EPL-2.0)
+Eclipse Public License Attribution (EPL-1.0 / EPL-2.0)
 -------------------------------------------------------------------------------
 The following components are licensed under EPL:
 
-    • JUnit (EPL-2.0)
+    • JUnit (EPL-1.0 / EPL-2.0)
     • JUnit Vintage Engine (EPL-2.0)
     • JaCoCo Maven Plugin (EPL-2.0)
     • Jakarta XML Bind API (EPL-2.0)
-  
+    • H2 Database (dual-licensed EPL-1.0 / MPL-2.0)
 
 -------------------------------------------------------------------------------
 MIT License Attribution

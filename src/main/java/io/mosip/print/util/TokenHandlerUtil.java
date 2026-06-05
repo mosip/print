@@ -3,6 +3,7 @@ package io.mosip.print.util;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import io.mosip.kernel.core.util.DateUtils2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,12 +43,12 @@ public class TokenHandlerUtil {
 		try {
 			DecodedJWT decodedJWT = JWT.decode(accessToken);
 			Map<String, Claim> claims = decodedJWT.getClaims();
-			LocalDateTime expiryTime = DateUtils
-					.convertUTCToLocalDateTime(DateUtils.getUTCTimeFromDate(decodedJWT.getExpiresAt()));
+			LocalDateTime expiryTime = DateUtils2
+					.convertUTCToLocalDateTime(DateUtils2.getUTCTimeFromDate(decodedJWT.getExpiresAt()));
 
 			if (!decodedJWT.getIssuer().equals(issuerUrl)) {
 				return false;
-			} else if (!DateUtils.before(DateUtils.getUTCCurrentDateTime(), expiryTime)) {
+			} else if (!DateUtils2.before(DateUtils2.getUTCCurrentDateTime(), expiryTime)) {
 				return false;
 			} else if (!claims.get("clientId").asString().equals(clientId)) {
 				return false;

@@ -3,6 +3,7 @@ package io.mosip.print.util;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import io.mosip.kernel.core.util.DateUtils2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +70,7 @@ public class AuditLogRequestBuilder {
 		ResponseWrapper<AuditResponseDto> responseWrapper = new ResponseWrapper<>();
 		try {
 			auditRequestDto.setDescription(description);
-			auditRequestDto.setActionTimeStamp(DateUtils.getUTCCurrentDateTimeString());
+			auditRequestDto.setActionTimeStamp(DateUtils2.getUTCCurrentDateTimeString());
 			auditRequestDto.setApplicationId(AuditLogConstant.MOSIP_4.toString());
 			auditRequestDto.setApplicationName(AuditLogConstant.REGISTRATION_PROCESSOR.toString());
 			auditRequestDto.setCreatedBy(AuditLogConstant.SYSTEM.toString());
@@ -89,7 +90,7 @@ public class AuditLogRequestBuilder {
 			requestWrapper.setRequest(auditRequestDto);
 			DateTimeFormatter format = DateTimeFormatter.ofPattern(env.getProperty(DATETIME_PATTERN));
 			LocalDateTime localdatetime = LocalDateTime
-					.parse(DateUtils.getUTCCurrentDateTimeString(env.getProperty(DATETIME_PATTERN)), format);
+					.parse(DateUtils2.getUTCCurrentDateTimeString(env.getProperty(DATETIME_PATTERN)), format);
 			requestWrapper.setRequesttime(localdatetime);
 			requestWrapper.setVersion(env.getProperty(REG_PROC_APPLICATION_VERSION));
 			responseWrapper = (ResponseWrapper<AuditResponseDto>) registrationProcessorRestService.postApi(apiname, "",
@@ -123,7 +124,7 @@ public class AuditLogRequestBuilder {
 
 			auditRequestDto = new AuditRequestDto();
 			auditRequestDto.setDescription(description);
-			auditRequestDto.setActionTimeStamp(DateUtils.getUTCCurrentDateTimeString());
+			auditRequestDto.setActionTimeStamp(DateUtils2.getUTCCurrentDateTimeString());
 			auditRequestDto.setApplicationId(AuditLogConstant.MOSIP_4.toString());
 			auditRequestDto.setApplicationName(AuditLogConstant.REGISTRATION_PROCESSOR.toString());
 			auditRequestDto.setCreatedBy(AuditLogConstant.SYSTEM.toString());
@@ -143,7 +144,7 @@ public class AuditLogRequestBuilder {
 			requestWrapper.setRequest(auditRequestDto);
 			DateTimeFormatter format = DateTimeFormatter.ofPattern(env.getProperty(DATETIME_PATTERN));
 			LocalDateTime localdatetime = LocalDateTime
-					.parse(DateUtils.getUTCCurrentDateTimeString(env.getProperty(DATETIME_PATTERN)), format);
+					.parse(DateUtils2.getUTCCurrentDateTimeString(env.getProperty(DATETIME_PATTERN)), format);
 			requestWrapper.setRequesttime(localdatetime);
 			requestWrapper.setVersion(env.getProperty(REG_PROC_APPLICATION_VERSION));
 			responseWrapper = (ResponseWrapper<AuditResponseDto>) registrationProcessorRestService
