@@ -29,6 +29,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
+import io.mosip.kernel.core.util.DateUtils2;
 import io.mosip.print.dto.PrintResponse;
 import io.mosip.print.exception.AccessDeniedException;
 import io.mosip.print.exception.InvalidTokenException;
@@ -58,7 +59,7 @@ class PrintExceptionHandlerTest {
     private static final String SERVICE_ID = "mosip.print.service";
     private static final String SERVICE_VERSION = "1.0";
     private static final String DATETIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-    private static final String CURRENT_DATETIME = "2025-08-03T10:00:00.000Z";
+    private static final String CURRENT_DATETIME = "2026-06-05T11:19:48.774Z";
 
     /**
      * Sets up test fixtures before each test method execution.
@@ -80,13 +81,13 @@ class PrintExceptionHandlerTest {
     void regPrintAppExceptionHandlerShouldReturnProperResponse() {
         RegPrintAppException exception = new RegPrintAppException("ERR-001", "Test error message");
 
-        try (MockedStatic<DateUtils> dateUtilsMock = mockStatic(DateUtils.class);
+        try (MockedStatic<DateUtils2> dateUtilsMock = mockStatic(DateUtils2.class);
              MockedStatic<PrintLogger> printLoggerMock = mockStatic(PrintLogger.class)) {
 
             Logger mockLogger = mock(Logger.class);
             printLoggerMock.when(() -> PrintLogger.getLogger(PrintExceptionHandler.class))
                     .thenReturn(mockLogger);
-            dateUtilsMock.when(() -> DateUtils.getUTCCurrentDateTimeString(DATETIME_PATTERN))
+            dateUtilsMock.when(() -> DateUtils2.getUTCCurrentDateTimeString(DATETIME_PATTERN))
                     .thenReturn(CURRENT_DATETIME);
 
             ResponseEntity<PrintResponse> response = printExceptionHandler.regPrintAppException(exception);
