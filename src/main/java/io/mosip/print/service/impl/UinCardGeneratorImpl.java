@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import io.mosip.kernel.core.util.DateUtils2;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,6 @@ import io.mosip.print.logger.PrintLogger;
 import io.mosip.print.service.PrintRestClientService;
 import io.mosip.print.service.UinCardGenerator;
 import io.mosip.print.spi.PDFGenerator;
-import io.mosip.print.util.DateUtils;
 import io.mosip.print.util.RestApiClient;
 
 /**
@@ -99,9 +99,9 @@ public class UinCardGeneratorImpl implements UinCardGenerator<byte[]> {
 			request.setData(Base64.encodeBase64String(out.toByteArray()));
 		  	DateTimeFormatter format = DateTimeFormatter.ofPattern(env.getProperty(DATETIME_PATTERN));
 			LocalDateTime localdatetime = LocalDateTime
-					.parse(DateUtils.getUTCCurrentDateTimeString(env.getProperty(DATETIME_PATTERN)), format);
+					.parse(DateUtils2.getUTCCurrentDateTimeString(env.getProperty(DATETIME_PATTERN)), format);
 
-		  	request.setTimeStamp(DateUtils.getUTCCurrentDateTimeString());
+		  	request.setTimeStamp(DateUtils2.getUTCCurrentDateTimeString());
 			RequestWrapper<PDFSignatureRequestDto> requestWrapper = new RequestWrapper<>();
 
 			requestWrapper.setRequest(request);

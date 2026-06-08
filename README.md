@@ -42,7 +42,7 @@ To deploy print service in production follow the given steps:
 
 1. Onboard your organisation as [Credential Partner](https://docs.mosip.io/1.2.0/partners).
 2. Place your `.p12` file in `../src/main/resources` folder.
-3. Set configuration as in given [here](https://github.com/mosip/mosip-config/blob/develop/print-default.properties).
+3. Set configuration as in given [here](https://github.com/mosip/mosip-config/blob/master/print-default.properties).
 4. Build and run as given [here](docs/build-and-run.md).
 
 ## Test
@@ -73,7 +73,7 @@ Ensure the following artifacts are available in the classpath or loader path:
 
 ### Configuration
 Print uses properties from **mosip-config**.  
-You can check the configuration here: [print-default.properties](https://github.com/mosip/mosip-config/blob/develop/print-default.properties)
+You can check the configuration here: [print-default.properties](https://github.com/mosip/mosip-config/blob/master/print-default.properties)
 ### Local Setup (for Development or Contribution)
 
 1. Ensure the **Config Server** is running and accessible.To run config server [check here.](https://github.com/mosip/mosip-config/blob/master/README.md)

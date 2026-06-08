@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import io.mosip.kernel.core.util.DateUtils2;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -167,7 +168,7 @@ public class PrintExceptionHandler {
 					.collect(Collectors.toList());
 			response.setErrors(errors);
 		}
-		response.setResponsetime(DateUtils.getUTCCurrentDateTimeString(env.getProperty(DATETIME_PATTERN)));
+		response.setResponsetime(DateUtils2.getUTCCurrentDateTimeString(env.getProperty(DATETIME_PATTERN)));
 		response.setVersion(env.getProperty(REG_PRINT_SERVICE_VERSION));
 
 		return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response);
