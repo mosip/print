@@ -20,18 +20,18 @@ The service is a **reference implementation** for credential partner onboarding.
 
 ## Technology Stack
 
-| Layer | Technology |
-|---|---|
-| Language | Java 21 |
-| Framework | Spring Boot 3.2.3 + Spring Cloud Config |
-| Build | Maven 3.9.6 |
-| PDF generation | iText 7 (html2pdf 2.0.0) + iText 5 (legacy) |
-| Template engine | Apache Velocity 1.7 |
-| QR codes | ZXing (Google) 3.4.1 |
-| Cryptography | BouncyCastle 1.66, JWT 3.8.1 |
-| Messaging | MOSIP WebSub (kernel-websub-client-api) |
-| Biometrics | CBEFF format via kernel-cbeffutil |
-| Tests | JUnit 5, Mockito 4.11.0, JaCoCo |
+| Layer | Technology                                 |
+|---|--------------------------------------------|
+| Language | Java 21                                    |
+| Framework | Spring Boot 3.2.3 + Spring Cloud Config    |
+| Build | Maven 3.9.6                                |
+| PDF generation | pdfbox 
+| Template engine | Apache Velocity 1.7                        |
+| QR codes | ZXing (Google) 3.4.1                       |
+| Cryptography | BouncyCastle 1.66, JWT 3.8.1               |
+| Messaging | MOSIP WebSub (kernel-websub-client-api)    |
+| Biometrics | CBEFF format via kernel-cbeffutil          |
+| Tests | JUnit 5, Mockito 4.11.0, JaCoCo            |
 | Containerisation | Docker (Alpine-based), Helm for Kubernetes |
 
 ---
@@ -181,7 +181,7 @@ PrintServiceImpl.java
     ├── KeyManager / CryptoUtil        — decrypt credential data
     ├── Masterdata (TEMPLATES)         — fetch HTML template
     ├── TemplateManagerImpl            — merge template + data (Velocity)
-    ├── PDFGeneratorImpl               — HTML → PDF (iText)
+    ├── PDFGeneratorImpl               — HTML → PDF (PDF Box)
     ├── QrcodeGeneratorImpl            — embed QR code (ZXing)
     ├── DigitalSignatureUtility        — sign PDF (Keymanager PDFSIGN)
     ├── DataShareUtil                  — upload PDF (DataShare)
