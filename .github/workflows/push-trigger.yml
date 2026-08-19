@@ -23,7 +23,7 @@ on:
 
 jobs:
   build-maven-print:
-    uses: mosip/kattu/.github/workflows/maven-build.yml@v0.0.1
+    uses: Mohanraj209/kattu/.github/workflows/maven-build.yml@main
     with:
       SERVICE_LOCATION: ./
       BUILD_ARTIFACT: print-service
