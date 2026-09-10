@@ -107,7 +107,7 @@ jobs:
   sonar_analysis:
     needs: build-maven-print
     if: "${{  github.event_name != 'pull_request' }}"
-    uses: mosip/kattu/.github/workflows/maven-sonar-analysis.yml@master-java21
+    uses: mosip/rajapandi1234/.github/workflows/maven-sonar-analysis.yml@patch-9
     with:
       SERVICE_LOCATION: ./
     secrets:
